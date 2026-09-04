@@ -1,0 +1,12 @@
+{
+  "name": "ai-buddy-shared",
+  "version": "1.0.0",
+  "description": "AI Buddy — shared schemas and utilities used by both server and client",
+  "private": true,
+  "main": "index.js",
+  "scripts": {},
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {}
+}

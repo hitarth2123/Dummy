@@ -1,0 +1,24 @@
+{
+  "name": "ai-buddy-root",
+  "version": "1.0.0",
+  "description": "AI Buddy monorepo root — workspace orchestration only",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "concurrently --names SERVER,CLIENT --prefix-colors cyan,magenta \"npm run dev --workspace=server\" \"npm run dev --workspace=client\"",
+    "dev:server": "npm run dev --workspace=server",
+    "dev:client": "npm run dev --workspace=client",
+    "install:all": "npm install",
+    "validate:env": "node scripts/validateEnv.js",
+    "test:schemas": "npm run test:schemas --workspace=server",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
+
