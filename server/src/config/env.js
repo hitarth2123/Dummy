@@ -46,10 +46,12 @@ const envSchema = z.object({
 
   // ── LLM ───────────────────────────────────────────────────────────────────
   LLM_PROVIDER: z
-    .enum(['openai', 'gemini', 'ollama'])
+    .enum(['openai', 'gemini', 'ollama', 'custom', 'puter', 'deepseek'])
     .default('openai'),
   OPENAI_API_KEY: z.string().optional(),
   GEMINI_API_KEY: z.string().optional(),
+  DEEPSEEK_API_KEY: z.string().optional(),
+  DEEPSEEK_BASE_URL: z.string().url().optional(),
   LLM_MODEL: z.string().default('gpt-4o-mini'),
 
   // ── Vector DB ─────────────────────────────────────────────────────────────
