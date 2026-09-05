@@ -9,6 +9,7 @@ jest.mock('@heyputer/puter.js/src/init.cjs', () => ({
 }), { virtual: true });
 
 const { chatDeepSeek, chatPuter, chat } = require('../src/services/llm.service');
+const { createGeminiClient, completeWithFallback } = require('../src/config/llm');
 
 describe('LLM Service', () => {
   const originalEnv = process.env;
@@ -105,5 +106,29 @@ describe('LLM Service', () => {
     process.env.LLM_PROVIDER = 'puter';
     const res = await chat('What is AI?');
     expect(res).toBe('Puter Gemini answer');
+  });
+
+  test('falls back from Gemini 429 to Groq', async () => {
+    process.env.GEMINI_API_KEY = 'gemini-test-key';
+    process.env.GROQ_API_KEY = 'groq-test-key';
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce({ ok: false, status: 429 })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: jest.fn().mockResolvedValue({ choices: [{ message: { content: '{"answer":"groq"}' } }] }),
+      });
+
+    const result = await completeWithFallback([{ role: 'user', content: 'test' }]);
+
+    expect(result).toBe('{"answer":"groq"}');
+    expect(global.fetch).toHaveBeenNthCalledWith(2,
+      'https://api.groq.com/openai/v1/chat/completions',
+      expect.objectContaining({ headers: expect.objectContaining({ Authorization: 'Bearer groq-test-key' }) })
+    );
+  });
+
+  test('fails clearly when a provider key is missing', () => {
+    delete process.env.GEMINI_API_KEY;
+    expect(() => createGeminiClient()).toThrow('GEMINI_API_KEY is not configured');
   });
 });

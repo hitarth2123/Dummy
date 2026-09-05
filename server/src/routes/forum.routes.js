@@ -1,8 +1,9 @@
 const router = require('express').Router();
 const { protect } = require('../middleware/auth.middleware');
+const { restrictTo } = require('../middleware/rbac.middleware');
 const { deptScope } = require('../middleware/deptScope.middleware');
 
-router.use(protect, deptScope);
+router.use(protect, restrictTo('student', 'faculty', 'hod', 'admin'), deptScope);
 
 router.get('/',        (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
 router.post('/',       (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));

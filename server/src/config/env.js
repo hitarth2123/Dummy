@@ -49,7 +49,8 @@ const envSchema = z.object({
     .enum(['openai', 'gemini', 'ollama', 'custom', 'puter', 'deepseek'])
     .default('openai'),
   OPENAI_API_KEY: z.string().optional(),
-  GEMINI_API_KEY: z.string().optional(),
+  GEMINI_API_KEY: z.string({ required_error: 'GEMINI_API_KEY is required' }),
+  GROQ_API_KEY: z.string({ required_error: 'GROQ_API_KEY is required' }),
   DEEPSEEK_API_KEY: z.string().optional(),
   DEEPSEEK_BASE_URL: z.string().url().optional(),
   LLM_MODEL: z.string().default('gpt-4o-mini'),
@@ -66,6 +67,13 @@ const envSchema = z.object({
   CLIENT_URL: z
     .string({ required_error: 'CLIENT_URL is required' })
     .url('CLIENT_URL must be a valid URL'),
+
+  // Institutional SSO (DEP-002)
+  SSO_CLIENT_ID: z.string().optional(),
+  SSO_CLIENT_SECRET: z.string().optional(),
+  SSO_TOKEN_URL: z.string().url().optional(),
+  SSO_USERINFO_URL: z.string().url().optional(),
+  SSO_REDIRECT_URI: z.string().url().optional(),
 });
 
 const parseResult = envSchema.safeParse(process.env);

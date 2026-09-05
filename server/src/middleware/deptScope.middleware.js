@@ -8,26 +8,36 @@ const AppError = require('../utils/AppError');
  * HODs and Admins may pass an explicit ?dept= query param.
  */
 const deptScope = (req, _res, next) => {
-  const { role, department } = req.user;
+  const { role, dept, department } = req.user;
+  const userDepartment = dept || department;
 
   if (role === 'admin') {
-    // Admin can specify any dept or all
-    req.department = req.query.dept || null;
+    req.department = req.query.dept || req.body?.dept || null;
+    req.departmentFilter = req.department ? { department: req.department } : {};
     return next();
   }
 
   if (role === 'hod') {
-    // HOD can scope to their own dept only
-    if (req.query.dept && req.query.dept !== department) {
+    const requestedDepartment = req.query.dept || req.body?.dept;
+    if (requestedDepartment && requestedDepartment !== userDepartment) {
       return next(new AppError('HOD can only access their own department.', 403));
     }
-    req.department = department;
+    req.department = userDepartment;
+    req.departmentFilter = { department: userDepartment };
     return next();
   }
 
-  // Students and Faculty are always scoped to their department
-  req.department = department;
+  const requestedDepartment = req.query.dept || req.body?.dept;
+  if (requestedDepartment && requestedDepartment !== userDepartment) {
+    return next(new AppError('Cross-department access is not allowed.', 403));
+  }
+  req.department = userDepartment;
+  req.departmentFilter = { department: userDepartment };
   return next();
 };
 
-module.exports = { deptScope };
+const getDepartmentFilter = (req) => req.departmentFilter || {
+  department: req.user.dept || req.user.department,
+};
+
+module.exports = { deptScope, getDepartmentFilter };

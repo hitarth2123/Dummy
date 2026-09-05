@@ -1,8 +1,7 @@
 const router = require('express').Router();
 const { strictRateLimiter } = require('../middleware/rateLimiter');
-
-// Controllers (to be implemented in EPIC-03)
-// const authController = require('../controllers/auth.controller');
+const catchAsync = require('../utils/catchAsync');
+const authController = require('../controllers/auth.controller');
 
 // POST /api/auth/register
 router.post('/register', strictRateLimiter, (req, res) => {
@@ -10,19 +9,13 @@ router.post('/register', strictRateLimiter, (req, res) => {
 });
 
 // POST /api/auth/login
-router.post('/login', strictRateLimiter, (req, res) => {
-  res.status(501).json({ success: false, message: 'Not implemented yet' });
-});
+router.post('/login', strictRateLimiter, catchAsync(authController.login));
 
 // POST /api/auth/logout
-router.post('/logout', (req, res) => {
-  res.status(501).json({ success: false, message: 'Not implemented yet' });
-});
+router.post('/logout', catchAsync(authController.logout));
 
 // POST /api/auth/refresh
-router.post('/refresh', (req, res) => {
-  res.status(501).json({ success: false, message: 'Not implemented yet' });
-});
+router.post('/refresh', strictRateLimiter, catchAsync(authController.refresh));
 
 // POST /api/auth/forgot-password
 router.post('/forgot-password', strictRateLimiter, (req, res) => {

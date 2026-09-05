@@ -3,6 +3,7 @@
  * Abstraction layer for LLM API calls.
  */
 const { generateCustomResponse } = require('./customLlm.engine');
+const { completeWithFallback } = require('../config/llm');
 
 const getProvider = () => process.env.LLM_PROVIDER || 'custom';
 
@@ -64,6 +65,13 @@ const chat = async (prompt, options = {}) => {
   if (provider === 'custom') return generateCustomResponse(prompt, options);
   if (provider === 'puter') return chatPuter(prompt, options);
   if (provider === 'deepseek') return chatDeepSeek(prompt, options);
+  if (provider === 'gemini' || provider === 'groq') {
+    return completeWithFallback([
+      ...(options.systemPrompt ? [{ role: 'system', content: options.systemPrompt }] : []),
+      ...(options.history || []),
+      { role: 'user', content: prompt },
+    ], options);
+  }
   throw new Error(`LLM provider "${provider}" not yet implemented`);
 };
 
