@@ -2,6 +2,18 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
+const logApiProxy = (proxy) => {
+  proxy.on('proxyReq', (proxyReq, req) => {
+    console.log(`[Vite Proxy] request ${req.method} ${req.url} -> backend:5012`);
+  });
+  proxy.on('proxyRes', (proxyRes, req) => {
+    console.log(`[Vite Proxy] response ${req.method} ${req.url} -> ${proxyRes.statusCode}`);
+  });
+  proxy.on('error', (error, req) => {
+    console.error(`[Vite Proxy] failed ${req.method} ${req.url}: ${error.message}`);
+  });
+};
+
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -21,7 +33,7 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      '/api': { target: 'http://localhost:5000', changeOrigin: true },
+      '/api': { target: 'http://localhost:5012', changeOrigin: true, configure: logApiProxy },
     },
   },
 });

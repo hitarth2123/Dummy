@@ -7,6 +7,8 @@ const cookieParser = require('cookie-parser');
 
 const { env } = require('./src/config/env');
 const { rateLimiter } = require('./src/middleware/rateLimiter');
+const { requestLogger } = require('./src/middleware/requestLogger');
+const { logger } = require('./src/utils/logger');
 
 // ── Route imports ────────────────────────────────────────────────────────────
 const authRoutes          = require('./src/routes/auth.routes');
@@ -33,6 +35,7 @@ app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
+app.use(requestLogger);
 
 // ── Global Rate Limiter ──────────────────────────────────────────────────────
 app.use('/api', rateLimiter);
@@ -60,6 +63,14 @@ app.use((_req, res) => res.status(404).json({ success: false, message: 'Route no
 // eslint-disable-next-line no-unused-vars
 app.use((err, _req, res, _next) => {
   const statusCode = err.statusCode || 500;
+  logger.error('request.failed', {
+    requestId: _req.requestId,
+    method: _req.method,
+    path: _req.originalUrl,
+    status: statusCode,
+    error: err.message,
+    stack: env.NODE_ENV === 'development' ? err.stack : undefined,
+  });
   res.status(statusCode).json({
     success: false,
     message: err.message || 'Internal Server Error',

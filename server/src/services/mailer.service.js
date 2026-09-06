@@ -1,21 +1,27 @@
+const { transporter, smtp } = require('../config/mailer');
+
+const sendMail = async (to, subject, html, text) => {
+  if (!to || !subject || (!html && !text)) {
+    throw new TypeError('to, subject, and html or text are required');
+  }
+
+  return transporter.sendMail({
+    from: smtp.from,
+    to,
+    subject,
+    html,
+    text: text || undefined,
+  });
+};
+
 /**
  * mailer.service.js
  * Sends transactional emails via Nodemailer using configured SMTP.
  * HTML templates are loaded from server/src/templates/email/.
  */
-const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
-const { env } = require('../config/env');
-
 const TEMPLATE_DIR = path.join(__dirname, '../templates/email');
-
-const transporter = nodemailer.createTransport({
-  host: env.MAILER_HOST,
-  port: Number(env.MAILER_PORT),
-  secure: Number(env.MAILER_PORT) === 465,
-  auth: { user: env.MAILER_USER, pass: env.MAILER_PASS },
-});
 
 /**
  * loadTemplate — reads an HTML email template and replaces {{KEY}} placeholders.
@@ -30,16 +36,6 @@ const loadTemplate = (templateName, vars = {}) => {
     html = html.replaceAll(`{{${key}}}`, val);
   });
   return html;
-};
-
-/**
- * sendMail — generic send helper.
- * @param {string} to
- * @param {string} subject
- * @param {string} html
- */
-const sendMail = async (to, subject, html) => {
-  await transporter.sendMail({ from: env.MAILER_FROM, to, subject, html });
 };
 
 /**

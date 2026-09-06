@@ -3,7 +3,8 @@
  * Seeds the database with initial data for development.
  * Usage: node scripts/seedDb.js
  */
-require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '../server/.env') });
+process.env.SEED_MODE = 'true';
 
 const mongoose = require('mongoose');
 const bcrypt   = require('bcryptjs');
@@ -21,15 +22,19 @@ const seed = async () => {
   await User.deleteMany({ email: { $regex: /@seed\.dev$/ } });
   console.log('[Seed] Cleared existing seed users');
 
-  const hash = await bcrypt.hash('Password@123', 12);
-
   // ── Seed Users ──
-  const users = await User.insertMany([
-    { name: 'Admin User',   email: 'admin@seed.dev',   password_hash: hash, role: 'admin',   department: 'Administration' },
-    { name: 'HOD CS',       email: 'hod@seed.dev',     password_hash: hash, role: 'hod',     department: 'Computer Science' },
-    { name: 'Faculty CS',   email: 'faculty@seed.dev', password_hash: hash, role: 'faculty', department: 'Computer Science', subject_expertise: ['DBMS', 'OS'] },
-    { name: 'Student One',  email: 'student@seed.dev', password_hash: hash, role: 'student', department: 'Computer Science', semester: 5, enrolled_subjects: ['DBMS', 'CN', 'OS'] },
-  ]);
+  const seedUsers = [
+    { name: 'Admin User', email: 'admin@seed.dev', password: 'Admin@12345', role: 'admin', department: 'Administration' },
+    { name: 'HOD CS', email: 'hod@seed.dev', password: 'Hod@12345', role: 'hod', department: 'Computer Science', subject_expertise: ['DBMS', 'OS'] },
+    { name: 'Faculty CS', email: 'faculty@seed.dev', password: 'Faculty@12345', role: 'faculty', department: 'Computer Science', subject_expertise: ['DBMS', 'OS'] },
+    { name: 'Faculty ECE', email: 'faculty.ece@seed.dev', password: 'FacultyEce@12345', role: 'faculty', department: 'Electronics and Communication', subject_expertise: ['Networks', 'Embedded Systems'] },
+    { name: 'Student One', email: 'student@seed.dev', password: 'Student@12345', role: 'student', department: 'Computer Science', semester: 5, enrolled_subjects: ['DBMS', 'CN', 'OS'] },
+    { name: 'Student Two', email: 'student.two@seed.dev', password: 'StudentTwo@12345', role: 'student', department: 'Electronics and Communication', semester: 3, enrolled_subjects: ['Networks', 'Digital Logic'] },
+  ];
+  const users = await User.insertMany(await Promise.all(seedUsers.map(async ({ password, ...user }) => ({
+    ...user,
+    password_hash: await bcrypt.hash(password, 12),
+  }))));
   console.log(`[Seed] Created ${users.length} users`);
 
   // ── Seed Ethics Config ──

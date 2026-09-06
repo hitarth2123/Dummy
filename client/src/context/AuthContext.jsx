@@ -15,10 +15,17 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (credentials) => {
-    const data = await authService.login(credentials);
-    setUser(data.user);
-    localStorage.setItem('ai_buddy_user', JSON.stringify(data.user));
-    return data;
+    const response = await authService.login(credentials);
+    const data = response.data || response;
+    const authenticatedUser = {
+      ...data.user,
+      token: data.accessToken,
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+    };
+    setUser(authenticatedUser);
+    localStorage.setItem('ai_buddy_user', JSON.stringify(authenticatedUser));
+    return { ...data, user: authenticatedUser };
   };
 
   const logout = async () => {

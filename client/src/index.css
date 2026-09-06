@@ -1,6 +1,10 @@
-/* ─── AI Buddy Global Styles ─────────────────────────────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── AI Buddy Global Styles ─────────────────────────────────────────────── */
 :root {
   /* Brand palette */
   --color-primary:        #6366f1;

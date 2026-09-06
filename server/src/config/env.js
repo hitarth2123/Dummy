@@ -35,22 +35,28 @@ const envSchema = z.object({
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
 
   // ── Email / Mailer ────────────────────────────────────────────────────────
-  MAILER_HOST: z.string({ required_error: 'MAILER_HOST is required' }),
+  MAILER_HOST: z.string().optional(),
   MAILER_PORT: z
     .string()
     .regex(/^\d+$/, 'MAILER_PORT must be a number')
     .default('587'),
-  MAILER_USER: z.string({ required_error: 'MAILER_USER is required' }),
-  MAILER_PASS: z.string({ required_error: 'MAILER_PASS is required' }),
-  MAILER_FROM: z.string({ required_error: 'MAILER_FROM is required' }),
+  MAILER_USER: z.string().optional(),
+  MAILER_PASS: z.string().optional(),
+  MAILER_FROM: z.string().optional(),
+  MAILER_STRICT_STARTUP: z.enum(['true', 'false']).default('false'),
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.string().regex(/^\d+$/, 'SMTP_PORT must be a number').optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  SMTP_FROM: z.string().optional(),
 
   // ── LLM ───────────────────────────────────────────────────────────────────
   LLM_PROVIDER: z
-    .enum(['openai', 'gemini', 'ollama', 'custom', 'puter', 'deepseek'])
+    .enum(['openai', 'gemini', 'groq', 'ollama', 'custom', 'puter', 'deepseek'])
     .default('openai'),
   OPENAI_API_KEY: z.string().optional(),
-  GEMINI_API_KEY: z.string({ required_error: 'GEMINI_API_KEY is required' }),
-  GROQ_API_KEY: z.string({ required_error: 'GROQ_API_KEY is required' }),
+  GEMINI_API_KEY: z.string().optional(),
+  GROQ_API_KEY: z.string().optional(),
   DEEPSEEK_API_KEY: z.string().optional(),
   DEEPSEEK_BASE_URL: z.string().url().optional(),
   LLM_MODEL: z.string().default('gpt-4o-mini'),
@@ -68,12 +74,38 @@ const envSchema = z.object({
     .string({ required_error: 'CLIENT_URL is required' })
     .url('CLIENT_URL must be a valid URL'),
 
+  // Local development login. Never enable this mode in production.
+  DEV_LOGIN_ENABLED: z.enum(['true', 'false']).default('true'),
+  DEV_LOGIN_EMAIL: z.string().email().optional(),
+
   // Institutional SSO (DEP-002)
   SSO_CLIENT_ID: z.string().optional(),
   SSO_CLIENT_SECRET: z.string().optional(),
   SSO_TOKEN_URL: z.string().url().optional(),
   SSO_USERINFO_URL: z.string().url().optional(),
   SSO_REDIRECT_URI: z.string().url().optional(),
+  SEED_MODE: z.enum(['true', 'false']).default('false'),
+}).superRefine((data, ctx) => {
+  if (data.SEED_MODE === 'true') return;
+
+  if (data.LLM_PROVIDER === 'gemini' && !data.GEMINI_API_KEY) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['GEMINI_API_KEY'], message: 'GEMINI_API_KEY is required' });
+  }
+  if (data.LLM_PROVIDER === 'groq' && !data.GROQ_API_KEY) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['GROQ_API_KEY'], message: 'GROQ_API_KEY is required' });
+  }
+
+  const requiredAlternatives = [
+    ['SMTP_HOST', data.SMTP_HOST, data.MAILER_HOST],
+    ['SMTP_USER', data.SMTP_USER, data.MAILER_USER],
+    ['SMTP_PASS', data.SMTP_PASS, data.MAILER_PASS],
+    ['SMTP_FROM', data.SMTP_FROM, data.MAILER_FROM],
+  ];
+  requiredAlternatives.forEach(([name, primary, legacy]) => {
+    if (!primary && !legacy) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: [name], message: `${name} is required` });
+    }
+  });
 });
 
 const parseResult = envSchema.safeParse(process.env);

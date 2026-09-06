@@ -112,4 +112,29 @@ describe('JWT authentication', () => {
     expect(auth.isTokenBlacklisted(claims.jti)).toBe(true);
     expect(response.status).toHaveBeenCalledWith(204);
   });
+
+  test('creates a development student session from a Gmail address', async () => {
+    const user = {
+      _id: 'gmail-user',
+      role: 'student',
+      department: 'Computer Science',
+      semester: 5,
+      enrolled_subjects: [],
+      is_active: true,
+      save: jest.fn().mockResolvedValue(undefined),
+    };
+    User.findOne.mockResolvedValue(null);
+    User.create.mockResolvedValue(user);
+    Session.create.mockResolvedValue({});
+    const response = makeResponse();
+
+    await auth.login({ body: { devEmail: 'student@gmail.com' }, ip: '127.0.0.1', get: jest.fn() }, response);
+
+    expect(User.create).toHaveBeenCalledWith(expect.objectContaining({
+      email: 'student@gmail.com',
+      role: 'student',
+    }));
+    expect(response.status).toHaveBeenCalledWith(200);
+    expect(response.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
 });

@@ -121,6 +121,24 @@ const exchangeSsoCode = async (code) => {
 };
 
 const getSsoProfile = async (req) => {
+  const devEmail = req.body?.devEmail;
+  const devPassword = req.body?.devPassword;
+  const devLoginEnabled = process.env.NODE_ENV !== 'production'
+    && process.env.DEV_LOGIN_ENABLED !== 'false';
+  if (devEmail && devLoginEnabled) {
+    if (!/^gmail\.com$/i.test(devEmail.split('@')[1] || '')) {
+      throw new AppError('Development login requires a Gmail address.', 400);
+    }
+    return {
+      email: devEmail.trim().toLowerCase(),
+      name: devEmail.split('@')[0],
+      role: 'student',
+      department: 'Computer Science',
+      semester: 5,
+      enrolled_subjects: [],
+      devPassword,
+    };
+  }
   if (req.ssoProfile) return req.ssoProfile;
   if (req.body?.ssoProfile) return req.body.ssoProfile;
   if (req.body?.code) return exchangeSsoCode(req.body.code);
@@ -133,7 +151,12 @@ const login = async (req, res) => {
   if (!email) throw new AppError('SSO profile did not contain an email.', 400);
 
   let user = await resolveQuery(User.findOne({ email: email.toLowerCase() }));
+  if (profile.devPassword && user) {
+    const validPassword = await bcrypt.compare(profile.devPassword, user.password_hash);
+    if (!validPassword) throw new AppError('Invalid development credentials.', 401);
+  }
   if (!user) {
+    if (profile.devPassword) throw new AppError('Development user was not found. Run the seed command first.', 401);
     user = await User.create({
       name: profile.name || profile.displayName || email,
       email: email.toLowerCase(),

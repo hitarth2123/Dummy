@@ -60,6 +60,7 @@ const AppRoutes = () => (
     {/* Student */}
     <Route path="/student" element={<PrivateRoute allowedRoles={['student']}><DashboardLayout /></PrivateRoute>}>
       <Route index                element={<StudentDashboard />} />
+      <Route path="dashboard"     element={<StudentDashboard />} />
       <Route path="learning-path" element={<LearningPath />} />
       <Route path="question-bank" element={<QuestionBank />} />
       <Route path="practice-mcq" element={<PracticeMCQ />} />
@@ -77,6 +78,7 @@ const AppRoutes = () => (
     {/* Faculty */}
     <Route path="/faculty" element={<PrivateRoute allowedRoles={['faculty']}><DashboardLayout /></PrivateRoute>}>
       <Route index                  element={<FacultyDashboard />} />
+      <Route path="dashboard"       element={<FacultyDashboard />} />
       <Route path="availability"    element={<Availability />} />
       <Route path="session-requests" element={<SessionRequests />} />
       <Route path="my-sessions"     element={<FacultyMySessions />} />
@@ -85,6 +87,7 @@ const AppRoutes = () => (
     {/* HOD */}
     <Route path="/hod" element={<PrivateRoute allowedRoles={['hod']}><DashboardLayout /></PrivateRoute>}>
       <Route index               element={<HODDashboard />} />
+      <Route path="dashboard"    element={<HODDashboard />} />
       <Route path="audit-log"    element={<AuditLog />} />
       <Route path="ethics-config" element={<EthicsConfig />} />
       <Route path="faculty"      element={<FacultyMgmt />} />
@@ -93,6 +96,7 @@ const AppRoutes = () => (
     {/* Admin */}
     <Route path="/admin" element={<PrivateRoute allowedRoles={['admin']}><DashboardLayout /></PrivateRoute>}>
       <Route index                    element={<AdminDashboard />} />
+      <Route path="dashboard"         element={<AdminDashboard />} />
       <Route path="users"             element={<Users />} />
       <Route path="timetable"         element={<Timetable />} />
       <Route path="emergency-contacts" element={<EmergencyContacts />} />

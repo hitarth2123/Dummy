@@ -5,9 +5,12 @@
   "private": true,
   "main": "app.js",
   "scripts": {
+    "prestart": "node ../scripts/freePorts.js 3000 5012",
     "start": "node server.js",
+    "predev": "node ../scripts/freePorts.js 3000 5012",
     "dev": "nodemon server.js",
     "validate:env": "node ../scripts/validateEnv.js",
+    "seed": "node ../scripts/seedDb.js",
     "test": "jest --runInBand --forceExit",
     "test:schemas": "jest tests/schemas.test.js --runInBand --forceExit"
   },

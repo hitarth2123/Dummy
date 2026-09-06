@@ -3,26 +3,63 @@
  * Axios instance with base URL, auth header injection, and token refresh interceptor.
  */
 import axios from 'axios';
+import clientLogger from '@utils/clientLogger';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.DEV ? '/api' : (import.meta.env.VITE_API_URL || '/api'),
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 });
 
 // ── Request interceptor — attach access token ─────────────────────────────
 api.interceptors.request.use((config) => {
+  const requestId = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  const startedAt = performance.now();
+  config.headers['x-request-id'] = requestId;
+  config.metadata = { requestId, startedAt };
   const user = JSON.parse(localStorage.getItem('ai_buddy_user') || 'null');
-  if (user?.token) {
-    config.headers.Authorization = `Bearer ${user.token}`;
+  if (user?.token || user?.accessToken) {
+    config.headers.Authorization = `Bearer ${user.token || user.accessToken}`;
   }
+  clientLogger.info('request.started', {
+    requestId,
+    method: config.method?.toUpperCase(),
+    url: `${config.baseURL || ''}${config.url || ''}`,
+    data: config.data,
+  });
   return config;
 });
 
 // ── Response interceptor — handle 401 globally ───────────────────────────
 api.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    const requestId = res.config.metadata?.requestId || res.headers['x-request-id'];
+    clientLogger.info('request.completed', {
+      requestId,
+      method: res.config.method?.toUpperCase(),
+      url: res.config.url,
+      status: res.status,
+      durationMs: res.config.metadata ? Number((performance.now() - res.config.metadata.startedAt).toFixed(2)) : undefined,
+      response: {
+        type: 'json',
+        success: res.data?.success,
+        keys: res.data && typeof res.data === 'object' ? Object.keys(res.data) : [],
+      },
+      output: res.data,
+    });
+    return res;
+  },
   async (err) => {
+    const config = err.config || {};
+    clientLogger.error('request.failed', {
+      requestId: config.metadata?.requestId || err.response?.headers?.['x-request-id'],
+      method: config.method?.toUpperCase(),
+      url: config.url,
+      status: err.response?.status,
+      durationMs: config.metadata ? Number((performance.now() - config.metadata.startedAt).toFixed(2)) : undefined,
+      message: err.response?.data?.message || err.message,
+      output: err.response?.data,
+    });
     if (err.response?.status === 401) {
       localStorage.removeItem('ai_buddy_user');
       window.location.href = '/login';
