@@ -91,6 +91,7 @@ export const studentService = {
 
 export const llmService = {
   chat:     (data) => api.post('/llm/chat', data).then(r => r.data),
+  generateMcq: (data) => api.post('/llm/mcq/generate', data).then(r => r.data),
   summarise:(data) => api.post('/llm/summarise', data).then(r => r.data),
   explain:  (data) => api.post('/llm/explain', data).then(r => r.data),
 };

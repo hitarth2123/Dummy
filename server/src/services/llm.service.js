@@ -81,6 +81,23 @@ const chat = async (prompt, options = {}) => {
  * @returns {Promise<number[]>} 768-dim embedding
  */
 const embed = async (text) => {
+  if (getProvider() === 'gemini' && process.env.GEMINI_API_KEY) {
+    const model = process.env.GEMINI_EMBEDDING_MODEL || 'text-embedding-004';
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:embedContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: { parts: [{ text }] } }),
+      }
+    );
+    if (response.ok) {
+      const data = await response.json();
+      if (Array.isArray(data.embedding?.values) && data.embedding.values.length === 768) {
+        return data.embedding.values;
+      }
+    }
+  }
   const { generateLocalEmbedding } = require('./localEmbedding.service');
   return generateLocalEmbedding(text);
 };
