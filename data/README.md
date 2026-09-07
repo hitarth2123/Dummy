@@ -42,6 +42,14 @@ data/MBA/Financial_Management/2021_textbook_Capital_Budgeting.docx
 node scripts/ingestContent.js --file ./data/BTech/DBMS/2023_past_paper_SQL.pdf \
   --dept BTech --subject DBMS --topic SQL --year 2023 --doc_type past_paper
 
+# Extracts text, creates 768-dimension embeddings, and stores chunks in
+# MongoDB Atlas collection knowledgechunks.
+npm run ingest -- --file ./data/BTech/DBMS/notes.txt --dept BTech --subject DBMS --topic Normalization
+
+## Atlas Vector Search Mapping
+
+Use the mapping in `server/src/config/vector-index.json` for the `knowledgechunks` collection and create the index with the name `vector_index`.
+
 # Bulk (all files under /data — uses filename convention for auto-tagging)
 node scripts/ingestContent.js --bulk
 ```

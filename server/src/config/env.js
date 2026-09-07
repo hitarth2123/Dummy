@@ -85,6 +85,9 @@ const envSchema = z.object({
   SSO_USERINFO_URL: z.string().url().optional(),
   SSO_REDIRECT_URI: z.string().url().optional(),
   SEED_MODE: z.enum(['true', 'false']).default('false'),
+  LLM_SERVICE_ENABLED: z.enum(['true', 'false']).default('true'),
+  LLM_SERVICE_PORT: z.string().regex(/^\d+$/, 'LLM_SERVICE_PORT must be a number').default('7031'),
+  LLM_SERVICE_URL: z.string().url().optional(),
 }).superRefine((data, ctx) => {
   if (data.SEED_MODE === 'true') return;
 

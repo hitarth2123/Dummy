@@ -9,13 +9,15 @@
     "shared"
   ],
   "scripts": {
-    "predev": "node scripts/freePorts.js 3000 5012",
-    "dev": "concurrently --names SERVER,CLIENT --prefix-colors cyan,magenta \"npm run dev --workspace=server\" \"npm run dev --workspace=client\"",
+    "predev": "node scripts/freePorts.js 3000 5012 7031",
+    "dev": "concurrently --names SERVER,LLM,CLIENT --prefix-colors cyan,yellow,magenta \"npm run dev --workspace=server\" \"npm run llm:dev --workspace=server\" \"npm run dev --workspace=client\"",
     "dev:server": "npm run dev --workspace=server",
     "dev:client": "npm run dev --workspace=client",
     "install:all": "npm install",
     "validate:env": "node scripts/validateEnv.js",
     "seed": "npm run seed --workspace=server",
+    "ingest": "npm run ingest --workspace=server --",
+    "vector:index": "npm run vector:index --workspace=server",
     "test:schemas": "npm run test:schemas --workspace=server",
     "test": "npm run test --workspaces --if-present"
   },

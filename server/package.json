@@ -9,8 +9,13 @@
     "start": "node server.js",
     "predev": "node ../scripts/freePorts.js 3000 5012",
     "dev": "nodemon server.js",
+    "prellm:dev": "node ../scripts/freePorts.js 7031",
+    "llm": "node llm-server.js",
+    "llm:dev": "node llm-server.js",
     "validate:env": "node ../scripts/validateEnv.js",
     "seed": "node ../scripts/seedDb.js",
+    "ingest": "node ../scripts/ingestContent.js",
+    "vector:index": "node ../scripts/createVectorIndex.js",
     "test": "jest --runInBand --forceExit",
     "test:schemas": "jest tests/schemas.test.js --runInBand --forceExit"
   },
@@ -28,6 +33,7 @@
     "morgan": "^1.10.0",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.14",
+    "pdf-parse": "^2.4.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {

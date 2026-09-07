@@ -1,57 +1,100 @@
-/**
- * scripts/ingestContent.js
- * Ingests PDF/URL content into KnowledgeChunk collection for RAG.
- * Usage: node scripts/ingestContent.js --file ./docs/lecture.pdf --dept CS --subject DBMS
- */
-require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '../server/.env') });
 
+const fs = require('fs/promises');
+const path = require('path');
 const mongoose = require('mongoose');
-const { env }  = require('../server/src/config/env');
-
+const pdfParse = require('pdf-parse');
+const { env } = require('../server/src/config/env');
 const KnowledgeChunk = require('../server/src/models/KnowledgeChunk');
-// const { embed } = require('../server/src/services/llm.service'); // Uncomment in EPIC-04
+const { embed } = require('../server/src/services/llm.service');
 
-const CHUNK_SIZE = 500; // characters per chunk
+const CHUNK_SIZE = 1200;
+const CHUNK_OVERLAP = 150;
 
-/**
- * chunkText — splits text into overlapping chunks for better retrieval.
- */
-const chunkText = (text, size = CHUNK_SIZE, overlap = 50) => {
+const chunkText = (text) => {
   const chunks = [];
-  let i = 0;
-  while (i < text.length) {
-    chunks.push(text.slice(i, i + size));
-    i += size - overlap;
+  for (let start = 0; start < text.length; start += CHUNK_SIZE - CHUNK_OVERLAP) {
+    const content = text.slice(start, start + CHUNK_SIZE).trim();
+    if (content) chunks.push(content);
   }
   return chunks;
 };
 
+const readContent = async (filePath) => {
+  const buffer = await fs.readFile(filePath);
+  if (path.extname(filePath).toLowerCase() === '.pdf') {
+    const parsed = await pdfParse(buffer);
+    return parsed.text;
+  }
+  if (path.extname(filePath).toLowerCase() === '.json') {
+    return JSON.stringify(JSON.parse(buffer.toString('utf8')), null, 2);
+  }
+  return buffer.toString('utf8');
+};
+
+const getArg = (args, name, fallback) => {
+  const index = args.indexOf(name);
+  return index === -1 ? fallback : args[index + 1];
+};
+
+const resolveInputPath = (filePath) => {
+  const candidates = [
+    path.resolve(process.cwd(), filePath),
+    path.resolve(__dirname, '..', filePath),
+  ];
+  return candidates.find((candidate) => {
+    try {
+      require('fs').accessSync(candidate);
+      return true;
+    } catch {
+      return false;
+    }
+  }) || candidates[0];
+};
+
 const ingest = async () => {
   const args = process.argv.slice(2);
-  const fileIdx = args.indexOf('--file');
-  const deptIdx = args.indexOf('--dept');
-  const subjIdx = args.indexOf('--subject');
+  const filePath = getArg(args, '--file');
+  if (!filePath) throw new Error('Usage: node scripts/ingestContent.js --file <path> --dept <department> --subject <subject>');
 
-  if (fileIdx === -1) {
-    console.error('Usage: node ingestContent.js --file <path> --dept <dept> --subject <subject>');
-    process.exit(1);
-  }
-
-  const filePath = args[fileIdx + 1];
-  const dept     = args[deptIdx + 1]  || 'General';
-  const subject  = args[subjIdx + 1]  || 'General';
+  const resolvedFilePath = resolveInputPath(filePath);
+  const department = getArg(args, '--dept', 'General');
+  const subject = getArg(args, '--subject', 'General');
+  const topic = getArg(args, '--topic', path.basename(resolvedFilePath, path.extname(resolvedFilePath)));
+  const sourceType = path.extname(resolvedFilePath).toLowerCase() === '.pdf' ? 'pdf' : 'manual';
+  const content = await readContent(resolvedFilePath);
+  const chunks = chunkText(content);
+  if (!chunks.length) throw new Error('The source document did not contain readable text.');
 
   await mongoose.connect(env.MONGO_URI, { dbName: env.DB_NAME });
-  console.log(`[Ingest] Connected | file: ${filePath} | dept: ${dept} | subject: ${subject}`);
+  console.log(`[Ingest] Connected | ${resolvedFilePath} | ${chunks.length} chunks`);
 
-  // TODO: Parse PDF/URL content and call embed() in EPIC-04
-  // For now this is a scaffold — real implementation added when LLM service is ready.
-  console.log('[Ingest] ⚠️  LLM embedding not yet implemented (EPIC-04). Scaffold only.');
+  const documents = [];
+  for (let index = 0; index < chunks.length; index += 1) {
+    console.log(`[Ingest] Embedding chunk ${index + 1}/${chunks.length}`);
+    documents.push({
+      content: chunks[index],
+      embedding: await embed(chunks[index]),
+      source_document: path.basename(resolvedFilePath),
+      source_type: sourceType,
+      department,
+      subject,
+      topic,
+      chunk_index: index,
+      token_count: chunks[index].split(/\s+/).length,
+      metadata: { absolute_path: resolvedFilePath },
+    });
+  }
 
+  await KnowledgeChunk.insertMany(documents);
+  console.log(`[Ingest] Stored ${documents.length} chunks in ${env.DB_NAME}.knowledgechunks`);
   await mongoose.disconnect();
 };
 
-ingest().catch((err) => {
-  console.error('[Ingest] ❌ Failed:', err.message);
+ingest().catch(async (error) => {
+  console.error(`[Ingest] Failed: ${error.message}`);
+  await mongoose.disconnect().catch(() => {});
   process.exit(1);
 });
+
+module.exports = { chunkText, readContent };

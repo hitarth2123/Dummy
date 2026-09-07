@@ -12,22 +12,17 @@
  * 4. Name it: vector_index
  * 5. Paste this JSON definition:
  *
+ * The complete reusable mapping is in server/src/config/vector-index.json.
+ * Paste only its "definition" object into Atlas Search Index JSON Editor:
+ *
  * {
  *   "fields": [
- *     {
- *       "type": "vector",
- *       "path": "embedding",
- *       "numDimensions": 768,
- *       "similarity": "cosine"
- *     },
- *     {
- *       "type": "filter",
- *       "path": "department"
- *     },
- *     {
- *       "type": "filter",
- *       "path": "subject"
- *     }
+ *     { "type": "vector", "path": "embedding", "numDimensions": 768, "similarity": "cosine" },
+ *     { "type": "filter", "path": "department" },
+ *     { "type": "filter", "path": "subject" },
+ *     { "type": "filter", "path": "source_type" },
+ *     { "type": "filter", "path": "topic" },
+ *     { "type": "filter", "path": "chunk_index" }
  *   ]
  * }
  *
