@@ -89,6 +89,11 @@ export const studentService = {
   getEmergency:    ()    => api.get('/student/emergency').then(r => r.data),
 };
 
+export const mockTestService = {
+  generate: (data) => api.post('/llm/mock-test/generate', data).then(r => r.data),
+  submit: (id, data) => api.post(`/llm/mock-test/${id}/submit`, data).then(r => r.data),
+};
+
 export const llmService = {
   chat:     (data) => api.post('/llm/chat', data).then(r => r.data),
   generateMcq: (data) => api.post('/llm/mcq/generate', data).then(r => r.data),

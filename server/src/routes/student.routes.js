@@ -3,18 +3,19 @@ const { protect }    = require('../middleware/auth.middleware');
 const { restrictTo } = require('../middleware/rbac.middleware');
 const { deptScope }  = require('../middleware/deptScope.middleware');
 const { lockout }    = require('../middleware/lockout.middleware');
+const controller = require('../controllers/student.controller');
 
 // All student routes require authentication + student role
 router.use(protect, restrictTo('student'), lockout, deptScope);
 
 // GET  /api/student/dashboard
-router.get('/dashboard', (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
+router.get('/dashboard', controller.dashboard);
 
 // GET  /api/student/learning-path
-router.get('/learning-path', (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
+router.get('/learning-path', controller.learningPath);
 
 // GET  /api/student/question-bank
-router.get('/question-bank', (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
+router.get('/question-bank', controller.questionBank);
 
 // POST /api/student/mock-test/start
 router.post('/mock-test/start', (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));

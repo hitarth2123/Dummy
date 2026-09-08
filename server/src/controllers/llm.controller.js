@@ -4,6 +4,8 @@ const { generateMcqSet } = require('../services/mcq.service');
 const { chat } = require('../services/llm.service');
 const { logAction } = require('../services/audit.service');
 const { requestLlmWorker, workerEnabled } = require('../services/llmGateway.service');
+const { generateMockTest, submitMockTest, upsertLearningPath } = require('../services/mockTest.service');
+const LearningPath = require('../models/LearningPath');
 
 const getUserOptions = (req) => ({
   department: req.user?.dept || req.user?.department,
@@ -69,4 +71,21 @@ const chatLegacy = catchAsync(async (req, res) => {
   return tutorChatHandler(req, res);
 });
 
-module.exports = { generateMcq, tutorChat, chatLegacy };
+const generateMock = catchAsync(async (req, res) => {
+  const result = await generateMockTest({ user: req.user, subject: req.body.subject, count: req.body.count, durationMinutes: req.body.duration_minutes });
+  res.status(201).json({ success: true, data: result });
+});
+
+const submitMock = catchAsync(async (req, res) => {
+  const result = await submitMockTest({ user: req.user, testId: req.params.id, answers: req.body.answers, timeTakenSec: req.body.time_taken_sec });
+  if (!result) return res.status(404).json({ success: false, message: 'Mock test not found or already submitted.' });
+  return res.json({ success: true, data: result });
+});
+
+const generateLearningPath = catchAsync(async (req, res) => {
+  const persona = { ...req.user, ...req.body, id: req.user.id, dept: req.user.dept || req.user.department };
+  const path = await upsertLearningPath({ user: persona, mockScores: req.body.mock_scores || [] });
+  res.json({ success: true, data: path });
+});
+
+module.exports = { generateMcq, tutorChat, chatLegacy, generateMock, submitMock, generateLearningPath };
