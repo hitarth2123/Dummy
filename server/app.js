@@ -48,6 +48,8 @@ app.use('/api/auth',          authRoutes);
 app.use('/api/student',       studentRoutes);
 app.use('/api/faculty',       facultyRoutes);
 app.use('/api/hod',           hodRoutes);
+app.use('/api/forum/feedback', feedbackRoutes);
+app.use('/api/admin/feedback', feedbackRoutes);
 app.use('/api/admin',         adminRoutes);
 app.use('/api/forum',         forumRoutes);
 app.use('/api/feedback',      feedbackRoutes);

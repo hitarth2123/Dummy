@@ -97,10 +97,17 @@ export const llmService = {
 };
 
 export const forumService = {
-  getPosts:   (params) => api.get('/forum', { params }).then(r => r.data),
-  createPost: (data)   => api.post('/forum', data).then(r => r.data),
-  getPost:    (id)     => api.get(`/forum/${id}`).then(r => r.data),
-  reply:      (id, data) => api.post(`/forum/${id}/reply`, data).then(r => r.data),
+  getPosts:   (params) => api.get('/forum/posts', { params }).then(r => r.data),
+  createPost: (data)   => api.post('/forum/posts', data).then(r => r.data),
+  getPost:    (id)     => api.get(`/forum/posts/${id}`).then(r => r.data),
+  reply:      (id, data) => api.post(`/forum/posts/${id}/reply`, data).then(r => r.data),
+  flagGrievance: (id, data) => api.post(`/forum/posts/${id}/flag-grievance`, data).then(r => r.data),
+};
+
+export const feedbackService = {
+  submit: (data) => api.post('/forum/feedback', data).then(r => r.data),
+  list: (params) => api.get('/admin/feedback', { params }).then(r => r.data),
+  export: (params) => api.get('/admin/feedback/export', { params, responseType: 'blob' }).then(r => r.data),
 };
 
 export const hallucinationService = {

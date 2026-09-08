@@ -1,2 +1,5 @@
-import PlaceholderPage from '@components/shared/PlaceholderPage';
-export default function FacultyMgmt() { return <PlaceholderPage title="Faculty management" />; }
+import React, { useEffect, useState } from 'react';
+import api from '@services/api.service';
+
+const FacultyMgmt = () => { const [faculty, setFaculty] = useState([]); useEffect(() => { api.get('/hod/faculty').then((result) => setFaculty(result.data.data || [])); }, []); return <section className="space-y-6"><div><p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-700">Department operations</p><h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink">Faculty management</h1></div><div className="grid gap-4 md:grid-cols-2">{faculty.map((member) => <article key={member._id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-panel"><h2 className="text-lg font-semibold text-ink">{member.name}</h2><p className="mt-1 text-sm text-slate-500">{member.email}</p><div className="mt-5 grid grid-cols-2 gap-3 text-sm"><div><p className="text-slate-500">Sessions this month</p><p className="mt-1 text-xl font-semibold">{member.sessions_this_month}</p></div><div><p className="text-slate-500">Fulfillment rate</p><p className="mt-1 text-xl font-semibold">{member.fulfillment_rate}%</p></div></div></article>)}</div></section>; };
+export default FacultyMgmt;

@@ -7,14 +7,15 @@ const User = require('../models/User');
 const FeedbackForm = require('../models/FeedbackForm');
 const { sendFeedbackReminder } = require('../services/mailer.service');
 
-// Every Monday at 08:00
-cron.schedule('0 8 * * 1', async () => {
+// Every Monday at 09:00 India Standard Time.
+cron.schedule('0 9 * * 1', async () => {
   const now = new Date();
   const weekNumber = getISOWeek(now);
   const academicYear = getAcademicYear(now);
 
   try {
     const students = await User.find({ role: 'student', is_active: true }).select('email name department semester');
+    await User.updateMany({ role: 'student', is_active: true }, { $set: { feedback_due: true } });
 
     for (const student of students) {
       const alreadySubmitted = await FeedbackForm.exists({
@@ -43,7 +44,7 @@ cron.schedule('0 8 * * 1', async () => {
   } catch (err) {
     console.error('[FeedbackCron] Error:', err.message);
   }
-});
+}, { timezone: 'Asia/Kolkata' });
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function getISOWeek(date) {
@@ -59,4 +60,4 @@ function getAcademicYear(date) {
   return m >= 7 ? `${y}-${String(y + 1).slice(2)}` : `${y - 1}-${String(y).slice(2)}`;
 }
 
-console.log('[FeedbackCron] Scheduled — runs every Monday at 08:00');
+console.log('[FeedbackCron] Scheduled — runs every Monday at 09:00 IST');

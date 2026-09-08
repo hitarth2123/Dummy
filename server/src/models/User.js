@@ -62,6 +62,10 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    feedback_due: {
+      type: Boolean,
+      default: false,
+    },
     last_login: {
       type: Date,
     },

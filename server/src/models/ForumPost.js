@@ -103,5 +103,6 @@ forumPostSchema.index({ department: 1, type: 1, createdAt: -1 });
 forumPostSchema.index({ is_grievance: 1 });
 forumPostSchema.index({ parent_post: 1 });
 forumPostSchema.index({ author: 1 });
+forumPostSchema.index({ title: 'text', body: 'text', tags: 'text' });
 
 module.exports = mongoose.model('ForumPost', forumPostSchema);
