@@ -164,6 +164,21 @@ export const studentService = {
   bookSession:     (data) => api.post('/student/sessions/book', data).then(r => r.data),
   getSessions:     ()    => api.get('/student/sessions').then(r => r.data),
   getEmergency:    ()    => api.get('/student/emergency').then(r => r.data),
+  getFaculty:      ()    => api.get('/student/faculty').then(r => r.data),
+};
+
+export const facultyService = {
+  getDashboard:     () => api.get('/faculty/dashboard').then(r => r.data),
+  getAvailability:  () => api.get('/faculty/availability').then(r => r.data),
+  saveAvailability: (data) => api.put('/faculty/availability', data).then(r => r.data),
+  getRequests:      () => api.get('/faculty/session-requests').then(r => r.data),
+  updateRequest:    (id, data) => api.put(`/faculty/session-requests/${id}`, data).then(r => r.data),
+  getSessions:      () => api.get('/faculty/sessions').then(r => r.data),
+};
+
+export const adminService = {
+  getTimetable:    () => api.get('/admin/timetable').then(r => r.data),
+  uploadTimetable: (data) => api.post('/admin/timetable/upload', data).then(r => r.data),
 };
 
 export const mockTestService = {

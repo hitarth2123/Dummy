@@ -22,6 +22,7 @@ import AITutor            from '@pages/student/ai-tutor';
 import Videos             from '@pages/student/videos';
 import BookSession        from '@pages/student/book-session';
 import MySessions         from '@pages/student/my-sessions';
+import SessionDetails     from '@pages/student/session-details';
 import Forum              from '@pages/student/forum';
 import ReportHallucination from '@pages/student/report-hallucination';
 import Emergency          from '@pages/student/emergency';
@@ -74,6 +75,7 @@ const AppRoutes = () => (
       <Route path="videos"        element={<Videos />} />
       <Route path="book-session"  element={<BookSession />} />
       <Route path="my-sessions"   element={<MySessions />} />
+      <Route path="my-sessions/:id" element={<SessionDetails />} />
       <Route path="forum"         element={<Forum />} />
       <Route path="report-hallucination" element={<ReportHallucination />} />
       <Route path="emergency"     element={<Emergency />} />

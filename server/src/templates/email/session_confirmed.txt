@@ -1,0 +1,8 @@
+Doubt session confirmed
+
+Hello {{STUDENT_NAME}},
+Your session with {{FACULTY_NAME}} for {{SUBJECT}} is confirmed.
+Topic: {{TOPIC}}
+When: {{SCHEDULED_AT}}
+Meeting: {{MEETING_LINK}}
+{{NOTE}}

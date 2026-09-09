@@ -43,6 +43,9 @@ app.post('/v1/mcq/generate', async (req, res, next) => {
 app.post('/v1/tutor/chat', async (req, res, next) => {
   try {
     const prompt = req.body.message || req.body.prompt;
+    if (/\b(weather|temperature|forecast|rain|raining|sunny)\b/i.test(prompt || '')) {
+      return res.json({ success: true, data: { response: 'I do not have a live weather feed, so I cannot give today\'s forecast. I can still help with your coursework, revision, or study planning.', rag_sources: [] } });
+    }
     const rag = await searchKnowledge(prompt, {
       department: req.body.department,
       subject: req.body.subject,

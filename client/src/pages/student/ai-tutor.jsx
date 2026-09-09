@@ -1,42 +1,33 @@
 import React, { useRef, useState } from 'react';
-import { Flag, LoaderCircle, Send, Sparkles } from 'lucide-react';
+import { Bot, LoaderCircle, Send, Sparkles, UserRound } from 'lucide-react';
 import { useAuth } from '@hooks/useAuth';
-import { hallucinationService } from '@services/api.service';
+
+const escapeHtml = (value) => value.replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[character]));
+const inlineMarkup = (value) => escapeHtml(value).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+const TutorContent = ({ content }) => {
+  const lines = content.replace(/<details>[\s\S]*?<\/details>/gi, '').replace(/<summary>[\s\S]*?<\/summary>/gi, '').replace(/<br\s*\/?>/gi, '\n').replace(/\r/g, '').trim().split('\n');
+  const output = []; let paragraph = []; let code = null;
+  const flush = () => { if (paragraph.length) { output.push(<p key={`p-${output.length}`} className="leading-7 text-slate-700" dangerouslySetInnerHTML={{ __html: inlineMarkup(paragraph.join(' ')) }} />); paragraph = []; } };
+  lines.forEach((line, index) => {
+    if (line.startsWith('```')) { if (code === null) { flush(); code = []; } else { output.push(<pre key={`code-${index}`} className="overflow-x-auto rounded-xl bg-slate-950 p-4 text-xs leading-6 text-emerald-300"><code>{escapeHtml(code.join('\n'))}</code></pre>); code = null; } return; }
+    if (code !== null) { code.push(line); return; }
+    if (!line.trim()) { flush(); return; }
+    if (/^#{1,3} /.test(line)) { flush(); const level = line.match(/^#+/)[0].length; const Heading = level === 1 ? 'h2' : 'h3'; output.push(<Heading key={`h-${index}`} className={`${level === 1 ? 'text-xl' : 'text-base'} mt-2 font-bold text-ink`} dangerouslySetInnerHTML={{ __html: inlineMarkup(line.replace(/^#{1,3} /, '')) }} />); return; }
+    if (/^\s*[-•] /.test(line)) { flush(); output.push(<div key={`li-${index}`} className="flex gap-2 pl-2 leading-7 text-slate-700"><span className="text-teal-600">•</span><span dangerouslySetInnerHTML={{ __html: inlineMarkup(line.replace(/^\s*[-•] /, '')) }} /></div>); return; }
+    if (/^\s*\d+[.)] /.test(line)) { flush(); output.push(<div key={`ol-${index}`} className="flex gap-2 pl-2 leading-7 text-slate-700"><span className="font-semibold text-teal-700">{line.match(/^\s*\d+/)[0].trim()}.</span><span dangerouslySetInnerHTML={{ __html: inlineMarkup(line.replace(/^\s*\d+[.)] /, '')) }} /></div>); return; }
+    if (/^\s*[-*_]{3,}\s*$/.test(line)) { flush(); output.push(<hr key={`hr-${index}`} className="border-slate-200" />); return; }
+    paragraph.push(line);
+  });
+  flush();
+  return <div className="space-y-3 text-[15px]">{output}</div>;
+};
 
 const AITutor = () => {
-	const { user } = useAuth();
-	const [messages, setMessages] = useState([]);
-	const [prompt, setPrompt] = useState('');
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState('');
-	const [reported, setReported] = useState({});
-	const inputRef = useRef(null);
-
-	const sendMessage = async (event) => {
-		event.preventDefault();
-		const message = prompt.trim();
-		if (!message || loading) return;
-		setPrompt(''); setError(''); setLoading(true);
-		setMessages((current) => [...current, { role: 'user', content: message }, { role: 'assistant', content: '', sources: [] }]);
-		try {
-			const stored = JSON.parse(localStorage.getItem('ai_buddy_user') || 'null');
-			const response = await fetch('/api/llm/tutor/chat', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: stored?.token ? `Bearer ${stored.token}` : '' }, body: JSON.stringify({ message, stream: true }) });
-			if (!response.ok) throw new Error((await response.json()).message || 'Tutor request failed');
-			const reader = response.body.getReader(); const decoder = new TextDecoder(); let buffer = ''; let reading = true;
-			while (reading) { const { value, done } = await reader.read(); if (done) { reading = false; continue; } buffer += decoder.decode(value, { stream: true }); const events = buffer.split('\n\n'); buffer = events.pop() || ''; events.forEach((eventChunk) => { const line = eventChunk.split('\n').find((lineValue) => lineValue.startsWith('data: ')); if (!line) return; const data = JSON.parse(line.slice(6)); setMessages((current) => { const copy = [...current]; const last = copy[copy.length - 1]; copy[copy.length - 1] = { ...last, content: data.delta ? last.content + data.delta : last.content, sources: data.rag_sources || last.sources }; return copy; }); }); }
-		} catch (requestError) { setError(requestError.message); setMessages((current) => current.slice(0, -1)); } finally { setLoading(false); inputRef.current?.focus(); }
-	};
-
-	const reportResponse = async (index) => {
-		try {
-			await hallucinationService.report({ response: messages[index]?.content, source_ids: messages[index]?.sources?.map((source) => source.chunk_id) || [] });
-			setReported((current) => ({ ...current, [index]: true }));
-		} catch (requestError) {
-			setError(requestError.response?.data?.message || 'Could not submit the report.');
-		}
-	};
-
-	return <section className="flex min-h-[calc(100vh-11rem)] flex-col gap-6"><div><p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-700">Academic companion</p><h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink">AI tutor</h1><p className="mt-2 text-slate-600">Ask about your coursework and every answer will show its knowledge sources.</p></div><div className="flex-1 space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-panel sm:p-6">{messages.length === 0 && <div className="grid min-h-64 place-items-center text-center text-slate-500"><div><Sparkles className="mx-auto mb-3 text-amber-600" /><p>What are you studying today?</p></div></div>}{messages.map((message, index) => <div key={`${message.role}-${index}`} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}><div className={`max-w-2xl rounded-2xl px-4 py-3 text-sm leading-6 ${message.role === 'user' ? 'bg-ink text-white' : 'bg-slate-100 text-slate-700'}`}>{message.content || <LoaderCircle className="animate-spin" size={17} />}{message.role === 'assistant' && message.sources?.length > 0 && <div className="mt-3 flex flex-wrap gap-2 border-t border-slate-200 pt-3">{message.sources.map((source) => <span key={source.chunk_id} className="rounded-full bg-white px-2.5 py-1 text-xs text-slate-500">{source.source_document || source.chunk_id}</span>)}<button type="button" title="Report hallucination" aria-label="Report hallucination" onClick={() => reportResponse(index)} className={`ml-auto ${reported[index] ? 'text-emerald-600' : 'text-slate-400 hover:text-red-600'}`}><Flag size={15} /></button></div>}</div></div>)}</div>{error && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}<form onSubmit={sendMessage} className="flex gap-3"><input ref={inputRef} value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder={`Ask AI Buddy, ${user?.name || 'student'}...`} className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-600" /><button disabled={loading || !prompt.trim()} className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-teal-700 text-white hover:bg-teal-800 disabled:opacity-40" aria-label="Send message"><Send size={18} /></button></form></section>;
+  const { user } = useAuth();
+  const [messages, setMessages] = useState([]); const [prompt, setPrompt] = useState(''); const [loading, setLoading] = useState(false); const [error, setError] = useState(''); const inputRef = useRef(null);
+  const sendMessage = async (event) => { event.preventDefault(); const message = prompt.trim(); if (!message || loading) return; setPrompt(''); setError(''); setLoading(true); setMessages((current) => [...current, { role: 'user', content: message }, { role: 'assistant', content: '', sources: [] }]); try { const stored = JSON.parse(localStorage.getItem('ai_buddy_user') || 'null'); const response = await fetch('/api/llm/tutor/chat', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: stored?.token ? `Bearer ${stored.token}` : '' }, body: JSON.stringify({ message, stream: true }) }); if (!response.ok) throw new Error((await response.json()).message || 'Tutor request failed'); const reader = response.body.getReader(); const decoder = new TextDecoder(); let buffer = ''; let reading = true; while (reading) { const { value, done } = await reader.read(); if (done) { reading = false; continue; } buffer += decoder.decode(value, { stream: true }); const events = buffer.split('\n\n'); buffer = events.pop() || ''; events.forEach((chunk) => { const line = chunk.split('\n').find((item) => item.startsWith('data: ')); if (!line) return; const data = JSON.parse(line.slice(6)); setMessages((current) => { const copy = [...current]; const last = copy[copy.length - 1]; copy[copy.length - 1] = { ...last, content: data.delta ? last.content + data.delta : last.content, sources: data.rag_sources || last.sources }; return copy; }); }); } } catch (requestError) { setError(requestError.message); setMessages((current) => current.slice(0, -1)); } finally { setLoading(false); inputRef.current?.focus(); } };
+  return <section className="flex min-h-[calc(100vh-11rem)] flex-col gap-6"><header className="rounded-3xl bg-gradient-to-br from-ink via-slate-900 to-teal-950 p-6 text-white shadow-xl sm:p-8"><div className="flex items-center gap-3"><div className="grid h-11 w-11 place-items-center rounded-2xl bg-teal-400 text-ink"><Bot size={22} /></div><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-300">Academic companion</p><h1 className="mt-1 text-3xl font-bold tracking-tight">AI tutor</h1></div></div><p className="mt-4 max-w-2xl text-sm leading-6 text-slate-300">Ask about coursework for a structured explanation, or start with a normal conversation.</p></header><div className="flex-1 space-y-5 rounded-3xl border border-slate-200 bg-white p-4 shadow-panel sm:p-6">{messages.length === 0 && <div className="grid min-h-64 place-items-center text-center text-slate-500"><div><Sparkles className="mx-auto mb-3 text-amber-600" size={28} /><p className="font-semibold text-ink">What are you studying today?</p><p className="mt-1 text-sm">Ask about a topic or start a normal conversation.</p></div></div>}{messages.map((message, index) => <div key={`${message.role}-${index}`} className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>{message.role === 'assistant' && <div className="mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-teal-50 text-teal-700"><Bot size={16} /></div>}<div className={`max-w-3xl rounded-2xl px-5 py-4 text-sm ${message.role === 'user' ? 'bg-ink text-white' : 'border border-slate-200 bg-slate-50'}`}>{message.role === 'assistant' ? (message.content ? <TutorContent content={message.content} /> : <LoaderCircle className="animate-spin text-teal-700" size={18} />) : <div className="flex items-start gap-2"><UserRound size={16} className="mt-0.5 shrink-0" />{message.content}</div>}</div></div>)}</div>{error && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}<form onSubmit={sendMessage} className="flex gap-3"><input ref={inputRef} value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder={`Ask AI Buddy, ${user?.name || 'student'}...`} className="min-w-0 flex-1 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm shadow-sm outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-100" /><button disabled={loading || !prompt.trim()} className="inline-flex items-center gap-2 rounded-2xl bg-teal-700 px-5 py-3 text-sm font-semibold text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-50"><Send size={16} /> Send</button></form></section>;
 };
 
 export default AITutor;

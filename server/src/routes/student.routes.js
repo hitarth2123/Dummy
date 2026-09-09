@@ -14,6 +14,13 @@ router.get('/dashboard', controller.dashboard);
 // GET  /api/student/subjects — available subjects list
 router.get('/subjects', controller.getSubjects);
 
+// Faculty discovery and doubt-session booking
+router.get('/faculty', controller.listFaculty);
+router.post('/sessions/book', controller.bookSession);
+router.get('/sessions', controller.studentSessions);
+router.post('/doubt-session', controller.bookSession);
+router.get('/doubt-session/my', controller.studentSessions);
+
 // GET  /api/student/learning-path
 router.get('/learning-path', controller.learningPath);
 
@@ -36,11 +43,6 @@ router.get('/mock-tests', controller.mockTestHistory);
 router.get('/mock-test/:id/results', controller.mockTestResults);
 
 // POST /api/student/sessions/book
-router.post('/sessions/book', (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
-
-// GET  /api/student/sessions
-router.get('/sessions', (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
-
 // GET  /api/student/emergency
 router.get('/emergency', (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
 

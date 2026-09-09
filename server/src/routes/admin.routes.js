@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { protect }    = require('../middleware/auth.middleware');
 const { restrictTo } = require('../middleware/rbac.middleware');
+const controller = require('../controllers/admin.controller');
 
 router.use(protect, restrictTo('admin'));
 
@@ -15,9 +16,9 @@ router.put('/users/:id',          (req, res) => res.status(501).json({ success: 
 // DELETE /api/admin/users/:id
 router.delete('/users/:id',       (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
 // GET  /api/admin/timetable
-router.get('/timetable',          (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
+router.get('/timetable',          controller.getTimetable);
 // POST /api/admin/timetable
-router.post('/timetable',         (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
+router.post('/timetable/upload',  controller.uploadTimetable);
 // GET  /api/admin/emergency-contacts
 router.get('/emergency-contacts', (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
 // POST /api/admin/emergency-contacts

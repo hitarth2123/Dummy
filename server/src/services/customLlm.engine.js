@@ -9,6 +9,7 @@
 
 const path = require('path');
 const conversationalIntents = require('../dataset/conversationalIntents.json');
+const normalConversation = require('../dataset/normalConversation.json');
 const academicKnowledge = require('../dataset/academicKnowledge.json');
 const { generateLocalEmbedding, cosineSimilarity } = require('./localEmbedding.service');
 
@@ -50,7 +51,7 @@ const extractKeywords = (text) => {
 const matchConversationalIntent = (prompt) => {
   const normalized = prompt.toLowerCase().trim();
 
-  for (const item of conversationalIntents) {
+  for (const item of [...normalConversation, ...conversationalIntents]) {
     if (item.patterns) {
       for (const pat of item.patterns) {
         if (new RegExp(pat, 'i').test(normalized)) {
@@ -146,11 +147,9 @@ const formatMcqResponse = (item) => {
     `• **B)** ${mcq.options.B}\n` +
     `• **C)** ${mcq.options.C}\n` +
     `• **D)** ${mcq.options.D}\n\n` +
-    `---\n` +
-    `<details>\n<summary>👉 Click to reveal Correct Answer & Explanation</summary>\n\n` +
+    `---\n\n` +
     `**Correct Answer:** **${mcq.correct}**\n\n` +
-    `**Explanation:** ${mcq.explanation}\n` +
-    `</details>`;
+    `**Explanation:** ${mcq.explanation}`;
 };
 
 /**
@@ -193,14 +192,14 @@ const generateCustomResponse = async (prompt, options = {}) => {
 
   const trimmed = prompt.trim();
 
-  // 1. Check for conversational intents (greetings, motivation, about)
+  // Academic matches take priority when a casual keyword also appears in a topic request.
+  const match = findBestAcademicMatch(trimmed);
+
+  // Short standalone messages use the normal conversation datasets.
   const conversational = matchConversationalIntent(trimmed);
-  if (conversational && trimmed.split(/\s+/).length <= 6) {
+  if (!match && conversational && trimmed.split(/\s+/).length <= 8) {
     return conversational;
   }
-
-  // 2. Find best matching academic topic
-  const match = findBestAcademicMatch(trimmed);
 
   if (match) {
     // If user specifically asked for MCQs on this topic
@@ -210,19 +209,12 @@ const generateCustomResponse = async (prompt, options = {}) => {
     return formatAcademicExplanation(match.item);
   }
 
-  // 3. Fallback for open-ended or unrecognized questions
+  // Keep unmatched general conversation natural instead of inventing an academic answer.
   if (conversational) {
     return conversational;
   }
 
-  return `### 🤖 AI Buddy Academic Tutor\n\n` +
-    `I have analyzed your query: *"**${trimmed}**"*\n\n` +
-    `Here is a structured academic breakdown to help you study this topic:\n\n` +
-    `1. **Core Concept Definition**: Identify the fundamental definition, standard properties, and theoretical framework.\n` +
-    `2. **Key Principles & Workflow**: Break the topic into sequential sub-processes or architectural layers.\n` +
-    `3. **Practical Implementation / Example**: Connect the theory to a concrete real-world application or code snippet.\n` +
-    `4. **Exam Relevance**: Typical university questions focus on comparative analysis, mathematical derivations, or algorithm complexity.\n\n` +
-    `💡 *Tip: You can ask me specific topics like **Normalization in DBMS**, **CPU Scheduling**, **ACID Properties**, **OSI Model**, or ask for **Practice MCQs**!*`;
+  return `I am not sure how to answer that yet. I can explain academic topics, create practice MCQs, help with exam planning, or have a short study-related conversation. Try asking about a specific subject or topic.`;
 };
 
 module.exports = {

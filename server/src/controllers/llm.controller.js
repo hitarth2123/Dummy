@@ -24,6 +24,12 @@ const generateMcq = catchAsync(async (req, res) => {
 
 const tutorChatHandler = async (req, res) => {
   const prompt = req.body?.message || req.body?.prompt;
+  if (/\b(weather|temperature|forecast|rain|raining|sunny)\b/i.test(prompt || '')) {
+    const response = 'I do not have a live weather feed, so I cannot give today\'s forecast. I can still help with your coursework, revision, or study planning.';
+    if (req.body?.stream === false || typeof res.write !== 'function') return res.json({ success: true, data: { response, rag_sources: [] } });
+    res.status(200); res.setHeader('Content-Type', 'text/event-stream'); res.setHeader('Cache-Control', 'no-cache'); res.setHeader('Connection', 'keep-alive');
+    res.write(`data: ${JSON.stringify({ delta: response })}\n\n`); res.write(`data: ${JSON.stringify({ rag_sources: [], done: true })}\n\n`); return res.end();
+  }
   const userOptions = getUserOptions(req);
   const workerResult = workerEnabled()
     ? await requestLlmWorker('/v1/tutor/chat', {
@@ -59,7 +65,7 @@ const tutorChatHandler = async (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
-  const parts = String(response).match(/.{1,80}/g) || [''];
+  const parts = String(response).match(/[\s\S]{1,80}/g) || [''];
   for (const part of parts) res.write(`data: ${JSON.stringify({ delta: part })}\n\n`);
   res.write(`data: ${JSON.stringify({ rag_sources: rag.rag_sources, done: true })}\n\n`);
   return res.end();

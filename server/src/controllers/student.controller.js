@@ -4,6 +4,10 @@ const LearningPath = require('../models/LearningPath');
 const ExamTimetable = require('../models/ExamTimetable');
 const MockTest = require('../models/MockTest');
 const User = require('../models/User');
+const DoubtSession = require('../models/DoubtSession');
+const FacultyAvailability = require('../models/FacultyAvailability');
+const { sendFacultyRequest } = require('../services/mailer.service');
+const { getConfiguredZoomLink, getDevelopmentMeetingLink } = require('../services/meeting.service');
 const dbmsQuestionBank = require('../dataset/dbms/dbms_question_bank.json');
 
 const bundledDBMSQuestions = dbmsQuestionBank.sets.flatMap((set) => set.questions.map((question) => ({
@@ -179,6 +183,64 @@ const dashboard = catchAsync(async (req, res) => {
   res.json({ success: true, data: { user, agenda: path?.topics?.slice(0, 5) || [], exams, lockout_active: Boolean(user?.lockout_until && user.lockout_until > new Date()) } });
 });
 
+const listFaculty = catchAsync(async (req, res) => {
+  const faculty = await User.find({ role: 'faculty', department: req.department, is_active: true }).select('name email department subject_expertise').lean();
+  const availability = await FacultyAvailability.find({ faculty: { $in: faculty.map((item) => item._id) }, is_available: true }).lean();
+  const byFaculty = new Map(availability.map((item) => [String(item.faculty), item]));
+  return res.json({ success: true, data: faculty.map((item) => ({ ...item, availability: byFaculty.get(String(item._id)) || null })) });
+});
+
+const bookSession = catchAsync(async (req, res) => {
+  const { faculty_id, subject, topic, description, scheduled_at, duration_minutes = 30 } = req.body;
+  if (!faculty_id || !subject || !description || !scheduled_at) return res.status(400).json({ success: false, message: 'Faculty, subject, description, and scheduled time are required.' });
+  const faculty = await User.findOne({ _id: faculty_id, role: 'faculty', department: req.department, is_active: true }).lean();
+  if (!faculty) return res.status(404).json({ success: false, message: 'Faculty member not found in your department.' });
+  const scheduled = new Date(scheduled_at);
+  if (Number.isNaN(scheduled.getTime()) || scheduled <= new Date()) return res.status(400).json({ success: false, message: 'Scheduled time must be a valid future date.' });
+  const availability = await FacultyAvailability.findOne({ faculty: faculty_id, department: req.department, is_available: true }).lean();
+  const day = scheduled.toLocaleDateString('en-US', { weekday: 'long' });
+  const time = scheduled.toTimeString().slice(0, 5);
+  const slot = availability?.slots?.find((item) => item.day_of_week === day && !item.is_booked && item.start_time <= time && item.end_time > time);
+  const isDevelopmentTest = process.env.NODE_ENV !== 'production' && req.body.test_mode === true;
+  if (!slot && !isDevelopmentTest) return res.status(409).json({ success: false, message: 'This faculty member is not available at that time.' });
+  const student = await User.findById(req.user.id).select('name').lean();
+  if (slot) {
+    const reserved = await FacultyAvailability.findOneAndUpdate(
+      { faculty: faculty_id, department: req.department, is_available: true, 'slots._id': slot._id, 'slots.is_booked': false },
+      { $set: { 'slots.$.is_booked': true, 'slots.$.booked_by': req.user.id } },
+      { new: true }
+    ).lean();
+    if (!reserved) return res.status(409).json({ success: false, message: 'This time slot was just booked by another student. Please choose another slot.' });
+  }
+  let session;
+  try {
+    session = await DoubtSession.create({ student: req.user.id, faculty: faculty_id, department: req.department, subject, topic, description, scheduled_at: scheduled, duration_minutes });
+  } catch (error) {
+    if (slot) await FacultyAvailability.updateOne({ faculty: faculty_id, 'slots._id': slot._id, 'slots.booked_by': req.user.id }, { $set: { 'slots.$.is_booked': false, 'slots.$.booked_by': null } });
+    throw error;
+  }
+  await sendFacultyRequest(faculty.email, { FACULTY_NAME: faculty.name, STUDENT_NAME: student?.name || 'Student', SUBJECT: subject, TOPIC: topic || 'General doubt', DESCRIPTION: description, SCHEDULED_AT: scheduled.toLocaleString() }).catch(() => {});
+  return res.status(201).json({ success: true, data: session });
+});
+
+const studentSessions = catchAsync(async (req, res) => {
+  const sessions = await DoubtSession.find({ student: req.user.id }).populate('faculty', 'name email subject_expertise').sort({ scheduled_at: -1 }).lean();
+  const configuredZoomLink = getConfiguredZoomLink();
+  await Promise.all(sessions.filter((session) => session.status === 'confirmed' && session.meeting_link !== configuredZoomLink).map((session) => {
+    session.meeting_link = configuredZoomLink;
+    session.meeting_platform = 'zoom';
+    return DoubtSession.updateOne({ _id: session._id }, { meeting_link: configuredZoomLink, meeting_platform: 'zoom' });
+  }));
+  const legacySessions = sessions.filter((session) => session.meeting_link && session.meeting_link.startsWith('https://meet.google.com/'));
+  await Promise.all(legacySessions.map((session) => {
+    const meetingLink = getDevelopmentMeetingLink(session._id);
+    session.meeting_link = meetingLink;
+    session.meeting_platform = 'other';
+    return DoubtSession.updateOne({ _id: session._id }, { meeting_link: meetingLink, meeting_platform: 'other' });
+  }));
+  return res.json({ success: true, data: sessions });
+});
+
 const mockTestResults = catchAsync(async (req, res) => {
   const test = await MockTest.findOne({ _id: req.params.id, student: req.user.id, status: 'completed' })
     .populate('questions.question')
@@ -196,4 +258,4 @@ const mockTestHistory = catchAsync(async (req, res) => {
   return res.json({ success: true, data: tests });
 });
 
-module.exports = { questionBank, toggleBookmark, learningPath, completeLearningPathTopic, dashboard, mockTestResults, mockTestHistory, getSubjects, getQuestionSets };
+module.exports = { questionBank, toggleBookmark, learningPath, completeLearningPathTopic, dashboard, listFaculty, bookSession, studentSessions, mockTestResults, mockTestHistory, getSubjects, getQuestionSets };

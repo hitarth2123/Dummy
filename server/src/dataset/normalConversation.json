@@ -1,0 +1,35 @@
+[
+  {
+    "intent": "casual_greeting",
+    "patterns": ["^good morning$", "^good afternoon$", "^good evening$", "^how are you\\??$", "^how is it going\\??$"],
+    "responses": [
+      "Good to see you. I am ready to help with coursework, revision, or a quick conversation.",
+      "I am doing well and ready to study with you. What would you like to work on?"
+    ]
+  },
+  {
+    "intent": "casual_acknowledgement",
+    "patterns": ["^okay$", "^ok$", "^cool$", "^got it$", "^sounds good$"],
+    "responses": [
+      "Great. Send me the next topic whenever you are ready.",
+      "Perfect. We can continue from there whenever you like."
+    ]
+  },
+  {
+    "intent": "goodbye",
+    "patterns": ["^bye$", "^goodbye$", "^see you$", "^talk to you later$"],
+    "responses": [
+      "See you later. Keep your study session focused and manageable.",
+      "Goodbye. I will be here when you want to continue."
+    ]
+  },
+  {
+    "intent": "weather",
+    "keywords": ["weather", "temperature", "forecast", "rain", "raining", "sunny"],
+    "patterns": ["what('s| is) the weather", "how('s| is) the weather", "will it rain"],
+    "responses": [
+      "I cannot check live weather in this chat. Tell me your city and I can help you decide what information to look for, or ask me an academic question.",
+      "I do not have a live weather feed, so I cannot give today's forecast. I can still help with your coursework, revision, or study planning."
+    ]
+  }
+]
