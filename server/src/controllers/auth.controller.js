@@ -10,7 +10,7 @@ const blacklistedTokens = new Map();
 const getConfig = () => ({
   jwtSecret: process.env.JWT_SECRET,
   refreshSecret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
-  accessExpiresIn: process.env.JWT_EXPIRES_IN || '15m',
+  accessExpiresIn: process.env.JWT_EXPIRES_IN,
   refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
 });
 
@@ -126,8 +126,8 @@ const getSsoProfile = async (req) => {
   const devLoginEnabled = process.env.NODE_ENV !== 'production'
     && process.env.DEV_LOGIN_ENABLED !== 'false';
   if (devEmail && devLoginEnabled) {
-    if (!/^gmail\.com$/i.test(devEmail.split('@')[1] || '')) {
-      throw new AppError('Development login requires a Gmail address.', 400);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(devEmail.trim())) {
+      throw new AppError('Please enter a valid email address.', 400);
     }
     return {
       email: devEmail.trim().toLowerCase(),
@@ -173,11 +173,13 @@ const login = async (req, res) => {
   user.last_login = new Date();
   if (typeof user.save === 'function') await user.save();
 
-  return res.status(200).json({ success: true, data: {
-    user: claimUser(user),
-    accessToken: tokens.accessToken,
-    refreshToken: tokens.refreshToken,
-  } });
+  return res.status(200).json({
+    success: true, data: {
+      user: claimUser(user),
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+    }
+  });
 };
 
 const logout = async (req, res) => {
@@ -225,10 +227,12 @@ const refresh = async (req, res) => {
   if (!user || user.is_active === false) throw new AppError('User is not available.', 401);
 
   const tokens = await issueTokens(user, req, session);
-  res.json({ success: true, data: {
-    accessToken: tokens.accessToken,
-    refreshToken: tokens.refreshToken,
-  } });
+  res.json({
+    success: true, data: {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+    }
+  });
 };
 
 module.exports = {

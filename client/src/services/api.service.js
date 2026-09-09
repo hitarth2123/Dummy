@@ -30,7 +30,21 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// ── Response interceptor — handle 401 globally ───────────────────────────
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+// ── Response interceptor — handle 401 globally with silent token refresh ──
 api.interceptors.response.use(
   (res) => {
     const requestId = res.config.metadata?.requestId || res.headers['x-request-id'];
@@ -60,10 +74,70 @@ api.interceptors.response.use(
       message: err.response?.data?.message || err.message,
       output: err.response?.data,
     });
-    if (err.response?.status === 401) {
+
+    if (err.response?.status === 401 && !config._retry) {
+      const isAuthUrl = config.url?.includes('/auth/login') || config.url?.includes('/auth/refresh');
+      if (isAuthUrl) {
+        localStorage.removeItem('ai_buddy_user');
+        window.location.href = '/login';
+        return Promise.reject(err);
+      }
+
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            config.headers.Authorization = `Bearer ${token}`;
+            return api(config);
+          })
+          .catch((refreshErr) => Promise.reject(refreshErr));
+      }
+
+      config._retry = true;
+      isRefreshing = true;
+
+      const user = JSON.parse(localStorage.getItem('ai_buddy_user') || 'null');
+      const refreshToken = user?.refreshToken;
+
+      try {
+        const refreshEndpoint = import.meta.env.DEV ? '/api/auth/refresh' : ((import.meta.env.VITE_API_URL || '/api') + '/auth/refresh');
+        const { data } = await axios.post(refreshEndpoint, { refreshToken }, { withCredentials: true });
+        const resData = data.data || data;
+        const newAccessToken = resData?.accessToken;
+        const newRefreshToken = resData?.refreshToken;
+
+        if (newAccessToken && user) {
+          const updatedUser = {
+            ...user,
+            token: newAccessToken,
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken || user.refreshToken,
+          };
+          localStorage.setItem('ai_buddy_user', JSON.stringify(updatedUser));
+          api.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
+          config.headers.Authorization = `Bearer ${newAccessToken}`;
+
+          processQueue(null, newAccessToken);
+          return api(config);
+        } else {
+          throw new Error('Refresh token invalid');
+        }
+      } catch (refreshErr) {
+        processQueue(refreshErr, null);
+        localStorage.removeItem('ai_buddy_user');
+        window.location.href = '/login';
+        return Promise.reject(refreshErr);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
+    if (err.response?.status === 401 && config._retry) {
       localStorage.removeItem('ai_buddy_user');
       window.location.href = '/login';
     }
+
     return Promise.reject(err);
   }
 );
@@ -79,11 +153,12 @@ export const authService = {
 
 export const studentService = {
   getDashboard:    ()    => api.get('/student/dashboard').then(r => r.data),
-  getLearningPath: ()    => api.get('/student/learning-path').then(r => r.data),
+  getSubjects:     ()    => api.get('/student/subjects').then(r => r.data),
+  getLearningPath: (params) => api.get('/student/learning-path', { params }).then(r => r.data),
   getQuestionBank: (params) => api.get('/student/question-bank', { params }).then(r => r.data),
-  startMockTest:   (data)   => api.post('/student/mock-test/start', data).then(r => r.data),
-  submitMockTest:  (id, data) => api.post(`/student/mock-test/${id}/submit`, data).then(r => r.data),
-  getResults:      (id)  => api.get(`/student/mock-test/${id}/results`).then(r => r.data),
+  toggleBookmark:  (id)  => api.post(`/student/question-bank/${id}/bookmark`).then(r => r.data),
+  getMockTestHistory: () => api.get('/student/mock-tests').then(r => r.data),
+  getMockTestResults: (id) => api.get(`/student/mock-test/${id}/results`).then(r => r.data),
   bookSession:     (data) => api.post('/student/sessions/book', data).then(r => r.data),
   getSessions:     ()    => api.get('/student/sessions').then(r => r.data),
   getEmergency:    ()    => api.get('/student/emergency').then(r => r.data),
@@ -92,6 +167,10 @@ export const studentService = {
 export const mockTestService = {
   generate: (data) => api.post('/llm/mock-test/generate', data).then(r => r.data),
   submit: (id, data) => api.post(`/llm/mock-test/${id}/submit`, data).then(r => r.data),
+};
+
+export const learningPathService = {
+  generate: (data) => api.post('/llm/learning-path/generate', data).then(r => r.data),
 };
 
 export const llmService = {

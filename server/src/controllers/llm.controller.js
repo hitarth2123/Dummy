@@ -6,6 +6,7 @@ const { logAction } = require('../services/audit.service');
 const { requestLlmWorker, workerEnabled } = require('../services/llmGateway.service');
 const { generateMockTest, submitMockTest, upsertLearningPath } = require('../services/mockTest.service');
 const LearningPath = require('../models/LearningPath');
+const User = require('../models/User');
 
 const getUserOptions = (req) => ({
   department: req.user?.dept || req.user?.department,
@@ -83,8 +84,28 @@ const submitMock = catchAsync(async (req, res) => {
 });
 
 const generateLearningPath = catchAsync(async (req, res) => {
-  const persona = { ...req.user, ...req.body, id: req.user.id, dept: req.user.dept || req.user.department };
+  const isManual = req.body.manual_refresh === true;
+  const targetSubject = req.body.subject;
+
+  // Rate-limit: max 1 manual refresh per 24 hours UNLESS a subject parameter is passed
+  if (isManual && !targetSubject) {
+    const user = await User.findById(req.user.id).select('last_learning_path_refresh').lean();
+    if (user?.last_learning_path_refresh) {
+      const hoursSince = (Date.now() - new Date(user.last_learning_path_refresh).getTime()) / (1000 * 60 * 60);
+      if (hoursSince < 24) {
+        const hoursLeft = Math.ceil(24 - hoursSince);
+        return res.status(429).json({ success: false, message: `You can refresh your learning path again in ${hoursLeft} hour(s).` });
+      }
+    }
+  }
+
+  const persona = { ...req.user, ...req.body, id: req.user.id, dept: req.user.dept || req.user.department, subject: targetSubject };
   const path = await upsertLearningPath({ user: persona, mockScores: req.body.mock_scores || [] });
+
+  if (isManual && !targetSubject) {
+    await User.findByIdAndUpdate(req.user.id, { last_learning_path_refresh: new Date() });
+  }
+
   res.json({ success: true, data: path });
 });
 

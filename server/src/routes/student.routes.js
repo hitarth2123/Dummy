@@ -11,20 +11,23 @@ router.use(protect, restrictTo('student'), lockout, deptScope);
 // GET  /api/student/dashboard
 router.get('/dashboard', controller.dashboard);
 
+// GET  /api/student/subjects — available subjects list
+router.get('/subjects', controller.getSubjects);
+
 // GET  /api/student/learning-path
 router.get('/learning-path', controller.learningPath);
 
 // GET  /api/student/question-bank
 router.get('/question-bank', controller.questionBank);
 
-// POST /api/student/mock-test/start
-router.post('/mock-test/start', (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
+// POST /api/student/question-bank/:id/bookmark — toggle bookmark
+router.post('/question-bank/:id/bookmark', controller.toggleBookmark);
 
-// POST /api/student/mock-test/:id/submit
-router.post('/mock-test/:id/submit', (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
+// GET  /api/student/mock-tests — history of completed mock tests
+router.get('/mock-tests', controller.mockTestHistory);
 
 // GET  /api/student/mock-test/:id/results
-router.get('/mock-test/:id/results', (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
+router.get('/mock-test/:id/results', controller.mockTestResults);
 
 // POST /api/student/sessions/book
 router.post('/sessions/book', (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));

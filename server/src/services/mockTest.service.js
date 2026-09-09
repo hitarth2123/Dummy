@@ -65,6 +65,7 @@ const submitMockTest = async ({ user, testId, answers = [], timeTakenSec = 0 }) 
   test.status = 'completed';
   test.submitted_at = new Date();
   await test.save();
+  await test.populate('questions.question');
 
   const weakTopics = topicBreakdown.filter((item) => item.score_pct < 60).map((item) => item.topic);
   await User.findByIdAndUpdate(user.id, { weak_topics: weakTopics });
@@ -73,15 +74,44 @@ const submitMockTest = async ({ user, testId, answers = [], timeTakenSec = 0 }) 
 };
 
 const upsertLearningPath = async ({ user, mockScores = [] }) => {
+  const targetSubject = user.subject || (user.enrolled_subjects?.[0]) || 'DBMS';
   const weakTopics = user.weak_topics || mockScores.filter((item) => item.score_pct < 60).map((item) => item.topic);
+
+  let dbTopics = [];
+  try {
+    dbTopics = await QuestionBank.distinct('topic', { subject: targetSubject });
+  } catch (err) {
+    dbTopics = [];
+  }
+
+  if (!dbTopics.length) {
+    dbTopics = [
+      `${targetSubject} — Core Concepts & Fundamentals`,
+      `${targetSubject} — Architecture & Design`,
+      `${targetSubject} — Advanced Problem Solving`,
+      `${targetSubject} — Optimization & Analysis`,
+      `${targetSubject} — Practical Applications`,
+    ];
+  }
+
+  const topicItems = dbTopics.map((topicName) => {
+    const matched = mockScores.find((m) => m.topic === topicName);
+    return {
+      topic: topicName,
+      subject: targetSubject,
+      score: matched ? matched.score_pct : null,
+    };
+  });
+
   const topics = [...new Map([
-    ...mockScores.sort((a, b) => a.score_pct - b.score_pct).map((item) => [item.topic, { topic: item.topic, subject: user.subject || 'General', score: item.score_pct }]),
-    ...weakTopics.map((topic) => [topic, { topic, subject: user.subject || 'General', score: null }]),
-    ...(user.enrolled_subjects || []).map((subject) => [subject, { topic: subject, subject, score: null }]),
+    ...mockScores.sort((a, b) => a.score_pct - b.score_pct).map((item) => [item.topic, { topic: item.topic, subject: targetSubject, score: item.score_pct }]),
+    ...weakTopics.map((topic) => [topic, { topic, subject: targetSubject, score: null }]),
+    ...topicItems.map((item) => [item.topic, item]),
   ]).values()].slice(0, 20).map((item, index) => ({ ...item, order: index + 1, status: 'pending' }));
+
   return LearningPath.findOneAndUpdate(
-    { student: user.id, department: user.dept || user.department, subject: user.subject || 'General' },
-    { student: user.id, department: user.dept || user.department, subject: user.subject || 'General', semester: user.semester, topics, overall_progress_pct: 0, generated_by: 'ai', $inc: { version: 1 } },
+    { student: user.id, department: user.dept || user.department, subject: targetSubject },
+    { student: user.id, department: user.dept || user.department, subject: targetSubject, semester: user.semester || 5, topics, overall_progress_pct: 0, generated_by: 'ai', $inc: { version: 1 } },
     { upsert: true, new: true, setDefaultsOnInsert: true },
   ).lean();
 };

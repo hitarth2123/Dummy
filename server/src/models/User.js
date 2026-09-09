@@ -57,6 +57,16 @@ const userSchema = new Schema(
       type: [String],
       default: [],
     },
+    // Bookmarked question bank questions
+    bookmarked_questions: {
+      type: [{ type: Schema.Types.ObjectId, ref: 'QuestionBank' }],
+      default: [],
+    },
+    // Learning path manual refresh rate-limit
+    last_learning_path_refresh: {
+      type: Date,
+      default: null,
+    },
     // Account status
     is_active: {
       type: Boolean,

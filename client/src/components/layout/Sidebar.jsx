@@ -5,9 +5,13 @@ import { useAuth } from '@hooks/useAuth';
 
 const navigation = {
   student: [
-    ['Dashboard', '/student', Gauge], ['Learning path', '/student/learning-path', BookOpen],
-    ['Question bank', '/student/question-bank', ClipboardList], ['AI tutor', '/student/ai-tutor', MessageSquare],
-    ['Practice MCQ', '/student/practice-mcq', HelpCircle], ['Sessions', '/student/my-sessions', CalendarDays],
+    ['Dashboard', '/student', Gauge],
+    ['Mock test', '/student/mock-test', FileText],
+    ['Learning path', '/student/learning-path', BookOpen],
+    ['Question bank', '/student/question-bank', ClipboardList],
+    ['Practice MCQ', '/student/practice-mcq', HelpCircle],
+    ['AI tutor', '/student/ai-tutor', MessageSquare],
+    ['Sessions', '/student/my-sessions', CalendarDays],
     ['Forum', '/student/forum', MessageSquare],
   ],
   faculty: [

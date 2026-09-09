@@ -60,9 +60,38 @@ const fallbackSet = ({ topic, count, rag_sources }) => ({
 });
 
 const generateMcqSet = async ({ topic, count = 5, department, subject }) => {
-  const safeCount = Math.max(1, Math.min(Number(count) || 5, 20));
-  const rag = await searchKnowledge(topic, { department, subject, topK: 5 });
-  if (!rag.rag_sources.length) throw new Error('No relevant knowledge chunks were found for this topic.');
+  const safeCount = Math.max(1, Math.min(Number(count) || 5, 50));
+  let rag = await searchKnowledge(topic, { department, subject, topK: 5 });
+
+  if (!rag.rag_sources.length) {
+    const QuestionBank = require('../models/QuestionBank');
+    const existingQuestions = await QuestionBank.find({
+      $or: [{ subject }, { topic }, { department }],
+    }).limit(15).lean();
+
+    const fallbackContent = existingQuestions.length
+      ? existingQuestions.map((q) => `${q.question_text} (Topic: ${q.topic}, Correct: ${q.correct_answer})`).join('\n')
+      : `${subject || topic} is a core academic subject covering fundamental principles, architectural models, design patterns, and application problems in ${department || 'computer science'}.`;
+
+    const syntheticChunk = {
+      _id: existingQuestions.length ? String(existingQuestions[0]._id) : 'default-knowledge-chunk',
+      source_document: `${subject || topic} Curriculum Notes`,
+      source_type: 'curriculum',
+      department: department || 'Computer Science',
+      subject: subject || topic || 'General',
+      topic: topic || 'General',
+      score: 1.0,
+      content: fallbackContent,
+    };
+
+    rag = {
+      query: topic,
+      chunks: [syntheticChunk],
+      chunkIds: [syntheticChunk._id],
+      context: fallbackContent,
+      rag_sources: [toCitation(syntheticChunk)],
+    };
+  }
 
   let generated;
   try {
