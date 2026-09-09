@@ -86,6 +86,11 @@ const questionBankSchema = new Schema(
       trim: true,
       default: 'manual',
     },
+    set_name: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     is_verified: {
       type: Boolean,
       default: false,

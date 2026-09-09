@@ -73,7 +73,7 @@ const chatLegacy = catchAsync(async (req, res) => {
 });
 
 const generateMock = catchAsync(async (req, res) => {
-  const result = await generateMockTest({ user: req.user, subject: req.body.subject, count: req.body.count, durationMinutes: req.body.duration_minutes });
+  const result = await generateMockTest({ user: req.user, subject: req.body.subject, setName: req.body.set_name, count: req.body.count, durationMinutes: req.body.duration_minutes });
   res.status(201).json({ success: true, data: result });
 });
 

@@ -12,7 +12,9 @@ import DashboardLayout from '@layouts/DashboardLayout';
 // Student pages
 import StudentDashboard   from '@pages/student/dashboard';
 import LearningPath       from '@pages/student/learning-path';
+import TopicStudy         from '@pages/student/topic-study';
 import QuestionBank       from '@pages/student/question-bank';
+import QuestionPaper      from '@pages/student/question-paper';
 import PracticeMCQ        from '@pages/student/practice-mcq';
 import MockTest           from '@pages/student/mock-test';
 import MockTestResults    from '@pages/student/mock-test-results';
@@ -62,7 +64,9 @@ const AppRoutes = () => (
       <Route index                element={<StudentDashboard />} />
       <Route path="dashboard"     element={<StudentDashboard />} />
       <Route path="learning-path" element={<LearningPath />} />
+      <Route path="learning-path/topic" element={<TopicStudy />} />
       <Route path="question-bank" element={<QuestionBank />} />
+      <Route path="question-bank/paper" element={<QuestionPaper />} />
       <Route path="practice-mcq" element={<PracticeMCQ />} />
       <Route path="mock-test"     element={<MockTest />} />
       <Route path="mock-test/:id/results" element={<MockTestResults />} />

@@ -4,10 +4,10 @@ const User = require('../models/User');
 const LearningPath = require('../models/LearningPath');
 const { generateMcqSet } = require('./mcq.service');
 
-const generateMockTest = async ({ user, subject, count = 30, durationMinutes = 30 }) => {
+const generateMockTest = async ({ user, subject, setName, count = 30, durationMinutes = 30 }) => {
   const total = Math.max(30, Math.min(Number(count) || 30, 50));
   const generated = await generateMcqSet({
-    topic: subject,
+    topic: setName ? `${subject} ${setName}` : subject,
     subject,
     department: user.dept || user.department,
     count: total,
@@ -77,6 +77,54 @@ const upsertLearningPath = async ({ user, mockScores = [] }) => {
   const targetSubject = user.subject || (user.enrolled_subjects?.[0]) || 'DBMS';
   const weakTopics = user.weak_topics || mockScores.filter((item) => item.score_pct < 60).map((item) => item.topic);
 
+  // Try to load from structured dataset for known subjects
+  let datasetTopics = [];
+  try {
+    const subjectKey = targetSubject.toLowerCase().replace(/\s+/g, '_');
+    const datasetPath = require('path').resolve(__dirname, `../dataset/${subjectKey}/${subjectKey}_learning_path.json`);
+    datasetTopics = require(datasetPath);
+  } catch {
+    // No dataset file for this subject — fall back to DB topics
+  }
+
+  if (datasetTopics.length > 0) {
+    // Build structured learning path from dataset
+    const topics = datasetTopics.map((item, index) => {
+      const matched = mockScores.find((m) => m.topic === item.topic);
+      return {
+        topic: item.topic,
+        subject: targetSubject,
+        order: item.order || index + 1,
+        status: matched && matched.score_pct >= 80 ? 'completed' : matched && matched.score_pct >= 40 ? 'in_progress' : 'pending',
+        score: matched ? matched.score_pct : null,
+        description: item.description || '',
+        reading_material: item.reading_material || '',
+        key_concepts: item.key_concepts || [],
+        exercises: item.exercises || [],
+        estimated_minutes: item.estimated_minutes || 30,
+      };
+    });
+
+    const completedCount = topics.filter((t) => t.status === 'completed').length;
+    const overallPct = topics.length ? Math.round((completedCount / topics.length) * 100) : 0;
+
+    return LearningPath.findOneAndUpdate(
+      { student: user.id, department: user.dept || user.department, subject: targetSubject },
+      {
+        student: user.id,
+        department: user.dept || user.department,
+        subject: targetSubject,
+        semester: user.semester || 5,
+        topics,
+        overall_progress_pct: overallPct,
+        generated_by: 'ai',
+        $inc: { version: 1 },
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true },
+    ).lean();
+  }
+
+  // Fallback: use existing DB topics or generic placeholders
   let dbTopics = [];
   try {
     dbTopics = await QuestionBank.distinct('topic', { subject: targetSubject });

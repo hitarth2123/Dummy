@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AlertTriangle, ArrowRight, Award, ChevronLeft, ChevronRight, Clock, History, LoaderCircle, Play, Send, Timer } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { mockTestService, studentService } from '@services/api.service';
 
 /* ── TimerBar ─────────────────────────────────────────────────────────────── */
@@ -48,7 +48,10 @@ const QuestionDots = ({ total, current, answers }) => (
 
 /* ── Config Screen ────────────────────────────────────────────────────────── */
 const ConfigScreen = ({ onStart, loading, error, history, historyLoading, onViewResults }) => {
-  const [config, setConfig] = useState({ subject: 'DBMS', count: 30, duration_minutes: 30 });
+  const [searchParams] = useSearchParams();
+  const selectedSet = searchParams.get('set') || '';
+  const selectedSubject = searchParams.get('subject') || 'DBMS';
+  const [config, setConfig] = useState({ subject: selectedSubject, set_name: selectedSet, count: 30, duration_minutes: 30 });
   const handleSubmit = (e) => { e.preventDefault(); onStart(config); };
 
   return (
@@ -70,6 +73,7 @@ const ConfigScreen = ({ onStart, loading, error, history, historyLoading, onView
             <Play size={18} className="text-indigo-400" />
             <span>Create New Mock Test</span>
           </h2>
+          {config.set_name && <div className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-3 py-2 text-xs font-semibold text-indigo-300">Paper set: {config.set_name}</div>}
           <label className="block">
             <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400">Subject</span>
             <input
@@ -215,7 +219,9 @@ const MockTest = () => {
     studentService
       .getMockTestHistory()
       .then((res) => {
-        setHistory(res.data || res || []);
+        // res = { success: true, data: [...] } from the API
+        const tests = Array.isArray(res) ? res : (res?.data || []);
+        setHistory(tests);
       })
       .catch(() => {})
       .finally(() => setHistoryLoading(false));

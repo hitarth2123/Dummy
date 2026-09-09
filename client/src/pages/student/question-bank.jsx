@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ClipboardList,
+  FileText,
   Filter,
   HelpCircle,
   LoaderCircle,
@@ -25,17 +26,42 @@ export default function QuestionBank() {
   // Filters
   const [subjectFilter, setSubjectFilter] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState('');
+  const [setNameFilter, setSetNameFilter] = useState('');
   const [bookmarkedOnly, setBookmarkedOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
 
+  // Available question sets
+  const [availableSets, setAvailableSets] = useState([]);
+  const [setsLoading, setSetsLoading] = useState(false);
+  const [mockSet, setMockSet] = useState('');
+
+  // Fetch available sets when subject changes
+  useEffect(() => {
+    setSetsLoading(true);
+    studentService
+      .getQuestionSets({ subject: subjectFilter || undefined })
+      .then((res) => {
+        const sets = Array.isArray(res) ? res : (res?.data || []);
+        setAvailableSets(sets);
+      })
+      .catch(() => setAvailableSets([]))
+      .finally(() => setSetsLoading(false));
+  }, [subjectFilter]);
+
   const fetchQuestions = useCallback(async () => {
+    if (!setNameFilter) {
+      setQuestions([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError('');
     try {
       const params = { page };
       if (subjectFilter) params.subject = subjectFilter;
       if (difficultyFilter) params.difficulty = difficultyFilter;
+      if (setNameFilter) params.set_name = setNameFilter;
       if (bookmarkedOnly) params.bookmarked = 'true';
 
       const res = await studentService.getQuestionBank(params);
@@ -47,7 +73,7 @@ export default function QuestionBank() {
     } finally {
       setLoading(false);
     }
-  }, [page, subjectFilter, difficultyFilter, bookmarkedOnly]);
+  }, [page, subjectFilter, difficultyFilter, setNameFilter, bookmarkedOnly]);
 
   useEffect(() => {
     fetchQuestions();
@@ -78,6 +104,19 @@ export default function QuestionBank() {
       q.subject?.toLowerCase().includes(query)
     );
   });
+
+  const setsByYear = availableSets.reduce((groups, set) => {
+    const year = set.year || 'Other papers';
+    if (!groups[year]) groups[year] = [];
+    groups[year].push(set);
+    return groups;
+  }, {});
+  const paperYears = Object.keys(setsByYear).sort((firstYear, secondYear) => {
+    if (firstYear === 'Other papers') return 1;
+    if (secondYear === 'Other papers') return -1;
+    return Number(secondYear) - Number(firstYear);
+  });
+  const showingPaperQuestions = Boolean(setNameFilter);
 
   return (
     <div className="space-y-6">
@@ -120,6 +159,7 @@ export default function QuestionBank() {
           value={subjectFilter}
           onChange={(e) => {
             setSubjectFilter(e.target.value);
+            setSetNameFilter(''); // reset set filter when subject changes
             setPage(1);
           }}
           className="rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-ink outline-none transition focus:border-teal-600"
@@ -130,6 +170,23 @@ export default function QuestionBank() {
           <option value="Operating Systems">Operating Systems</option>
           <option value="Computer Networks">Computer Networks</option>
           <option value="Software Engineering">Software Engineering</option>
+        </select>
+
+        {/* Set Filter */}
+        <select
+          value={setNameFilter}
+          onChange={(e) => {
+            setSetNameFilter(e.target.value);
+            setPage(1);
+          }}
+          className="rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-ink outline-none transition focus:border-teal-600"
+        >
+          <option value="">All Exam Sets</option>
+          {availableSets.map((s) => (
+            <option key={s.set_name} value={s.set_name}>
+              {s.set_name} ({s.question_count} Qs)
+            </option>
+          ))}
         </select>
 
         {/* Difficulty Select */}
@@ -165,21 +222,112 @@ export default function QuestionBank() {
         </button>
       </div>
 
+      {/* Visible year-wise question papers */}
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-panel sm:p-6">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">Previous year papers</p>
+            <h2 className="mt-1 text-xl font-bold text-ink">Question papers by year</h2>
+            <p className="mt-1 text-sm text-slate-500">Choose a subject paper set to view every question from that exam.</p>
+          </div>
+          {setsLoading && <LoaderCircle className="h-5 w-5 animate-spin text-teal-700" />}
+        </div>
+
+        {!setsLoading && paperYears.length > 0 && (
+          <div className="mt-5 space-y-5">
+            {paperYears.map((year) => (
+              <div key={year}>
+                <h3 className="mb-2 flex items-center gap-2 text-sm font-bold text-ink">
+                  <span className="grid h-7 w-7 place-items-center rounded-lg bg-teal-50 text-teal-700">{year === 'Other papers' ? '?' : String(year).slice(-2)}</span>
+                  {year}
+                </h3>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {setsByYear[year].map((set) => (
+                    <Link
+                      key={`${year}-${set.set_name}`}
+                      to={`/student/question-bank/paper?subject=${encodeURIComponent(set.subject || subjectFilter || 'DBMS')}&set=${encodeURIComponent(set.set_name)}`}
+                      className={`flex items-center justify-between gap-3 rounded-xl border p-4 text-left transition ${
+                        setNameFilter === set.set_name
+                          ? 'border-teal-500 bg-teal-50 ring-1 ring-teal-500'
+                          : 'border-slate-200 bg-slate-50 hover:border-teal-300 hover:bg-white'
+                      }`}
+                    >
+                      <span className="flex min-w-0 items-center gap-3">
+                        <FileText size={18} className="shrink-0 text-teal-700" />
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-semibold text-ink">{set.set_name}</span>
+                          <span className="mt-0.5 block text-xs text-slate-500">{set.subject || subjectFilter || 'All subjects'}</span>
+                        </span>
+                      </span>
+                      <span className="shrink-0 rounded-full bg-white px-2 py-1 text-[11px] font-bold text-teal-800 shadow-sm">{set.question_count} Qs</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!setsLoading && paperYears.length === 0 && (
+          <p className="mt-5 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">No question paper sets are available for this subject yet.</p>
+        )}
+      </section>
+
+      <section className="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-panel sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-700">Assessment studio</p>
+            <h2 className="mt-1 text-xl font-bold text-ink">Generate a mock test from a paper set</h2>
+            <p className="mt-1 text-sm text-slate-600">Select a previous-year set to carry its subject and paper context into the mock-test generator.</p>
+          </div>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-[340px] sm:flex-row">
+            <select value={mockSet} onChange={(event) => setMockSet(event.target.value)} className="min-w-0 flex-1 rounded-xl border border-indigo-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-ink outline-none focus:border-indigo-500">
+              <option value="">Select a paper set</option>
+              {availableSets.map((set) => <option key={set.set_name} value={set.set_name}>{set.set_name} ({set.question_count} Qs)</option>)}
+            </select>
+            <Link to={mockSet ? `/student/mock-test?subject=${encodeURIComponent(availableSets.find((set) => set.set_name === mockSet)?.subject || subjectFilter || 'DBMS')}&set=${encodeURIComponent(mockSet)}` : '#'} onClick={(event) => { if (!mockSet) event.preventDefault(); }} className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white ${mockSet ? 'bg-indigo-700 hover:bg-indigo-800' : 'cursor-not-allowed bg-indigo-300'}`}>
+              <Play size={16} /> Generate mock test
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Active Set Info */}
+      {setNameFilter && (
+        <div className="flex items-center gap-3 rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3">
+          <FileText size={18} className="text-indigo-600" />
+          <div>
+            <p className="text-sm font-semibold text-indigo-800">Viewing: {setNameFilter}</p>
+            <p className="text-xs text-indigo-600">
+              {availableSets.find((s) => s.set_name === setNameFilter)?.question_count || '?'} questions in this set
+              {subjectFilter && ` · ${subjectFilter}`}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSetNameFilter('')}
+            className="ml-auto text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition"
+          >
+            Clear set filter
+          </button>
+        </div>
+      )}
+
       {error && (
         <div className="rounded-xl bg-red-50 p-4 text-sm text-red-700 border border-red-100">
           {error}
         </div>
       )}
 
-      {/* Loading State */}
-      {loading && (
+      {/* Question results are shown only on a selected paper page. */}
+      {showingPaperQuestions && loading && (
         <div className="flex min-h-[300px] items-center justify-center">
           <LoaderCircle className="h-8 w-8 animate-spin text-teal-700" />
         </div>
       )}
 
       {/* Questions Grid */}
-      {!loading && filteredQuestions.length > 0 && (
+      {showingPaperQuestions && !loading && filteredQuestions.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-slate-500 px-1">
             <span>Showing {filteredQuestions.length} questions</span>
@@ -200,6 +348,11 @@ export default function QuestionBank() {
                     {q.topic && (
                       <span className="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
                         {q.topic}
+                      </span>
+                    )}
+                    {q.set_name && (
+                      <span className="rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700 border border-indigo-100">
+                        {q.set_name}
                       </span>
                     )}
                     {q.year && (
@@ -299,7 +452,7 @@ export default function QuestionBank() {
       )}
 
       {/* Empty State */}
-      {!loading && filteredQuestions.length === 0 && (
+      {showingPaperQuestions && !loading && filteredQuestions.length === 0 && (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center text-slate-500">
           <ClipboardList className="mx-auto mb-3 text-teal-700" size={32} />
           <h3 className="text-lg font-semibold text-ink">No questions found</h3>
@@ -310,6 +463,10 @@ export default function QuestionBank() {
           </p>
         </div>
       )}
+
+      <Link to="/student/dashboard" className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50">
+        <ChevronLeft size={16} /> Back to dashboard
+      </Link>
     </div>
   );
 }

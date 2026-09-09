@@ -17,6 +17,12 @@ router.get('/subjects', controller.getSubjects);
 // GET  /api/student/learning-path
 router.get('/learning-path', controller.learningPath);
 
+// PATCH /api/student/learning-path/topic — mark one topic as completed
+router.patch('/learning-path/topic', controller.completeLearningPathTopic);
+
+// GET  /api/student/question-bank/sets — available question sets per subject
+router.get('/question-bank/sets', controller.getQuestionSets);
+
 // GET  /api/student/question-bank
 router.get('/question-bank', controller.questionBank);
 

@@ -41,6 +41,28 @@ const topicProgressSchema = new Schema(
       type: Date,
       default: null,
     },
+    description: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    reading_material: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    key_concepts: {
+      type: [String],
+      default: [],
+    },
+    exercises: {
+      type: [Schema.Types.Mixed],
+      default: [],
+    },
+    estimated_minutes: {
+      type: Number,
+      default: 30,
+    },
   },
   { _id: false }
 );
