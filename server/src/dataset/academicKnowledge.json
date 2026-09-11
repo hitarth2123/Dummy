@@ -1,0 +1,127 @@
+[
+  {
+    "department": "BTech",
+    "subject": "DBMS",
+    "topic": "Normalization",
+    "keywords": ["normalization", "1nf", "2nf", "3nf", "bcnf", "normal form", "functional dependency", "partial dependency", "transitive dependency"],
+    "summary": "Database Normalization is a systematic approach of decomposing tables to eliminate data redundancy and undesirable anomalies (insertion, update, deletion).",
+    "details": "### Database Normalization Explained\n\n**Normalization** is the process of organizing data in a relational database to minimize redundancy and dependency by dividing large tables into smaller, linked tables.\n\n#### Normal Forms Progression:\n1. **1NF (First Normal Form)**: Eliminate repeating groups and ensure atomic (indivisible) values in every column with a defined primary key.\n2. **2NF (Second Normal Form)**: Must be in 1NF and eliminate **partial dependencies** (every non-prime attribute must be fully functionally dependent on the primary key).\n3. **3NF (Third Normal Form)**: Must be in 2NF and eliminate **transitive dependencies** ($X \\rightarrow Y$ where $Y$ is a non-prime attribute and $X$ is not a candidate key).\n4. **BCNF (Boyce-Codd Normal Form)**: A stricter version of 3NF where for every functional dependency $X \\rightarrow Y$, $X$ must be a **super key**.\n\n#### Key Advantages:\n- Eliminates update, insert, and delete anomalies\n- Saves storage space and maintains ACID consistency\n- Improves query maintenance and indexing efficiency",
+    "example": "-- Example 3NF Table Decomposition\n-- Bad (Transitive Dependency: StudentID -> DeptID -> DeptName):\nCREATE TABLE Student_Bad (StudentID INT, StudentName VARCHAR(50), DeptID INT, DeptName VARCHAR(50));\n\n-- Good (Normalized to 3NF):\nCREATE TABLE Department (DeptID INT PRIMARY KEY, DeptName VARCHAR(50));\nCREATE TABLE Student (StudentID INT PRIMARY KEY, StudentName VARCHAR(50), DeptID INT REFERENCES Department(DeptID));",
+    "mcq": {
+      "question": "Which normal form removes partial functional dependencies?",
+      "options": { "A": "1NF", "B": "2NF", "C": "3NF", "D": "BCNF" },
+      "correct": "B",
+      "explanation": "2NF requires the relation to be in 1NF and ensures that no non-prime attribute is partially dependent on any candidate key."
+    }
+  },
+  {
+    "department": "BTech",
+    "subject": "DBMS",
+    "topic": "Transactions and ACID Properties",
+    "keywords": ["acid", "transaction", "atomicity", "consistency", "isolation", "durability", "concurrency", "commit", "rollback"],
+    "summary": "A transaction is a single logical unit of database work governed by ACID properties to guarantee data integrity.",
+    "details": "### ACID Properties in Database Systems\n\n- **A — Atomicity**: 'All or nothing'. Either the entire transaction succeeds (COMMIT) or any failure causes complete rollback.\n- **C — Consistency**: A transaction transitions the database from one valid consistent state to another, preserving all constraints and triggers.\n- **I — Isolation**: Concurrent transactions execute independently without interfering with each other (controlled via Isolation Levels: Read Uncommitted, Read Committed, Repeatable Read, Serializable).\n- **D — Durability**: Once committed, the changes are permanent and survive system crashes or power failures (logged to write-ahead logs / WAL).",
+    "example": "-- Example SQL Transaction with Rollback Protection\nBEGIN TRANSACTION;\n  UPDATE Accounts SET balance = balance - 500 WHERE account_id = 101;\n  UPDATE Accounts SET balance = balance + 500 WHERE account_id = 102;\nCOMMIT;",
+    "mcq": {
+      "question": "Which ACID property ensures committed transactions survive power outages?",
+      "options": { "A": "Atomicity", "B": "Consistency", "C": "Isolation", "D": "Durability" },
+      "correct": "D",
+      "explanation": "Durability guarantees that once a transaction has committed, its updates survive system crashes and hardware failures."
+    }
+  },
+  {
+    "department": "BTech",
+    "subject": "Operating Systems",
+    "topic": "CPU Scheduling Algorithms",
+    "keywords": ["cpu scheduling", "fcfs", "sjf", "round robin", "priority scheduling", "turnaround time", "waiting time", "preemptive"],
+    "summary": "CPU scheduling algorithms allocate CPU time among ready processes to optimize turnaround time, waiting time, and CPU utilization.",
+    "details": "### CPU Scheduling Algorithms\n\n1. **FCFS (First-Come, First-Served)**: Non-preemptive, simple FIFO queue. Suffer from the *Convoy Effect* where short processes wait behind long ones.\n2. **SJF / SRTF (Shortest Job First / Shortest Remaining Time First)**: Provably optimal for minimum average waiting time. Can cause starvation for long processes.\n3. **Round Robin (RR)**: Preemptive scheduling where each process gets a fixed time quantum ($q$). Fair and suitable for time-sharing systems.\n4. **Priority Scheduling**: Processes scheduled according to priority values. Starvation solved via **Aging** (gradually increasing priority of waiting processes).\n5. **Multilevel Feedback Queue (MLFQ)**: Adaptive queueing that dynamically adjusts process priorities based on CPU burst history.",
+    "example": "// Turnaround Time = Completion Time - Arrival Time\n// Waiting Time = Turnaround Time - Burst Time",
+    "mcq": {
+      "question": "Which CPU scheduling algorithm gives the theoretical minimum average waiting time?",
+      "options": { "A": "FCFS", "B": "Round Robin", "C": "Shortest Job First (SJF)", "D": "Priority Scheduling" },
+      "correct": "C",
+      "explanation": "SJF is provably optimal because scheduling shorter jobs first minimizes the cumulative waiting time for all subsequent processes."
+    }
+  },
+  {
+    "department": "BTech",
+    "subject": "Operating Systems",
+    "topic": "Deadlocks and Coffman Conditions",
+    "keywords": ["deadlock", "coffman conditions", "mutual exclusion", "hold and wait", "no preemption", "circular wait", "bankers algorithm"],
+    "summary": "A deadlock occurs when a set of processes are blocked because each process holds a resource and waits for another resource held by another process.",
+    "details": "### Deadlocks & The 4 Coffman Conditions\n\nAll four conditions must hold simultaneously for a deadlock to occur:\n1. **Mutual Exclusion**: At least one resource must be non-shareable.\n2. **Hold and Wait**: A process holds at least one resource and is waiting to acquire additional resources held by other processes.\n3. **No Preemption**: Resources cannot be forcibly preempted; they can only be released voluntarily.\n4. **Circular Wait**: A closed chain of processes exists such that each process holds resources needed by the next process ($P_0 \\rightarrow P_1 \\rightarrow \\dots \\rightarrow P_0$).\n\n#### Handling Methods:\n- **Deadlock Prevention**: Invalidate at least one of the 4 Coffman conditions (e.g., resource ordering eliminates circular wait).\n- **Deadlock Avoidance**: Banker's Algorithm ensures system always stays in a 'Safe State'.\n- **Deadlock Detection & Recovery**: Resource Allocation Graph (RAG) cycle detection and process termination / resource preemption.",
+    "example": "// Safe State Condition in Banker's Algorithm:\n// Need[i][j] = Max[i][j] - Allocation[i][j]\n// Check if Available >= Need[i] for process P_i",
+    "mcq": {
+      "question": "Which condition is eliminated if resources are assigned a global linear hierarchy order?",
+      "options": { "A": "Mutual Exclusion", "B": "Hold and Wait", "C": "No Preemption", "D": "Circular Wait" },
+      "correct": "D",
+      "explanation": "Imposing a total ordering on all resource types ensures that processes only request resources in increasing order, preventing circular wait."
+    }
+  },
+  {
+    "department": "BTech",
+    "subject": "Computer Networks",
+    "topic": "OSI and TCP/IP Model Layers",
+    "keywords": ["osi model", "tcp/ip", "physical", "data link", "network", "transport", "session", "presentation", "application", "tcp", "udp", "ip"],
+    "summary": "The 7-layer OSI model and 4-layer TCP/IP model standardize communication protocols across computer networks.",
+    "details": "### OSI 7-Layer Reference Model\n\n1. **Physical (Layer 1)**: Transmits raw bitstream over physical media (Cables, Hubs, Modems, Signals).\n2. **Data Link (Layer 2)**: Node-to-node framing, physical MAC addressing, error detection (Ethernet, Switches, ARP).\n3. **Network (Layer 3)**: End-to-end packet routing and logical IP addressing (IP, Routers, ICMP, OSPF).\n4. **Transport (Layer 4)**: Process-to-process communication, reliability, flow control, port numbers (TCP, UDP).\n5. **Session (Layer 5)**: Session establishment, checkpointing, and termination.\n6. **Presentation (Layer 6)**: Syntax, character translation, compression, encryption (TLS, JSON, JPEG).\n7. **Application (Layer 7)**: User-facing network services and protocols (HTTP, HTTPS, DNS, SMTP, FTP, SSH).",
+    "example": "// TCP vs UDP:\n// TCP: Connection-oriented, 3-Way Handshake (SYN, SYN-ACK, ACK), reliable, flow-controlled.\n// UDP: Connectionless, lightweight, low latency, ideal for video streaming and gaming.",
+    "mcq": {
+      "question": "At which OSI layer does IP routing and packet forwarding occur?",
+      "options": { "A": "Data Link Layer", "B": "Network Layer", "C": "Transport Layer", "D": "Application Layer" },
+      "correct": "B",
+      "explanation": "The Network Layer (Layer 3) is responsible for logical addressing (IP) and routing packets across networks."
+    }
+  },
+  {
+    "department": "BTech",
+    "subject": "Data Structures",
+    "topic": "Binary Search Trees and AVL Trees",
+    "keywords": ["bst", "binary search tree", "avl tree", "balance factor", "rotations", "tree traversal", "inorder", "preorder", "postorder"],
+    "summary": "A BST provides logarithmic search time, while AVL trees maintain strict height balancing via rotations to guarantee O(log n) operations.",
+    "details": "### Binary Search Tree (BST) & AVL Balancing\n\n- **BST Property**: For any node $N$, all keys in the left subtree $< N.key$ and all keys in the right subtree $> N.key$.\n- **In-Order Traversal**: Always yields keys in strictly **sorted ascending order** ($O(n)$).\n- **Worst Case BST**: Skewed tree degrades to a linked list with $O(n)$ search time.\n\n#### AVL Self-Balancing Trees:\n- **Balance Factor ($BF$)**: $BF = \\text{Height}(Left) - \\text{Height}(Right) \\in \\{-1, 0, +1\\}$.\n- **Rotations** to restore balance upon insertion/deletion:\n  - **LL Rotation**: Single right rotation\n  - **RR Rotation**: Single left rotation\n  - **LR Rotation**: Left rotation on child, then right rotation on root\n  - **RL Rotation**: Right rotation on child, then left rotation on root",
+    "example": "// Inorder Traversal Algorithm (Recursive)\nfunction inOrder(root) {\n  if (!root) return;\n  inOrder(root.left);\n  console.log(root.key);\n  inOrder(root.right);\n}",
+    "mcq": {
+      "question": "What is the maximum allowed balance factor in an AVL tree?",
+      "options": { "A": "0", "B": "1", "C": "2", "D": "Unlimited" },
+      "correct": "B",
+      "explanation": "In an AVL tree, the balance factor for every node must be -1, 0, or +1. An absolute balance factor of 2 triggers rotation."
+    }
+  },
+  {
+    "department": "BBA",
+    "subject": "Marketing Management",
+    "topic": "The 4Ps Marketing Mix",
+    "keywords": ["marketing mix", "4ps", "product", "price", "place", "promotion", "marketing strategy", "target market"],
+    "summary": "The 4Ps Marketing Mix (Product, Price, Place, Promotion) is the foundational framework for executing marketing strategy.",
+    "details": "### The 4Ps Marketing Mix Framework\n\n1. **Product**: The goods or services offered to meet customer needs. Encompasses design, quality, branding, packaging, and product lifecycle (PLC).\n2. **Price**: The financial amount customers pay. Includes cost-plus pricing, penetration pricing, skimming, and competitive pricing strategies.\n3. **Place**: Distribution channels, logistics, warehousing, and retail placement ensuring the product is conveniently available to the target market.\n4. **Promotion**: Integrated communication mix including advertising, sales promotion, public relations (PR), personal selling, and digital marketing.",
+    "example": "// Example Strategy:\n// Apple iPhone uses Premium Pricing + Selective Place (Apple Stores) + Lifestyle Promotion + Differentiated Product Design.",
+    "mcq": {
+      "question": "Which P of the Marketing Mix deals with distribution channels and supply chain logistics?",
+      "options": { "A": "Product", "B": "Price", "C": "Place", "D": "Promotion" },
+      "correct": "C",
+      "explanation": "Place focuses on getting the product to the consumer through distribution channels, retailers, and logistics."
+    }
+  },
+  {
+    "department": "BCom",
+    "subject": "Financial Accounting",
+    "topic": "Double Entry System and Balance Sheet",
+    "keywords": ["double entry", "accounting equation", "debit", "credit", "balance sheet", "assets", "liabilities", "equity"],
+    "summary": "The double-entry system ensures that for every debit there is an equal credit, maintaining the core accounting equation.",
+    "details": "### Fundamental Accounting Principles\n\n#### The Core Accounting Equation:\n$$\\text{Assets} = \\text{Liabilities} + \\text{Owner's Equity}$$\n\n#### Rules of Debit and Credit (Golden Rules):\n1. **Real Accounts** (Tangible/Intangible Assets): *Debit what comes in, Credit what goes out.*\n2. **Personal Accounts** (Persons/Entities): *Debit the receiver, Credit the giver.*\n3. **Nominal Accounts** (Expenses/Incomes): *Debit all expenses and losses, Credit all incomes and gains.*\n\n#### Key Financial Statements:\n- **Income Statement (P&L)**: Measures financial performance (revenue - expenses) over a specific period.\n- **Balance Sheet**: A snapshot of assets, liabilities, and equity at a specific point in time.\n- **Cash Flow Statement**: Tracks cash inflows and outflows across operating, investing, and financing activities.",
+    "example": "// Journal Entry for purchasing Machinery for $10,000 in cash:\n// Debit: Machinery Account (Asset increases) $10,000\n// Credit: Cash Account (Asset decreases)       $10,000",
+    "mcq": {
+      "question": "What is the primary accounting equation represented on a Balance Sheet?",
+      "options": { 
+        "A": "Assets = Liabilities + Equity", 
+        "B": "Assets + Liabilities = Equity", 
+        "C": "Revenue - Expenses = Equity", 
+        "D": "Assets = Liabilities - Equity" 
+      },
+      "correct": "A",
+      "explanation": "The fundamental accounting equation states that Assets must always equal Liabilities plus Owner's Equity."
+    }
+  }
+]

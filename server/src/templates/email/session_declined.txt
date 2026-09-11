@@ -1,0 +1,7 @@
+Doubt session declined
+
+Hello {{STUDENT_NAME}},
+{{FACULTY_NAME}} could not accept your session request for {{SUBJECT}}.
+When: {{SCHEDULED_AT}}
+Reason: {{REASON}}
+Please choose another available time or faculty member.
