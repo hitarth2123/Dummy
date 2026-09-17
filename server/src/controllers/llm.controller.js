@@ -12,6 +12,8 @@ const TutorConversation = require('../models/TutorConversation');
 const LearningPath = require('../models/LearningPath');
 const QuestionBank = require('../models/QuestionBank');
 const User = require('../models/User');
+const { getAvailability, isAvailable } = require('../services/aiAvailability.service');
+const { escalateDistress, isDistressPrompt, getDistressSeverity } = require('../services/safety.service');
 
 const getUserOptions = (req) => ({
   department: req.user?.dept || req.user?.department,
@@ -59,6 +61,11 @@ const generateQuestionSets = catchAsync(async (req, res) => {
 
 const tutorChatHandler = async (req, res) => {
   const prompt = req.body?.message || req.body?.prompt;
+  const isDistressRequest = Boolean(isDistressPrompt(prompt));
+  const distressSeverity = isDistressRequest ? getDistressSeverity(prompt) : null;
+  const availability = await getAvailability();
+  const isNormalConversation = /^(hi|hello|hey|good morning|good afternoon|good evening|how are you|who are you|what can you do|thanks|thank you|okay|ok|bye|goodbye|tell me a joke|i feel|i'm feeling|i am feeling|i need support|i am stressed|i'm stressed|i am anxious|i'm anxious|i am bored|i'm bored|i am lonely|i'm lonely|i am sad|i'm sad|i am tired|i'm tired|i feel overwhelmed|can we talk|talk to me|help me calm down|let's relax|lets relax)\b/i.test(String(prompt || '').trim());
+  const educationPaused = !isAvailable(availability, 'tutor_education') && !isNormalConversation;
   const isWeatherRequest = /\b(weather|temperature|forecast|rain|raining|sunny)\b/i.test(prompt || '');
   const userOptions = getUserOptions(req);
   const history = Array.isArray(req.body?.history) ? req.body.history.filter((message) => message?.role && message?.content).slice(-20) : [];
@@ -83,23 +90,30 @@ const tutorChatHandler = async (req, res) => {
   } catch (error) {
     console.warn(`[Conversation] Could not load conversation: ${error.message}`);
   }
-  const rag = isWeatherRequest
+  const rag = isDistressRequest || educationPaused || isWeatherRequest
     ? { relevant: false, chunks: [], context: '', chunkIds: [], rag_sources: [] }
     : await searchKnowledge(prompt, { ...userOptions, topic: classification.topic, topK: 5 });
-  const devdocs = isWeatherRequest ? { context: '', sources: [] } : await searchDevDocs(prompt, { topK: 2 });
+  const devdocs = isDistressRequest || educationPaused || isWeatherRequest ? { context: '', sources: [] } : await searchDevDocs(prompt, { topK: 2 });
   const context = [rag.context, devdocs.context].filter(Boolean).join('\n\n');
   const useStoredKnowledge = rag.relevant && !devdocs.context && rag.chunks[0]?.content;
-  const response = isWeatherRequest
+  const response = isDistressRequest && distressSeverity === 'critical'
+    ? 'I am really sorry you are carrying this much fear and shame right now. A low grade does not define you or make you a disgrace. Please pause and move away from anything you could use to hurt yourself or someone else. Contact a trusted person, faculty member, HOD, or family member now and tell them you need someone with you. If there is immediate danger, call emergency services now.'
+    : isDistressRequest
+    ? 'It sounds like the exam or result is feeling difficult right now. You are not alone, and one exam does not define your ability or future. Please take a short pause, breathe, and contact a faculty member if you want help making a manageable plan.'
+    : educationPaused
+    ? 'I am here with you, but academic answers are temporarily paused. You can still talk with me about how you are feeling, ask for a calming break, or have a normal conversation. You do not need to solve everything right now.'
+    : isWeatherRequest
     ? 'I do not have a live weather feed, so I cannot give today\'s forecast. I can still help with your coursework, revision, or study planning.'
     : useStoredKnowledge
     ? rag.chunks[0].content
     : await chat(prompt, {
-      systemPrompt: 'Answer naturally for normal conversation. For academic or coding questions, use the supplied context when relevant, explain clearly, and cite source names or URLs when you use them. Do not invent documentation details.',
+      provider: 'groq',
+      systemPrompt: educationPaused ? 'Only respond to normal conversation, emotional support, and calming requests. Do not answer academic, exam, study, or coding questions. Be gentle and do not create pressure.' : 'Answer naturally for normal conversation. For academic or coding questions, use the supplied context when relevant, explain clearly, and cite source names or URLs when you use them. Do not invent documentation details.',
       history,
       context,
     });
 
-  const savedKnowledge = !isWeatherRequest && !useStoredKnowledge
+  const savedKnowledge = !isDistressRequest && !educationPaused && !isWeatherRequest && !useStoredKnowledge
     ? await captureKnowledge({ question: prompt, answer: response, classification }).catch((error) => {
       console.warn(`[Knowledge] Could not persist generated answer: ${error.message}`);
       return null;
@@ -149,6 +163,7 @@ const tutorChatHandler = async (req, res) => {
       ...savedKnowledge.classification,
     } : { saved: false, source: 'mongo_vector_search' },
   };
+  await escalateDistress({ prompt, response, user: req.user, req }).catch((error) => console.error('[Safety] Distress escalation failed:', error.message));
   if (req.body?.stream === false || typeof res.write !== 'function') {
     return res.json({ success: true, data: payload });
   }

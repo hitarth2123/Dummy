@@ -1,2 +1,5 @@
-import PlaceholderPage from '@components/shared/PlaceholderPage';
-export default function EmergencyContacts() { return <PlaceholderPage title="Emergency contacts" />; }
+import EmergencyDirectory from '@components/shared/EmergencyDirectory';
+
+export default function EmergencyContacts() {
+	return <EmergencyDirectory admin />;
+}

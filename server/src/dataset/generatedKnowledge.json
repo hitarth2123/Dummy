@@ -140,5 +140,24 @@
     "created_at": "2026-09-19T20:57:44.466Z",
     "sequence": 8,
     "topic_sequence": 1
+  },
+  {
+    "department": "Computer Science",
+    "subject": "General",
+    "topic": "i am feeling some pressure about the test",
+    "subtopic": "Core Concepts",
+    "question": "i am feeling some pressure about the test",
+    "answer": "I’m really sorry you’re feeling that pressure—tests can feel like a huge weight sometimes. Let’s try to break it down a bit so it feels more manageable. Here are a few ideas that might help you feel a little more in control:\n\n---\n\n### 1. **Take a quick “reset” break**\n- **Micro‑breaks**: Every 25–30 minutes, step away for 2–3 minutes. Stretch, walk around, or just look out the window.  \n- **Breathing exercise**: 4‑7‑8 breathing (inhale 4 s, hold 7 s, exhale 8 s) can calm the nervous system in under a minute.\n\n### 2. **Create a realistic study schedule**\n| Time | Activity | Why it helps |\n|------|----------|--------------|\n| 1 h | Review the most recent lecture or chapter | Builds confidence early |\n| 30 min | Practice problems / flashcards | Reinforces memory |\n| 15 min | Short break | Prevents burnout |\n| 1 h | Deep‑dive into a tough concept | Focused effort on weak spots |\n| 15 min | Quick recap of what you learned | Solidifies retention |\n\n- **Use a timer** (Pomodoro or a simple phone timer) to keep you on track.\n- **Prioritize** the topics that carry the most weight or that you find most challenging.\n\n### 3. **Active learning tricks**\n- **Teach it to an imaginary student**: Explaining a concept out loud forces you to organize your thoughts.\n- **Create a mind‑map**: Visual connections can make complex material feel more approachable.\n- **Use spaced repetition**: Apps like Anki or Quizlet can help you review key points just before you’re about to forget them.\n\n### 4. **Mind‑set & self‑talk**\n- Replace “I have to ace this” with “I’m doing my best, and that’s enough.”  \n- Remind yourself that one test doesn’t define your entire future.  \n- If you notice a negative thought pattern, pause, breathe, and reframe it.\n\n### 5. **Nutrition & sleep**\n- **Hydrate**: Even mild dehydration can sap focus.  \n- **Snack smart**: Nuts, fruit, or yogurt give steady energy.  \n- **Aim for 7–8 hrs of sleep**: Your brain consolidates memory during sleep—no “cramming” can replace a good night’s rest.\n\n### 6. **When the pressure feels overwhelming**\n- **Talk it out**: A quick chat with a friend, family member, or counselor can release tension.  \n- **Write it down**: Jotting down what’s stressing you can make it feel less abstract.  \n- **Grounding exercise**: Name 5 things you can see, 4 you can touch, 3 you can hear, 2 you can smell, 1 you can taste. It brings you back to the present moment.\n\n---\n\n#### Quick “cheat sheet” for the night before the test\n1. **Review**: Skim notes, focus on key formulas or concepts.  \n2. **Sleep**: Aim for a consistent bedtime; avoid screens 30 min before.  \n3. **Plan**: Lay out your test‑day essentials (ID, calculator, snacks).  \n4. **Positive mantra**: “I’ve prepared, I’m ready, I can handle this.”\n\n---\n\n**What feels most useful right now?**  \n- Do you want a specific study plan for a particular subject?  \n- Or maybe a quick relaxation routine to try before you hit the books again?  \n- Or just a chat to vent a bit?  \n\nLet me know how I can help you feel a bit lighter.",
+    "keywords": [
+      "feeling",
+      "some",
+      "pressure",
+      "about",
+      "the",
+      "test"
+    ],
+    "created_at": "2026-09-20T07:41:36.157Z",
+    "sequence": 9,
+    "topic_sequence": 1
   }
 ]

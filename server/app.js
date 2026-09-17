@@ -22,6 +22,7 @@ const llmRoutes           = require('./src/routes/llm.routes');
 const safetyRoutes        = require('./src/routes/safety.routes');
 const lockoutRoutes       = require('./src/routes/lockout.routes');
 const hallucinationRoutes = require('./src/routes/hallucination.routes');
+const aiAvailabilityRoutes = require('./src/routes/aiAvailability.routes');
 
 const app = express();
 
@@ -57,6 +58,7 @@ app.use('/api/llm',           llmRoutes);
 app.use('/api/safety',        safetyRoutes);
 app.use('/api/lockout',       lockoutRoutes);
 app.use('/api/hallucination', hallucinationRoutes);
+app.use('/api/ai-availability', aiAvailabilityRoutes);
 
 // ── 404 Handler ───────────────────────────────────────────────────────────────
 app.use((_req, res) => res.status(404).json({ success: false, message: 'Route not found' }));

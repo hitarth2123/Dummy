@@ -27,6 +27,7 @@ import Forum              from '@pages/student/forum';
 import ReportHallucination from '@pages/student/report-hallucination';
 import Emergency          from '@pages/student/emergency';
 import Settings           from '@pages/student/settings';
+import AiAvailabilityGate from '@components/shared/AiAvailabilityGate';
 
 // Faculty pages
 import FacultyDashboard  from '@pages/faculty/dashboard';
@@ -43,10 +44,12 @@ import FacultyMgmt   from '@pages/hod/faculty-mgmt';
 
 // Admin pages
 import AdminDashboard     from '@pages/admin/dashboard';
+import StudentActivity    from '@pages/admin/student-activity';
 import Users              from '@pages/admin/users';
 import Timetable          from '@pages/admin/timetable';
 import EmergencyContacts  from '@pages/admin/emergency-contacts';
 import AdminFeedback      from '@pages/admin/feedback';
+import AdminAuditLog      from '@pages/admin/audit-log';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -66,15 +69,15 @@ const AppRoutes = () => (
     <Route path="/student" element={<PrivateRoute allowedRoles={['student']}><DashboardLayout /></PrivateRoute>}>
       <Route index                element={<StudentDashboard />} />
       <Route path="dashboard"     element={<StudentDashboard />} />
-      <Route path="learning-path" element={<LearningPath />} />
+      <Route path="learning-path" element={<AiAvailabilityGate feature="learning_path"><LearningPath /></AiAvailabilityGate>} />
       <Route path="learning-path/topic" element={<TopicStudy />} />
-      <Route path="question-bank" element={<QuestionBank />} />
+      <Route path="question-bank" element={<AiAvailabilityGate feature="question_bank"><QuestionBank /></AiAvailabilityGate>} />
       <Route path="question-bank/paper" element={<QuestionPaper />} />
-      <Route path="practice-mcq" element={<PracticeMCQ />} />
-      <Route path="mock-test"     element={<MockTest />} />
+      <Route path="practice-mcq" element={<AiAvailabilityGate feature="practice_mcq"><PracticeMCQ /></AiAvailabilityGate>} />
+      <Route path="mock-test"     element={<AiAvailabilityGate feature="mock_test"><MockTest /></AiAvailabilityGate>} />
       <Route path="mock-test/:id/results" element={<MockTestResults />} />
       <Route path="ai-tutor"      element={<AITutor />} />
-      <Route path="book-session"  element={<BookSession />} />
+      <Route path="book-session"  element={<AiAvailabilityGate feature="booking_session"><BookSession /></AiAvailabilityGate>} />
       <Route path="my-sessions"   element={<MySessions />} />
       <Route path="my-sessions/:id" element={<SessionDetails />} />
       <Route path="forum"         element={<Forum />} />
@@ -105,6 +108,8 @@ const AppRoutes = () => (
     <Route path="/admin" element={<PrivateRoute allowedRoles={['admin']}><DashboardLayout /></PrivateRoute>}>
       <Route index                    element={<AdminDashboard />} />
       <Route path="dashboard"         element={<AdminDashboard />} />
+      <Route path="student-activity"  element={<StudentActivity />} />
+      <Route path="audit-log"          element={<AdminAuditLog />} />
       <Route path="users"             element={<Users />} />
       <Route path="timetable"         element={<Timetable />} />
       <Route path="emergency-contacts" element={<EmergencyContacts />} />

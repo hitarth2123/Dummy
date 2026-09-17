@@ -1,17 +1,18 @@
-const AppError = require('../utils/AppError');
-const User = require('../models/User');
+const ExamTimetable = require('../models/ExamTimetable');
 
 /**
- * lockout — blocks requests from users whose lockout_until is in the future.
+ * lockout — blocks AI requests during the student's matching exam window.
  * Run after protect middleware so req.user is available.
  */
-const lockout = async (req, _res, next) => {
+const lockout = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id).select('lockout_until');
-    if (user?.lockout_until && user.lockout_until > new Date()) {
-      const remaining = Math.ceil((user.lockout_until - Date.now()) / 60000);
-      return next(new AppError(`Account locked. Try again in ${remaining} minute(s).`, 423));
-    }
+    if (req.originalUrl.startsWith('/api/safety/') || req.originalUrl.includes('/student/emergency')) return next();
+    const subject = req.body?.subject || req.query?.subject || req.params?.subject;
+    if (!subject) return next();
+    const now = new Date();
+    const studentId = String(req.user.student_id || req.user.id || req.user._id);
+    const exam = await ExamTimetable.findOne({ student_id: studentId, subject, lockout_start: { $lte: now }, lockout_end: { $gt: now }, is_active: true, is_manually_unlocked: { $ne: true } }).select('lockout_end').lean();
+    if (exam) return res.status(423).json({ message: 'AI features locked during your exam', unlocks_at: exam.lockout_end.toISOString() });
     return next();
   } catch (err) {
     return next(err);

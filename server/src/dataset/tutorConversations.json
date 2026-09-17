@@ -694,5 +694,209 @@
     ],
     "created_at": "2026-09-19T20:57:44.508Z",
     "updated_at": "2026-09-19T20:57:44.508Z"
+  },
+  {
+    "conversation_id": "6aaf85fc5f397262f1df10fb",
+    "user_id": "6aa3fec1b20d58de11ac67fc",
+    "title": "hey / Core Concepts",
+    "topic": "jira",
+    "subtopic": "Core Concepts",
+    "sequence": 21,
+    "messages": [
+      {
+        "sequence": 1,
+        "role": "user",
+        "content": "hey",
+        "created_at": "2026-09-20T07:06:37.658Z"
+      },
+      {
+        "sequence": 2,
+        "role": "assistant",
+        "content": "Hey there! How’s it going?",
+        "created_at": "2026-09-20T07:06:37.658Z"
+      },
+      {
+        "sequence": 3,
+        "role": "user",
+        "content": "jira ?",
+        "created_at": "2026-09-20T07:06:44.490Z"
+      },
+      {
+        "sequence": 4,
+        "role": "assistant",
+        "content": "Sure! Jira is a popular project‑management and issue‑tracking tool developed by Atlassian. It’s widely used for:\n\n- **Bug tracking** – Log, prioritize, and resolve defects.\n- **Agile planning** – Scrum and Kanban boards, sprints, backlogs.\n- **Workflow customization** – Define custom issue types, statuses, and transitions.\n- **Reporting** – Burndown charts, velocity, sprint reports, and more.\n- **Integrations** – Connects with Git, Confluence, Bitbucket, Slack, and many other tools.\n\nIf you’re looking to get started, you can sign up for a free trial on Atlassian’s website, or if you’re already part of an organization, ask your admin to set up a Jira instance for you. Let me know if you need help with a specific feature or setup!",
+        "created_at": "2026-09-20T07:06:44.490Z"
+      }
+    ],
+    "created_at": "2026-09-20T07:06:37.658Z",
+    "updated_at": "2026-09-20T07:06:44.490Z"
+  },
+  {
+    "conversation_id": "6aaf8cbdbf290a2b818c5ae5",
+    "user_id": "6aa3fec1b20d58de11ac67fc",
+    "title": "jira / Core Concepts",
+    "topic": "jira",
+    "subtopic": "Core Concepts",
+    "sequence": 22,
+    "messages": [
+      {
+        "sequence": 1,
+        "role": "user",
+        "content": "jira",
+        "created_at": "2026-09-20T07:35:27.544Z"
+      },
+      {
+        "sequence": 2,
+        "role": "assistant",
+        "content": "**Jira** is a popular project‑management and issue‑tracking tool developed by Atlassian. It’s widely used by software teams, but its flexibility makes it useful for many other types of projects as well.\n\n---\n\n### Core Concepts\n\n| Concept | What it is | Typical use |\n|---------|------------|-------------|\n| **Project** | A container for issues, boards, and settings. | Separate projects for each product, team, or initiative. |\n| **Issue** | The smallest unit of work (bug, task, story, epic, etc.). | Track bugs, feature requests, support tickets, or any work item. |\n| **Issue type** | Classification of an issue (Story, Bug, Task, Epic, Sub‑task, etc.). | Helps teams apply different workflows or fields. |\n| **Workflow** | The lifecycle of an issue (statuses, transitions, conditions). | Customise how work moves from “To‑Do” to “Done.” |\n| **Board** | Visual representation of issues (Kanban or Scrum). | Plan sprints, track progress, or manage continuous flow. |\n| **Sprint** | A time‑boxed iteration (Scrum). | Deliver a set of stories in a fixed period. |\n| **Epic** | A large body of work that can be broken into stories. | Organise related stories under a common theme. |\n| **Component / Label** | Sub‑categorisation within a project. | Filter or group issues by feature, module, or tag. |\n\n---\n\n### Key Features\n\n| Feature | Description |\n|---------|-------------|\n| **Customisable workflows** | Define statuses, transitions, and conditions to match your process. |\n| **Rich issue fields** | Add custom fields (text, number, date, dropdown, etc.) to capture domain‑specific data. |\n| **Agile boards** | Scrum boards for sprint planning and velocity tracking; Kanban boards for continuous flow. |\n| **Roadmaps** | Visual timeline of epics and releases (available in Jira Software Premium). |\n| **Automation** | Trigger actions (e.g., assign, comment, transition) based on rules. |\n| **Integrations** | Connect with Confluence, Bitbucket, GitHub, Slack, Microsoft Teams, and many third‑party apps. |\n| **Reporting** | Built‑in reports (burndown, velocity, control chart) and customizable dashboards. |\n| **Permissions & Security** | Granular control over who can view, edit, or transition issues. |\n| **REST API** | Automate issue creation, updates, and queries programmatically. |\n\n---\n\n### Typical Use Cases\n\n| Team | How they use Jira |\n|------|-------------------|\n| **Software dev** | Track bugs, user stories, and sprints; integrate with CI/CD pipelines. |\n| **Product management** | Prioritise backlog, plan releases, and share roadmaps with stakeholders. |\n| **IT support** | Manage incident tickets, change requests, and service‑level agreements. |\n| **Marketing** | Plan campaigns, content calendars, and track deliverables. |\n| **HR / Ops** | Track internal requests, onboarding tasks, and compliance items. |\n\n---\n\n### Getting Started\n\n1. **Create an Atlassian account** (free tier available).  \n2. **Set up a project** – choose a template (Scrum, Kanban, Bug Tracking, etc.).  \n3. **Define issue types & workflows** – use the default or customize to fit your process.  \n4. **Add team members** – assign roles (Admin, Developer, Reporter, etc.).  \n5. **Create issues** – start populating the backlog.  \n6. **Plan a sprint** (if using Scrum) or start dragging cards onto the board (Kanban).  \n7. **Use filters & dashboards** to keep everyone aligned.\n\n---\n\n### Resources\n\n| Resource | Link |\n|----------|------|\n| Atlassian Jira Docs | https://support.atlassian.com/jira-software-cloud/ |\n| Jira Software Tutorials | https://www.atlassian.com/software/jira/guides |\n| Community Forum | https://community.atlassian.com/t5/Jira-Software/ct-p/jira-software |\n| API Reference | https://developer.atlassian.com/cloud/jira/platform/rest/v3/ |\n\n---\n\nIf you have a specific question—like how to set up a custom workflow, integrate with GitHub, or automate issue transitions—just let me know and I can dive into the details!",
+        "created_at": "2026-09-20T07:35:27.544Z"
+      }
+    ],
+    "created_at": "2026-09-20T07:35:27.544Z",
+    "updated_at": "2026-09-20T07:35:27.544Z"
+  },
+  {
+    "conversation_id": "6aaf8d93c8a0dded6d3dadd7",
+    "user_id": "6aa3fec1b20d58de11ac67fc",
+    "title": "jira / Core Concepts",
+    "topic": "i am gonna disgrace my family with this low grade",
+    "subtopic": "Core Concepts",
+    "sequence": 23,
+    "messages": [
+      {
+        "sequence": 1,
+        "role": "user",
+        "content": "jira",
+        "created_at": "2026-09-20T07:38:59.599Z"
+      },
+      {
+        "sequence": 2,
+        "role": "assistant",
+        "content": "I am here with you, but academic answers are temporarily paused. You can still talk with me about how you are feeling, ask for a calming break, or have a normal conversation. You do not need to solve everything right now.",
+        "created_at": "2026-09-20T07:38:59.599Z"
+      },
+      {
+        "sequence": 3,
+        "role": "user",
+        "content": "fastapi",
+        "created_at": "2026-09-20T07:39:14.936Z"
+      },
+      {
+        "sequence": 4,
+        "role": "assistant",
+        "content": "I am here with you, but academic answers are temporarily paused. You can still talk with me about how you are feeling, ask for a calming break, or have a normal conversation. You do not need to solve everything right now.",
+        "created_at": "2026-09-20T07:39:14.936Z"
+      },
+      {
+        "sequence": 5,
+        "role": "user",
+        "content": "i am bored",
+        "created_at": "2026-09-20T07:39:23.329Z"
+      },
+      {
+        "sequence": 6,
+        "role": "assistant",
+        "content": "I am here with you, but academic answers are temporarily paused. You can still talk with me about how you are feeling, ask for a calming break, or have a normal conversation. You do not need to solve everything right now.",
+        "created_at": "2026-09-20T07:39:23.329Z"
+      },
+      {
+        "sequence": 7,
+        "role": "user",
+        "content": "i am bored",
+        "created_at": "2026-09-20T07:41:12.118Z"
+      },
+      {
+        "sequence": 8,
+        "role": "assistant",
+        "content": "Hey, I hear you—bored days can feel like a bit of a drag. What’s been on your mind lately? Maybe we can brainstorm something fun or interesting to do. If you’re up for it, I can suggest a quick game, a creative project, or even a new podcast or book to dive into. Or if you just want to vent or chat about anything, I’m all ears. What do you feel like doing?",
+        "created_at": "2026-09-20T07:41:12.118Z"
+      },
+      {
+        "sequence": 9,
+        "role": "user",
+        "content": "i am feeling some pressure about the test",
+        "created_at": "2026-09-20T07:41:36.203Z"
+      },
+      {
+        "sequence": 10,
+        "role": "assistant",
+        "content": "I’m really sorry you’re feeling that pressure—tests can feel like a huge weight sometimes. Let’s try to break it down a bit so it feels more manageable. Here are a few ideas that might help you feel a little more in control:\n\n---\n\n### 1. **Take a quick “reset” break**\n- **Micro‑breaks**: Every 25–30 minutes, step away for 2–3 minutes. Stretch, walk around, or just look out the window.  \n- **Breathing exercise**: 4‑7‑8 breathing (inhale 4 s, hold 7 s, exhale 8 s) can calm the nervous system in under a minute.\n\n### 2. **Create a realistic study schedule**\n| Time | Activity | Why it helps |\n|------|----------|--------------|\n| 1 h | Review the most recent lecture or chapter | Builds confidence early |\n| 30 min | Practice problems / flashcards | Reinforces memory |\n| 15 min | Short break | Prevents burnout |\n| 1 h | Deep‑dive into a tough concept | Focused effort on weak spots |\n| 15 min | Quick recap of what you learned | Solidifies retention |\n\n- **Use a timer** (Pomodoro or a simple phone timer) to keep you on track.\n- **Prioritize** the topics that carry the most weight or that you find most challenging.\n\n### 3. **Active learning tricks**\n- **Teach it to an imaginary student**: Explaining a concept out loud forces you to organize your thoughts.\n- **Create a mind‑map**: Visual connections can make complex material feel more approachable.\n- **Use spaced repetition**: Apps like Anki or Quizlet can help you review key points just before you’re about to forget them.\n\n### 4. **Mind‑set & self‑talk**\n- Replace “I have to ace this” with “I’m doing my best, and that’s enough.”  \n- Remind yourself that one test doesn’t define your entire future.  \n- If you notice a negative thought pattern, pause, breathe, and reframe it.\n\n### 5. **Nutrition & sleep**\n- **Hydrate**: Even mild dehydration can sap focus.  \n- **Snack smart**: Nuts, fruit, or yogurt give steady energy.  \n- **Aim for 7–8 hrs of sleep**: Your brain consolidates memory during sleep—no “cramming” can replace a good night’s rest.\n\n### 6. **When the pressure feels overwhelming**\n- **Talk it out**: A quick chat with a friend, family member, or counselor can release tension.  \n- **Write it down**: Jotting down what’s stressing you can make it feel less abstract.  \n- **Grounding exercise**: Name 5 things you can see, 4 you can touch, 3 you can hear, 2 you can smell, 1 you can taste. It brings you back to the present moment.\n\n---\n\n#### Quick “cheat sheet” for the night before the test\n1. **Review**: Skim notes, focus on key formulas or concepts.  \n2. **Sleep**: Aim for a consistent bedtime; avoid screens 30 min before.  \n3. **Plan**: Lay out your test‑day essentials (ID, calculator, snacks).  \n4. **Positive mantra**: “I’ve prepared, I’m ready, I can handle this.”\n\n---\n\n**What feels most useful right now?**  \n- Do you want a specific study plan for a particular subject?  \n- Or maybe a quick relaxation routine to try before you hit the books again?  \n- Or just a chat to vent a bit?  \n\nLet me know how I can help you feel a bit lighter.",
+        "created_at": "2026-09-20T07:41:36.203Z"
+      },
+      {
+        "sequence": 11,
+        "role": "user",
+        "content": "i am gonna disgrace my family with this low grade",
+        "created_at": "2026-09-20T07:52:45.071Z"
+      },
+      {
+        "sequence": 12,
+        "role": "assistant",
+        "content": "I am here with you, but academic answers are temporarily paused. You can still talk with me about how you are feeling, ask for a calming break, or have a normal conversation. You do not need to solve everything right now.",
+        "created_at": "2026-09-20T07:52:45.072Z"
+      },
+      {
+        "sequence": 13,
+        "role": "user",
+        "content": "i am gonna disgrace my family with this low grade",
+        "created_at": "2026-09-20T07:54:12.982Z"
+      },
+      {
+        "sequence": 14,
+        "role": "assistant",
+        "content": "I am really sorry you are carrying this much fear and shame right now. A low grade does not define you or make you a disgrace. Please pause and move away from anything you could use to hurt yourself or someone else. Contact a trusted person, faculty member, HOD, or family member now and tell them you need someone with you. If there is immediate danger, call emergency services now.",
+        "created_at": "2026-09-20T07:54:12.982Z"
+      }
+    ],
+    "created_at": "2026-09-20T07:38:59.599Z",
+    "updated_at": "2026-09-20T07:54:12.982Z"
+  },
+  {
+    "conversation_id": "6aaf922b6a1200daab676700",
+    "user_id": "6aa3fec1b20d58de11ac67fc",
+    "title": "i am gonna disgrace my family with this low grade / Core Concepts",
+    "topic": "i am gonna disgrace my family with this low grade",
+    "subtopic": "Core Concepts",
+    "sequence": 24,
+    "messages": [
+      {
+        "sequence": 1,
+        "role": "user",
+        "content": "i am gonna disgrace my family with this low grade",
+        "created_at": "2026-09-20T07:58:35.342Z"
+      },
+      {
+        "sequence": 2,
+        "role": "assistant",
+        "content": "I am really sorry you are carrying this much fear and shame right now. A low grade does not define you or make you a disgrace. Please pause and move away from anything you could use to hurt yourself or someone else. Contact a trusted person, faculty member, HOD, or family member now and tell them you need someone with you. If there is immediate danger, call emergency services now.",
+        "created_at": "2026-09-20T07:58:35.342Z"
+      }
+    ],
+    "created_at": "2026-09-20T07:58:35.342Z",
+    "updated_at": "2026-09-20T07:58:35.342Z"
+  },
+  {
+    "conversation_id": "6aaf928b6201ca069a5e328a",
+    "user_id": "6aa3fec1b20d58de11ac67fc",
+    "title": "is exam soo tough / Core Concepts",
+    "topic": "is exam soo tough",
+    "subtopic": "Core Concepts",
+    "sequence": 25,
+    "messages": [
+      {
+        "sequence": 1,
+        "role": "user",
+        "content": "is exam soo tough ?",
+        "created_at": "2026-09-20T08:00:11.278Z"
+      },
+      {
+        "sequence": 2,
+        "role": "assistant",
+        "content": "I am here with you, but academic answers are temporarily paused. You can still talk with me about how you are feeling, ask for a calming break, or have a normal conversation. You do not need to solve everything right now.",
+        "created_at": "2026-09-20T08:00:11.278Z"
+      }
+    ],
+    "created_at": "2026-09-20T08:00:11.278Z",
+    "updated_at": "2026-09-20T08:00:11.278Z"
   }
 ]

@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  BookOpen, CalendarDays, ChevronLeft, ChevronRight, ClipboardList,
+  Activity, BookOpen, CalendarDays, ChevronLeft, ChevronRight, ClipboardList,
   FileText, Gauge, GraduationCap, HelpCircle, MessageSquare, Settings,
   ShieldAlert, Users, X, Sparkles
 } from 'lucide-react';
@@ -46,6 +46,8 @@ const navigation = {
   admin: [
     { section: 'Administration', items: [
       ['Dashboard', '/admin', Gauge],
+      ['Student Activity', '/admin/student-activity', Activity],
+      ['Audit Log', '/admin/audit-log', FileText],
       ['Users', '/admin/users', Users],
       ['Timetable', '/admin/timetable', CalendarDays],
       ['Emergency Contacts', '/admin/emergency-contacts', ShieldAlert],

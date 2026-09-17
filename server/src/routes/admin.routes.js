@@ -6,19 +6,24 @@ const controller = require('../controllers/admin.controller');
 router.use(protect, restrictTo('admin'));
 
 // GET  /api/admin/dashboard
-router.get('/dashboard',          (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
+router.get('/dashboard',          controller.getDashboard);
+router.get('/student-activity',   controller.getStudentActivity);
+router.get('/audit-log',           controller.getAuditLog);
+router.get('/ai-availability',    controller.getAiAvailability);
+router.put('/ai-availability',    controller.updateAiAvailability);
 // GET  /api/admin/users
-router.get('/users',              (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
+router.get('/users',              controller.getUsers);
 // POST /api/admin/users
-router.post('/users',             (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
+router.post('/users',             controller.createUser);
 // PUT  /api/admin/users/:id
-router.put('/users/:id',          (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
+router.put('/users/:id',          controller.updateUser);
 // DELETE /api/admin/users/:id
-router.delete('/users/:id',       (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
+router.delete('/users/:id',       controller.deactivateUser);
 // GET  /api/admin/timetable
 router.get('/timetable',          controller.getTimetable);
 // POST /api/admin/timetable
 router.post('/timetable/upload',  controller.uploadTimetable);
+router.post('/timetable/unlock/:student_id/:subject', controller.unlockTimetable);
 // GET  /api/admin/emergency-contacts
 router.get('/emergency-contacts', (req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
 // POST /api/admin/emergency-contacts

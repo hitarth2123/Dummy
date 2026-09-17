@@ -19,12 +19,13 @@ describe('Local AI services', () => {
 
   test('sends authenticated chat requests to Groq', async () => {
     process.env.GROQ_API_KEY = 'test-groq-key';
+    process.env.APINEX_API_KEY = 'should-not-be-used';
     global.fetch.mockResolvedValue({
       ok: true,
       json: async () => ({ choices: [{ message: { content: 'Hello from Groq' } }] }),
     });
 
-    await expect(chat('Hello')).resolves.toBe('Hello from Groq');
+    await expect(chat('Hello', { provider: 'groq' })).resolves.toBe('Hello from Groq');
     expect(global.fetch).toHaveBeenCalledWith(
       'https://api.groq.com/openai/v1/chat/completions',
       expect.objectContaining({
@@ -32,6 +33,18 @@ describe('Local AI services', () => {
         headers: expect.objectContaining({ Authorization: 'Bearer test-groq-key' }),
       })
     );
+  });
+
+  test('uses Groq when explicitly requested even if an Apinex key exists', async () => {
+    process.env.GROQ_API_KEY = 'test-groq-key';
+    process.env.APINEX_API_KEY = 'should-not-be-used';
+    global.fetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({ choices: [{ message: { content: 'Groq tutor response' } }] }),
+    });
+
+    await expect(chat('Explain normalization', { provider: 'groq' })).resolves.toBe('Groq tutor response');
+    expect(global.fetch.mock.calls[0][0]).toBe('https://api.groq.com/openai/v1/chat/completions');
   });
 
   test('uses the existing 768-dimensional local index embedding', async () => {

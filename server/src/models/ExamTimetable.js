@@ -39,6 +39,12 @@ const examTimetableSchema = new Schema(
       required: [true, 'subject is required'],
       trim: true,
     },
+    student_id: {
+      type: String,
+      required: [true, 'student_id is required'],
+      trim: true,
+      index: true,
+    },
     subject_code: {
       type: String,
       trim: true,
@@ -70,6 +76,10 @@ const examTimetableSchema = new Schema(
       type: Date,
       required: [true, 'lockout_end is required'],
     },
+    is_manually_unlocked: {
+      type: Boolean,
+      default: false,
+    },
     is_active: {
       type: Boolean,
       default: true,
@@ -86,6 +96,6 @@ const examTimetableSchema = new Schema(
 examTimetableSchema.index({ lockout_start: 1 });
 examTimetableSchema.index({ lockout_end: 1 });
 examTimetableSchema.index({ department: 1, semester: 1, exam_date: 1 });
-examTimetableSchema.index({ department: 1, lockout_start: 1, lockout_end: 1 });
+examTimetableSchema.index({ student_id: 1, subject: 1, lockout_start: 1, lockout_end: 1 });
 
 module.exports = mongoose.model('ExamTimetable', examTimetableSchema);

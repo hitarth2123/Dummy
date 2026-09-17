@@ -185,8 +185,25 @@ export const facultyService = {
 };
 
 export const adminService = {
+  getDashboard:    (params) => api.get('/admin/dashboard', { params }).then(r => r.data),
+  getStudentActivity: (params) => api.get('/admin/student-activity', { params }).then(r => r.data),
+  getAuditLog:     (params) => api.get('/admin/audit-log', { params }).then(r => r.data),
+  getUsers:        (params) => api.get('/admin/users', { params }).then(r => r.data),
+  createUser:      (data) => api.post('/admin/users', data).then(r => r.data),
+  updateUser:      (id, data) => api.put(`/admin/users/${id}`, data).then(r => r.data),
+  deactivateUser:  (id) => api.delete(`/admin/users/${id}`).then(r => r.data),
   getTimetable:    () => api.get('/admin/timetable').then(r => r.data),
   uploadTimetable: (data) => api.post('/admin/timetable/upload', data).then(r => r.data),
+  unlockTimetable: (studentId, subject, data) => api.post(`/admin/timetable/unlock/${encodeURIComponent(studentId)}/${encodeURIComponent(subject)}`, data).then(r => r.data),
+};
+
+export const aiAvailabilityService = {
+  get: () => api.get('/ai-availability').then(r => r.data),
+  update: (data) => api.put('/ai-availability', data).then(r => r.data),
+};
+
+export const safetyService = {
+  getAlerts: () => api.get('/safety/alerts').then(r => r.data),
 };
 
 export const mockTestService = {
