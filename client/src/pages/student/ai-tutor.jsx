@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@hooks/useAuth';
 import DistressPrompt from '@components/safety/DistressPrompt';
 import { safetyService } from '@services/api.service';
+import ThinkingOrb from '@components/three/ThinkingOrb';
 
 const escapeHtml = (value) => value.replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[character]));
 const inlineMarkup = (value) => escapeHtml(value).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
@@ -186,7 +187,7 @@ const AITutor = () => {
                     <SourceList sources={message.sources} />
                   </>
                 ) : (
-                  <LoaderCircle className="animate-spin text-primary" size={18} />
+                  <ThinkingOrb />
                 )
               ) : (
                 <div className="flex items-start gap-2">

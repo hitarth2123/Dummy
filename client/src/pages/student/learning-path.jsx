@@ -18,6 +18,7 @@ import {
   Trophy,
 } from 'lucide-react';
 import { studentService, learningPathService } from '@services/api.service';
+import ProgressOrb from '@components/three/ProgressOrb';
 
 const LearningPath = () => {
   const navigate = useNavigate();
@@ -225,8 +226,13 @@ const LearningPath = () => {
                   </p>
                 </div>
               </div>
-              <div className="text-right">
-                <span className="text-3xl font-extrabold text-primary">{progressPct}%</span>
+              <div className="flex items-center gap-4">
+                <div className="hidden sm:block">
+                  <ProgressOrb progress={progressPct} />
+                </div>
+                <div className="text-right">
+                  <span className="text-3xl font-extrabold text-primary">{progressPct}%</span>
+                </div>
               </div>
             </div>
 

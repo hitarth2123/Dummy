@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRight, Building2, LoaderCircle, ShieldCheck } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@hooks/useAuth';
+import ThreeBackground from '@components/three/ThreeBackground';
 
 export const roleRedirects = {
   student: '/student/dashboard',
@@ -66,43 +67,60 @@ const Login = () => {
   };
 
   return (
-    <div className="grid min-h-screen bg-background lg:grid-cols-[1.05fr_0.95fr]">
-      <section className="hidden border-r border-surface-variant/20 bg-surface-container-low px-10 py-12 text-on-surface lg:flex lg:flex-col lg:justify-between xl:px-20">
-        <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-container text-on-primary-container">
-            <ShieldCheck size={21} />
-          </span>
-          <span className="text-lg font-semibold text-on-surface">AI Buddy</span>
-        </div>
-        <div className="max-w-lg">
-          <p className="mb-5 text-sm font-semibold uppercase tracking-[0.2em] text-secondary">Institutional learning support</p>
-          <h1 className="text-5xl font-semibold leading-tight tracking-tight">A calmer way to move through your semester.</h1>
-          <p className="mt-6 max-w-md text-base leading-7 text-on-surface-variant">One secure workspace for academic guidance, faculty support, and department operations.</p>
-        </div>
-        <p className="text-sm text-outline">Connected to your institution&apos;s identity provider.</p>
-      </section>
+    <div className="relative min-h-screen overflow-hidden" style={{ background: '#090d16' }}>
+      {/* Full-screen 3D cosmic background */}
+      <ThreeBackground variant="login" />
 
-      <main className="flex items-center justify-center px-5 py-10 sm:px-8">
-        <div className="w-full max-w-md">
-          <div className="mb-10 flex items-center gap-3 lg:hidden">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-container text-white">
-              <ShieldCheck size={21} />
+      {/* Centered glassmorphic login card */}
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10 sm:px-6">
+        <div
+          className="w-full max-w-md rounded-3xl border border-white/[0.12] p-8 shadow-2xl sm:p-10"
+          style={{
+            background: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(24px) saturate(1.4)',
+            WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
+            boxShadow: '0 32px 80px rgba(0, 0, 0, 0.5), 0 0 60px rgba(129, 140, 248, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+          }}
+        >
+          {/* Logo & Brand */}
+          <div className="mb-8 flex items-center gap-3">
+            <span
+              className="grid h-11 w-11 place-items-center rounded-2xl text-white shadow-lg"
+              style={{
+                background: 'linear-gradient(135deg, rgba(49, 46, 129, 0.9), rgba(56, 189, 248, 0.4))',
+                boxShadow: '0 0 20px rgba(129, 140, 248, 0.3)',
+              }}
+            >
+              <ShieldCheck size={22} />
             </span>
-            <span className="text-lg font-semibold text-on-surface">AI Buddy</span>
-          </div>
-
-          <div className="mb-8">
-            <div className="mb-5 inline-flex rounded-xl bg-secondary-container/20 p-3 text-secondary">
-              <Building2 size={22} />
+            <div>
+              <span className="text-lg font-bold text-white tracking-tight">AI Buddy</span>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-300/70">Institutional Learning</p>
             </div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Welcome back</p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-on-surface">Sign in to your workspace</h2>
-            <p className="mt-2 text-on-surface-variant">Sign in with your email or institutional SSO to continue.</p>
           </div>
 
+          {/* Heading */}
+          <div className="mb-7">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-400/20 px-3 py-1.5" style={{ background: 'rgba(129, 140, 248, 0.08)' }}>
+              <Building2 size={14} className="text-indigo-300" />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-indigo-300">Welcome back</span>
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+              Sign in to your{' '}
+              <span className="bg-gradient-to-r from-indigo-300 via-cyan-300 to-violet-300 bg-clip-text text-transparent">workspace</span>
+            </h1>
+            <p className="mt-2 text-sm leading-relaxed text-slate-400">
+              Sign in with your email or institutional SSO to continue.
+            </p>
+          </div>
+
+          {/* Quick Seed Login (Dev only) */}
           {import.meta.env.DEV && (
-            <div className="mb-6 rounded-xl border border-primary/20 bg-primary-container/15/60 p-4">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-on-primary-container">Quick Seed Login (Development)</p>
+            <div
+              className="mb-5 rounded-2xl border border-indigo-400/15 p-4"
+              style={{ background: 'rgba(129, 140, 248, 0.06)' }}
+            >
+              <p className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.18em] text-indigo-300/80">Quick Seed Login</p>
               <div className="flex flex-wrap gap-1.5">
                 {[
                   { role: 'Student', email: 'student@seed.dev', pass: 'Student@12345' },
@@ -118,7 +136,8 @@ const Login = () => {
                       setDevPassword(pass);
                       setError('');
                     }}
-                    className="rounded-lg bg-surface-container-low px-2.5 py-1 text-xs font-medium text-on-primary-container shadow-md transition hover:bg-primary-container hover:text-white border border-primary/30"
+                    className="rounded-lg border border-white/10 px-2.5 py-1.5 text-[11px] font-semibold text-indigo-200 transition hover:border-indigo-400/40 hover:bg-indigo-500/10 hover:text-white"
+                    style={{ background: 'rgba(15, 23, 42, 0.5)' }}
                   >
                     {role}
                   </button>
@@ -127,9 +146,10 @@ const Login = () => {
             </div>
           )}
 
+          {/* Login Form */}
           <form onSubmit={useDevelopmentLogin} className="space-y-4">
             <div>
-              <label htmlFor="dev-gmail" className="block text-sm font-semibold text-on-surface mb-1">
+              <label htmlFor="dev-gmail" className="mb-1.5 block text-xs font-semibold tracking-wide text-slate-300">
                 Email address
               </label>
               <input
@@ -139,12 +159,12 @@ const Login = () => {
                 value={gmail}
                 onChange={(event) => setGmail(event.target.value)}
                 placeholder="student@seed.dev or email@domain.com"
-                className="w-full rounded-xl border border-surface-variant/50 px-4 py-3 text-sm text-on-surface outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-indigo-400/50 focus:bg-white/[0.06] focus:ring-2 focus:ring-indigo-400/15"
               />
             </div>
 
             <div>
-              <label htmlFor="dev-password" className="block text-sm font-semibold text-on-surface mb-1">
+              <label htmlFor="dev-password" className="mb-1.5 block text-xs font-semibold tracking-wide text-slate-300">
                 Password
               </label>
               <input
@@ -153,14 +173,18 @@ const Login = () => {
                 value={devPassword}
                 onChange={(event) => setDevPassword(event.target.value)}
                 placeholder="Enter password"
-                className="w-full rounded-xl border border-surface-variant/50 px-4 py-3 text-sm text-on-surface outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-indigo-400/50 focus:bg-white/[0.06] focus:ring-2 focus:ring-indigo-400/15"
               />
             </div>
 
             <button
               type="submit"
               disabled={busy}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary-container px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition hover:bg-inverse-primary disabled:cursor-wait disabled:opacity-70"
+              className="flex w-full items-center justify-center gap-2.5 rounded-xl px-5 py-3.5 text-sm font-bold text-white transition disabled:cursor-wait disabled:opacity-60"
+              style={{
+                background: 'linear-gradient(135deg, rgba(49, 46, 129, 0.9) 0%, rgba(99, 102, 241, 0.7) 100%)',
+                boxShadow: '0 8px 30px rgba(99, 102, 241, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+              }}
             >
               {busy ? (
                 <>
@@ -176,31 +200,44 @@ const Login = () => {
             </button>
           </form>
 
+          {/* Divider */}
           <div className="relative my-6 text-center">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-surface-variant/40" /></div>
-            <span className="relative bg-background px-3 text-xs font-semibold uppercase tracking-wider text-outline">Or</span>
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/[0.08]" />
+            </div>
+            <span className="relative px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500" style={{ background: 'rgba(15, 23, 42, 0.65)' }}>
+              Or
+            </span>
           </div>
 
+          {/* SSO Button */}
           <button
             type="button"
             disabled={busy}
             onClick={startSso}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-surface-variant/50 bg-surface-container-low px-5 py-3 text-sm font-semibold text-on-surface shadow-md transition hover:bg-surface-container disabled:cursor-wait disabled:opacity-70"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 px-5 py-3 text-sm font-semibold text-slate-300 transition hover:border-white/20 hover:bg-white/[0.04] hover:text-white disabled:cursor-wait disabled:opacity-60"
+            style={{ background: 'rgba(255, 255, 255, 0.02)' }}
           >
             <span>Continue with institutional SSO</span>
           </button>
 
+          {/* Error */}
           {error && (
-            <p role="alert" className="mt-4 rounded-xl bg-error-container/15 p-4 text-sm text-error border border-error/20">
+            <p
+              role="alert"
+              className="mt-4 rounded-xl border border-red-400/20 p-4 text-sm text-red-300"
+              style={{ background: 'rgba(239, 68, 68, 0.08)' }}
+            >
               {error}
             </p>
           )}
 
-          <p className="mt-8 text-center text-xs leading-5 text-on-surface-variant">
-            Access is managed by your institution. Contact IT support if your account or role is incorrect.
+          {/* Footer note */}
+          <p className="mt-7 text-center text-[11px] leading-5 text-slate-500">
+            Access is managed by your institution.<br />Contact IT support if your account or role is incorrect.
           </p>
         </div>
-      </main>
+      </div>
     </div>
   );
 };

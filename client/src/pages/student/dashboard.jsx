@@ -18,6 +18,7 @@ import {
   Layers3,
 } from 'lucide-react';
 import { studentService } from '@services/api.service';
+import FloatingAICore from '@components/three/FloatingAICore';
 
 export default function StudentDashboard() {
   const [data, setData] = useState(null);
@@ -80,34 +81,40 @@ export default function StudentDashboard() {
     <div className="space-y-8">
       {/* Welcome Banner */}
       <section className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-r from-surface-container-low via-slate-900/90 to-surface-container p-6 text-on-surface shadow-panel sm:p-8">
-        {/* Decorative background glow */}
-        <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
-        <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 rounded-full bg-primary/15 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-primary border border-primary/30 shadow-sm">
-            <Sparkles size={14} className="text-secondary" />
-            <span className="text-primary-fixed">Student Dashboard</span>
+        <div className="relative z-10 flex items-center justify-between gap-4">
+          {/* Text content */}
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/15 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-primary border border-primary/30 shadow-sm">
+              <Sparkles size={14} className="text-secondary" />
+              <span className="text-primary-fixed">Student Dashboard</span>
+            </div>
+            <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+              Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-indigo-200">{user?.name || 'Student'}</span> 👋
+            </h1>
+            <p className="mt-2 text-on-surface-variant font-medium text-sm sm:text-base">
+              {user?.department || 'Computer Science'} · Semester {user?.semester || 5}
+            </p>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <Link
+                to="/student/mock-test"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-slate-950 transition hover:bg-primary-fixed hover:shadow-glow shadow-md"
+              >
+                <Play size={16} fill="currentColor" />
+                <span>Generate Mock Test</span>
+              </Link>
+              <Link
+                to="/student/question-bank"
+                className="inline-flex items-center gap-2 rounded-xl bg-surface-container-high px-5 py-2.5 text-sm font-semibold text-on-surface transition hover:bg-surface-bright border border-surface-variant/50"
+              >
+                <ClipboardList size={16} className="text-secondary" />
+                <span>Browse Question Bank</span>
+              </Link>
+            </div>
           </div>
-          <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-            Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-indigo-200">{user?.name || 'Student'}</span> 👋
-          </h1>
-          <p className="mt-2 text-on-surface-variant font-medium text-sm sm:text-base">
-            {user?.department || 'Computer Science'} · Semester {user?.semester || 5}
-          </p>
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <Link
-              to="/student/mock-test"
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-slate-950 transition hover:bg-primary-fixed hover:shadow-glow shadow-md"
-            >
-              <Play size={16} fill="currentColor" />
-              <span>Generate Mock Test</span>
-            </Link>
-            <Link
-              to="/student/question-bank"
-              className="inline-flex items-center gap-2 rounded-xl bg-surface-container-high px-5 py-2.5 text-sm font-semibold text-on-surface transition hover:bg-surface-bright border border-surface-variant/50"
-            >
-              <ClipboardList size={16} className="text-secondary" />
-              <span>Browse Question Bank</span>
-            </Link>
+
+          {/* 3D Floating AI Core */}
+          <div className="hidden lg:block shrink-0" style={{ marginRight: '-1rem', marginTop: '-1rem', marginBottom: '-1rem' }}>
+            <FloatingAICore />
           </div>
         </div>
       </section>
