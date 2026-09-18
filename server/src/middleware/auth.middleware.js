@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const { env } = require('../config/env');
 const AppError = require('../utils/AppError');
 const Session = require('../models/Session');
+const User = require('../models/User');
 const { isTokenBlacklisted } = require('../controllers/auth.controller');
 
 /**
@@ -39,15 +40,23 @@ const protect = async (req, _res, next) => {
     }
   }
 
+  const userQuery = User.findById(decoded.userId || decoded.id);
+  const currentUser = userQuery && typeof userQuery.select === 'function'
+    ? await userQuery.select('institution_id role department semester enrolled_subjects is_active token_version').lean()
+    : await userQuery;
+  if (!currentUser || currentUser.is_active === false) return next(new AppError('Account is unavailable. Please log in again.', 401));
+  if ((decoded.token_version || 0) !== (currentUser.token_version || 0)) return next(new AppError('Your account permissions changed. Please log in again.', 401));
+
   req.user = {
-    id: decoded.userId || decoded.id,
-    _id: decoded.userId || decoded.id,
-    role: decoded.role,
-    dept: decoded.dept || decoded.department,
-    department: decoded.dept || decoded.department,
-    semester: decoded.semester,
-    subjects: decoded.enrolled_subjects || decoded.subjects || [],
-    enrolled_subjects: decoded.enrolled_subjects || decoded.subjects || [],
+    id: String(currentUser._id),
+    _id: String(currentUser._id),
+    institution_id: currentUser.institution_id,
+    role: currentUser.role,
+    dept: currentUser.department,
+    department: currentUser.department,
+    semester: currentUser.semester,
+    subjects: currentUser.enrolled_subjects || [],
+    enrolled_subjects: currentUser.enrolled_subjects || [],
   };
   return next();
 };

@@ -13,8 +13,8 @@ const getQueue = () => {
   const connection = getConnection();
   if (!connection) return null;
   if (!queue) queue = new Queue(QUEUE_NAME, { connection, defaultJobOptions: {
-    attempts: 8,
-    backoff: { type: 'exponential', delay: 5000 },
+    attempts: 10,
+    backoff: { type: 'exponential', delay: 30000, maxDelay: 3600000 },
     removeOnComplete: { age: 86400, count: 1000 },
     removeOnFail: false,
   } });

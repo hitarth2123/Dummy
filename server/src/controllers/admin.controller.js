@@ -64,8 +64,41 @@ const getUsers = catchAsync(async (req, res) => {
   ];
   if (req.query.role) filter.role = req.query.role;
   if (req.query.department) filter.department = req.query.department;
+  if (req.query.semester) filter.semester = Number(req.query.semester);
   const users = await User.find(filter).select('-password_hash').sort({ createdAt: -1 }).lean();
   return res.json({ success: true, data: users });
+});
+
+const parseUserCsv = (input) => {
+  const lines = String(input || '').trim().split(/\r?\n/).filter(Boolean);
+  const required = ['institution_id', 'name', 'email', 'role', 'dept'];
+  if (lines.length < 2) return { rows: [], errors: [{ row: 1, message: 'CSV must include a header and at least one row.' }] };
+  const headers = lines[0].split(',').map((header) => header.trim().toLowerCase());
+  const missing = required.filter((header) => !headers.includes(header));
+  if (missing.length) return { rows: [], errors: [{ row: 1, message: `Missing columns: ${missing.join(', ')}` }] };
+  const errors = [];
+  const rows = lines.slice(1).map((line, index) => {
+    const values = line.split(',').map((value) => value.trim());
+    const row = Object.fromEntries(headers.map((header, valueIndex) => [header, values[valueIndex] || '']));
+    if (!row.institution_id || !row.name || !/^\S+@\S+\.\S+$/.test(row.email) || !['student', 'faculty', 'hod', 'admin'].includes(row.role) || !row.dept) {
+      errors.push({ row: index + 2, message: 'Expected institution_id, name, valid email, role, and dept.' });
+      return null;
+    }
+    if (row.semester && (!Number.isInteger(Number(row.semester)) || Number(row.semester) < 1 || Number(row.semester) > 8)) {
+      errors.push({ row: index + 2, message: 'semester must be an integer from 1 to 8.' });
+      return null;
+    }
+    return row;
+  }).filter(Boolean);
+  return { rows, errors };
+};
+
+const bulkImportUsers = catchAsync(async (req, res) => {
+  const { rows, errors } = parseUserCsv(req.body.csv || req.body.content);
+  if (errors.length) return res.status(400).json({ success: false, message: 'CSV contains invalid rows.', errors });
+  const documents = rows.map((row) => ({ institution_id: row.institution_id, name: row.name, email: row.email.toLowerCase(), password_hash: bcrypt.hashSync(require('crypto').randomUUID(), 12), role: row.role, department: row.dept, semester: row.semester ? Number(row.semester) : undefined }));
+  const created = await User.insertMany(documents, { ordered: false });
+  return res.status(201).json({ success: true, data: created.map((user) => { const safe = user.toObject(); delete safe.password_hash; return safe; }) });
 });
 
 const createUser = catchAsync(async (req, res) => {
@@ -85,16 +118,30 @@ const updateUser = catchAsync(async (req, res) => {
   const updates = Object.fromEntries(Object.entries(req.body).filter(([key]) => allowed.includes(key)));
   if (updates.role && !['student', 'faculty', 'hod', 'admin'].includes(updates.role)) return res.status(400).json({ success: false, message: 'Invalid user role.' });
   if (updates.semester !== undefined) updates.semester = Number(updates.semester);
-  const user = await User.findByIdAndUpdate(req.params.id, { $set: updates }, { new: true, runValidators: true }).select('-password_hash').lean();
+  const update = { $set: updates };
+  if (['role', 'department', 'is_active'].some((key) => updates[key] !== undefined)) update.$inc = { token_version: 1 };
+  const user = await User.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true }).select('-password_hash').lean();
   if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
   return res.json({ success: true, data: user });
 });
 
 const deactivateUser = catchAsync(async (req, res) => {
   if (String(req.params.id) === String(req.user.id)) return res.status(400).json({ success: false, message: 'You cannot deactivate your own admin account.' });
-  const user = await User.findByIdAndUpdate(req.params.id, { $set: { is_active: false } }, { new: true }).select('-password_hash').lean();
+  const user = await User.findByIdAndUpdate(req.params.id, { $set: { is_active: false }, $inc: { token_version: 1 } }, { new: true }).select('-password_hash').lean();
   if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
   return res.json({ success: true, data: user });
+});
+
+const resetUserPassword = catchAsync(async (req, res) => {
+  const temporaryPassword = require('crypto').randomBytes(12).toString('base64url');
+  const password_hash = await bcrypt.hash(temporaryPassword, 12);
+  const user = await User.findByIdAndUpdate(
+    req.params.id,
+    { $set: { password_hash }, $inc: { token_version: 1 } },
+    { new: true }
+  ).select('_id email');
+  if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
+  return res.json({ success: true, data: { user_id: user._id, email: user.email, temporary_password: temporaryPassword } });
 });
 
 const unlockTimetable = catchAsync(async (req, res) => {
@@ -209,4 +256,4 @@ const updateAiAvailability = catchAsync(async (req, res) => {
   return res.json({ success: true, data: await updateAvailability(updates, req.user.id) });
 });
 
-module.exports = { uploadTimetable, getTimetable, getUsers, createUser, updateUser, deactivateUser, unlockTimetable, getDashboard, getStudentActivity, getAuditLog, getAiAvailability, updateAiAvailability };
+module.exports = { uploadTimetable, getTimetable, getUsers, createUser, updateUser, bulkImportUsers, deactivateUser, resetUserPassword, unlockTimetable, getDashboard, getStudentActivity, getAuditLog, getAiAvailability, updateAiAvailability };

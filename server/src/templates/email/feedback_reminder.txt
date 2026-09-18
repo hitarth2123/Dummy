@@ -1,0 +1,6 @@
+Weekly AI Buddy feedback
+
+Please share your learning experience for week {{WEEK}} of {{YEAR}}.
+Feedback form: {{FEEDBACK_URL}}
+
+To unsubscribe from feedback reminders, submit a POST request to {{UNSUBSCRIBE_URL}} while authenticated.

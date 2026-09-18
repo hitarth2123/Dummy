@@ -11,7 +11,7 @@ const blacklistedTokens = new Map();
 const getConfig = () => ({
   jwtSecret: process.env.JWT_SECRET,
   refreshSecret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
-  accessExpiresIn: process.env.JWT_EXPIRES_IN,
+  accessExpiresIn: process.env.JWT_EXPIRES_IN || '15m',
   refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
 });
 
@@ -39,6 +39,7 @@ const claimUser = (user) => ({
   semester: user.semester ?? null,
   specialization: user.specialization || 'Common Core',
   enrolled_subjects: user.enrolled_subjects || user.subjects || [],
+  token_version: user.token_version || 0,
 });
 
 const signAccessToken = (user, options = {}) => {
@@ -182,7 +183,7 @@ const login = async (req, res) => {
 
   const tokens = await issueTokens(user, req);
   user.last_login = new Date();
-  if (profileUpdated) user.markModified('course');
+  if (profileUpdated && typeof user.markModified === 'function') user.markModified('course');
   if (typeof user.save === 'function') await user.save();
 
   return res.status(200).json({
@@ -247,6 +248,28 @@ const refresh = async (req, res) => {
   });
 };
 
+const unsubscribeEmail = async (req, res) => {
+  let userId = req.user?.id;
+  if (!userId && req.query.token) {
+    try {
+      const decoded = jwt.verify(req.query.token, getConfig().jwtSecret);
+      if (decoded.type !== 'email-unsubscribe') throw new Error('Invalid unsubscribe token');
+      userId = decoded.userId;
+    } catch {
+      throw new AppError('Invalid unsubscribe link.', 400);
+    }
+  }
+  if (!userId) throw new AppError('Authentication required.', 401);
+  await User.findByIdAndUpdate(userId, { $set: { email_unsubscribed: true } });
+  return res.json({ success: true, message: 'Email reminders unsubscribed.' });
+};
+
+const createUnsubscribeToken = (user) => jwt.sign(
+  { userId: String(user._id), type: 'email-unsubscribe' },
+  getConfig().jwtSecret,
+  { expiresIn: '1y' },
+);
+
 module.exports = {
   login,
   logout,
@@ -257,4 +280,6 @@ module.exports = {
   issueTokens,
   blacklistToken,
   isTokenBlacklisted,
+  unsubscribeEmail,
+  createUnsubscribeToken,
 };

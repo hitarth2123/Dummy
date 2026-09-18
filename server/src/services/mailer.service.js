@@ -22,6 +22,7 @@ const sendMail = async (to, subject, html, text) => {
 const fs = require('fs');
 const path = require('path');
 const TEMPLATE_DIR = path.join(__dirname, '../templates/email');
+const { enqueueEmail } = require('../jobs/email.queue');
 
 /**
  * loadTemplate — reads an HTML email template and replaces {{KEY}} placeholders.
@@ -41,19 +42,23 @@ const renderTemplate = (templateName, extension, vars = {}) => {
 const loadTemplate = (templateName, vars = {}) => renderTemplate(templateName, 'html', vars);
 const loadTextTemplate = (templateName, vars = {}) => renderTemplate(templateName, 'txt', vars);
 
-const sendTemplatedMail = (to, subject, templateName, vars) => sendMail(to, subject, loadTemplate(templateName, vars), loadTextTemplate(templateName, vars));
+const sendTemplatedMail = async (to, subject, templateName, vars, triggerId) => {
+  const jobId = await enqueueEmail({ triggerId, to, subject, templateName, vars });
+  if (jobId) return { queued: true, jobId, triggerId };
+  return sendMail(to, subject, loadTemplate(templateName, vars), loadTextTemplate(templateName, vars));
+};
 
 /**
  * Convenience senders for specific email types.
  */
-const sendSessionConfirmed  = (to, vars) => sendTemplatedMail(to, 'Session Confirmed', 'session_confirmed', vars);
-const sendSessionDeclined   = (to, vars) => sendTemplatedMail(to, 'Session Declined', 'session_declined', vars);
-const sendFacultyRequest    = (to, vars) => sendTemplatedMail(to, 'New Session Request', 'faculty_session_request', vars);
-const sendEthicsEscalation  = (to, vars) => sendTemplatedMail(to, 'Ethics Alert', 'ethics_escalation', vars);
-const sendGrievanceEscalation = (to, vars) => sendMail(to, 'Grievance Update', loadTemplate('grievance_escalation', vars));
-const sendDistressAlert     = (to, vars) => sendMail(to, '⚠️ Distress Alert', loadTemplate('distress_alert', vars));
-const sendHallucinationReport = (to, vars) => sendMail(to, 'Hallucination Report', loadTemplate('hallucination_report', vars));
-const sendFeedbackReminder  = (to, vars) => sendMail(to, 'Weekly Feedback Reminder', loadTemplate('feedback_reminder', vars));
+const sendSessionConfirmed  = (to, vars) => sendTemplatedMail(to, 'Session Confirmed', 'session_confirmed', vars, 'E-01');
+const sendSessionDeclined   = (to, vars) => sendTemplatedMail(to, 'Session Declined', 'session_declined', vars, 'E-02');
+const sendFacultyRequest    = (to, vars) => sendTemplatedMail(to, 'New Session Request', 'faculty_session_request', vars, 'E-03');
+const sendEthicsEscalation  = (to, vars) => sendTemplatedMail(to, 'Ethics Alert', 'ethics_escalation', vars, 'E-04');
+const sendGrievanceEscalation = (to, vars) => sendTemplatedMail(to, 'Grievance Update', 'grievance_escalation', vars, 'E-06');
+const sendDistressAlert     = (to, vars) => sendTemplatedMail(to, 'Distress Alert', 'distress_alert', vars, 'E-07');
+const sendHallucinationReport = (to, vars) => sendTemplatedMail(to, 'Hallucination Report', 'hallucination_report', vars, 'E-05');
+const sendFeedbackReminder  = (to, vars) => sendTemplatedMail(to, 'Weekly Feedback Reminder', 'feedback_reminder', vars, 'E-08');
 
 module.exports = {
   sendMail,

@@ -7,6 +7,7 @@ const User = require('../models/User');
 const FeedbackForm = require('../models/FeedbackForm');
 const { sendFeedbackReminder } = require('../services/mailer.service');
 const { isDatabaseReady } = require('../config/db');
+const { createUnsubscribeToken } = require('../controllers/auth.controller');
 
 // Every Monday at 09:00 India Standard Time.
 cron.schedule('0 9 * * 1', async () => {
@@ -19,7 +20,7 @@ cron.schedule('0 9 * * 1', async () => {
   const academicYear = getAcademicYear(now);
 
   try {
-    const students = await User.find({ role: 'student', is_active: true }).select('email name department semester');
+    const students = await User.find({ role: 'student', is_active: true, email_unsubscribed: { $ne: true } }).select('email _id');
     await User.updateMany({ role: 'student', is_active: true }, { $set: { feedback_due: true } });
 
     for (const student of students) {
@@ -32,9 +33,10 @@ cron.schedule('0 9 * * 1', async () => {
 
       if (!alreadySubmitted) {
         await sendFeedbackReminder(student.email, {
-          NAME: student.name,
           WEEK: weekNumber,
           YEAR: academicYear,
+          FEEDBACK_URL: `${process.env.CLIENT_URL || 'http://localhost:3000'}/student/forum`,
+          UNSUBSCRIBE_URL: `${process.env.API_URL || 'http://localhost:5012/api'}/auth/email-unsubscribe?token=${createUnsubscribeToken(student)}`,
         });
 
         await FeedbackForm.findOneAndUpdate(

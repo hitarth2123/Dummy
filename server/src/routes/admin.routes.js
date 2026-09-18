@@ -15,8 +15,11 @@ router.put('/ai-availability',    controller.updateAiAvailability);
 router.get('/users',              controller.getUsers);
 // POST /api/admin/users
 router.post('/users',             controller.createUser);
+	// POST /api/admin/users/bulk-import
+	router.post('/users/bulk-import',  controller.bulkImportUsers);
 // PUT  /api/admin/users/:id
 router.put('/users/:id',          controller.updateUser);
+router.post('/users/:id/password-reset', controller.resetUserPassword);
 // DELETE /api/admin/users/:id
 router.delete('/users/:id',       controller.deactivateUser);
 // GET  /api/admin/timetable

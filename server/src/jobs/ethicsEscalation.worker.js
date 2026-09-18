@@ -12,8 +12,14 @@ const dispatchE04 = async (job) => {
   const flag = await EthicsFlag.findOne({ _id: flagId, hod_notified_at: null }).lean();
   if (!flag) return { skipped: true, reason: 'already-notified-or-missing' };
 
-  const hods = await User.find({ role: 'hod', department, is_active: true }).select('email').lean();
-  const addresses = [...new Set(hods.map((hod) => hod.email).filter(Boolean))];
+  const recipients = await User.find({
+    is_active: true,
+    $or: [
+      { role: 'admin' },
+      { role: { $in: ['faculty', 'hod'] }, department },
+    ],
+  }).select('email').lean();
+  const addresses = [...new Set(recipients.map((recipient) => recipient.email).filter(Boolean))];
   if (!addresses.length) throw new Error(`No active HOD email configured for department ${department}`);
 
   // E-04 is intentionally limited to student identifier and category; no prompt content is sent.

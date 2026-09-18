@@ -1,0 +1,6 @@
+AI Buddy Grievance Escalation
+
+Reference: {{REFERENCE_NUMBER}}
+Department: {{DEPARTMENT}}
+
+{{DESCRIPTION}}

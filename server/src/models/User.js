@@ -21,6 +21,10 @@ const userSchema = new Schema(
       lowercase: true,
       trim: true,
     },
+    institution_id: {
+      type: String,
+      trim: true,
+    },
     password_hash: {
       type: String,
       required: [true, 'password_hash is required'],
@@ -81,6 +85,15 @@ const userSchema = new Schema(
     is_active: {
       type: Boolean,
       default: true,
+    },
+    token_version: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    email_unsubscribed: {
+      type: Boolean,
+      default: false,
     },
     feedback_due: {
       type: Boolean,

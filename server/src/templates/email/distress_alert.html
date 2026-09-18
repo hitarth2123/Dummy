@@ -1,22 +1,2 @@
 <!doctype html>
-<html>
-  <body style="margin:0;background:#f8fafc;font-family:Arial,sans-serif;color:#17212b">
-    <main style="max-width:680px;margin:24px auto;background:#fff;border:1px solid #fecaca;padding:28px;border-radius:10px">
-      <h1 style="color:#b91c1c;margin-top:0">Immediate student wellbeing alert</h1>
-      <p>A student message was flagged as possible acute distress or unsafe pressure. Please review promptly and follow your institution's safeguarding procedure.</p>
-      <table style="width:100%;border-collapse:collapse;margin:20px 0">
-        <tr><td style="padding:8px 0;font-weight:bold">Student</td><td style="padding:8px 0">{{STUDENT_NAME}}</td></tr>
-        <tr><td style="padding:8px 0;font-weight:bold">Email</td><td style="padding:8px 0">{{STUDENT_EMAIL}}</td></tr>
-        <tr><td style="padding:8px 0;font-weight:bold">Department</td><td style="padding:8px 0">{{DEPARTMENT}}</td></tr>
-        <tr><td style="padding:8px 0;font-weight:bold">Semester</td><td style="padding:8px 0">{{SEMESTER}}</td></tr>
-        <tr><td style="padding:8px 0;font-weight:bold">Severity</td><td style="padding:8px 0;text-transform:uppercase">{{SEVERITY}}</td></tr>
-        <tr><td style="padding:8px 0;font-weight:bold">Detected signal</td><td style="padding:8px 0">{{PATTERN}}</td></tr>
-      </table>
-      <h2 style="font-size:16px">What the student wrote</h2>
-      <pre style="white-space:pre-wrap;background:#fef2f2;border-left:4px solid #ef4444;padding:14px">{{PROMPT}}</pre>
-      <h2 style="font-size:16px">What AI answered</h2>
-      <pre style="white-space:pre-wrap;background:#f8fafc;border-left:4px solid #94a3b8;padding:14px">{{AI_RESPONSE}}</pre>
-      <p style="font-size:12px;color:#64748b">This alert was generated automatically. Confirm the student's safety through the approved human support process; do not rely on the AI response alone.</p>
-    </main>
-  </body>
-</html>
+<html><body style="margin:0;background:#f8fafc;font-family:Arial,sans-serif;color:#17212b"><main style="max-width:680px;margin:24px auto;background:#fff;border:1px solid #fecaca;padding:clamp(18px,5vw,28px)"><h1 style="color:#b91c1c;margin-top:0">Immediate student wellbeing alert</h1><p>A student message was flagged for prompt safeguarding review.</p><p><strong>Student ID:</strong> {{STUDENT_ID}}<br><strong>Grievance reference:</strong> {{GRIEVANCE_REF}}<br><strong>Severity:</strong> {{SEVERITY}}</p><p>Review the case in AI Buddy. Message content and contact details are intentionally excluded from this notification.</p></main></body></html>

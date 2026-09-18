@@ -1,0 +1,7 @@
+Immediate student wellbeing alert
+
+Student ID: {{STUDENT_ID}}
+Grievance reference: {{GRIEVANCE_REF}}
+Severity: {{SEVERITY}}
+
+Review the case in AI Buddy. Message content and contact details are excluded.

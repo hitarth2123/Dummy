@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { strictRateLimiter } = require('../middleware/rateLimiter');
 const catchAsync = require('../utils/catchAsync');
 const authController = require('../controllers/auth.controller');
+const { protect } = require('../middleware/auth.middleware');
 
 // POST /api/auth/register
 router.post('/register', strictRateLimiter, (req, res) => {
@@ -16,6 +17,7 @@ router.post('/logout', catchAsync(authController.logout));
 
 // POST /api/auth/refresh
 router.post('/refresh', strictRateLimiter, catchAsync(authController.refresh));
+router.post('/email-unsubscribe', catchAsync(authController.unsubscribeEmail));
 
 // POST /api/auth/forgot-password
 router.post('/forgot-password', strictRateLimiter, (req, res) => {

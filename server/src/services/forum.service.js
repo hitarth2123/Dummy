@@ -1,7 +1,7 @@
 const ForumPost = require('../models/ForumPost');
 const Grievance = require('../models/Grievance');
 const User = require('../models/User');
-const { sendMail } = require('./mailer.service');
+const { sendGrievanceEscalation } = require('./mailer.service');
 const { logAction } = require('./audit.service');
 
 const buildScope = (req) => {
@@ -122,7 +122,11 @@ const flagGrievance = async (req) => {
     ...recipients.map((recipient) => recipient.email),
   ])].filter(Boolean).join(',');
   if (addresses) {
-    await sendMail(addresses, `Grievance ${grievance.reference_number}`, `<p>New grievance: <strong>${grievance.reference_number}</strong></p><p>${grievance.description}</p>`, `New grievance ${grievance.reference_number}: ${grievance.description}`);
+    await sendGrievanceEscalation(addresses, {
+      REFERENCE_NUMBER: grievance.reference_number,
+      DEPARTMENT: grievance.department,
+      DESCRIPTION: grievance.description,
+    });
   }
   await logAction({
     actor: req.user.id || req.user._id,

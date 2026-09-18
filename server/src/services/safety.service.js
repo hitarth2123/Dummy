@@ -46,8 +46,21 @@ const CRITICAL_DISTRESS_PATTERNS = [
   /\bcannot face my family\b/i,
 ];
 
+const HIGH_DISTRESS_PATTERNS = [
+  /\bpanic(?:king)?\b/i,
+  /\bdesperate\b/i,
+  /\bno way out\b/i,
+  /\bunsafe\b/i,
+  /\bcan't handle this\b/i,
+  /\bcan no longer handle\b/i,
+];
+
 const isDistressPrompt = (prompt) => DISTRESS_PATTERNS.find((pattern) => pattern.test(prompt || ''));
-const getDistressSeverity = (prompt) => CRITICAL_DISTRESS_PATTERNS.some((pattern) => pattern.test(prompt || '')) ? 'critical' : 'warning';
+const getDistressSeverity = (prompt) => {
+  if (CRITICAL_DISTRESS_PATTERNS.some((pattern) => pattern.test(prompt || ''))) return 'critical';
+  if (HIGH_DISTRESS_PATTERNS.some((pattern) => pattern.test(prompt || ''))) return 'high';
+  return 'warning';
+};
 
 const scanDistress = async ({ prompt, user, req }) => {
   const match = isDistressPrompt(prompt);
@@ -70,7 +83,7 @@ const escalateDistress = async ({ prompt, response, user, req }) => {
   const result = await scanDistress({ prompt, user, req });
   if (!result.flagged) return { flagged: false, notified: false };
 
-  const profile = await User.findById(user?.id || user?._id).select('name email department semester role course specialization').lean();
+  const profile = await User.findById(user?.id || user?._id).select('institution_id name email department semester role course specialization').lean();
   if (!profile) return { flagged: true, notified: false };
   const recipients = await User.find({
     is_active: true,
@@ -102,14 +115,9 @@ const escalateDistress = async ({ prompt, response, user, req }) => {
   });
   if (addresses.length) {
     await sendDistressAlert(addresses.join(','), {
-      STUDENT_NAME: profile.name,
-      STUDENT_EMAIL: profile.email,
-      DEPARTMENT: profile.department,
-      SEMESTER: profile.semester || 'Not specified',
-      PATTERN: result.pattern,
+      STUDENT_ID: profile.institution_id || profile._id,
+      GRIEVANCE_REF: `SAFETY-${profile._id}`,
       SEVERITY: result.severity,
-      PROMPT: prompt,
-      AI_RESPONSE: response,
     });
   }
   return { flagged: true, notified: addresses.length > 0, recipient_count: addresses.length };

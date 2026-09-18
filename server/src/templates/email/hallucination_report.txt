@@ -1,0 +1,6 @@
+AI hallucination report
+
+Student ID: {{STUDENT_ID}}
+Grievance reference: {{GRIEVANCE_REF}}
+
+Please review this case in AI Buddy. Student contact details are excluded.
