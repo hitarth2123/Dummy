@@ -1,6 +1,9 @@
 import React, { useRef, useState } from 'react';
-import { Bot, LoaderCircle, Send, Sparkles, UserRound } from 'lucide-react';
+import { Bot, FileWarning, LoaderCircle, Send, Sparkles, UserRound } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@hooks/useAuth';
+import DistressPrompt from '@components/safety/DistressPrompt';
+import { safetyService } from '@services/api.service';
 
 const escapeHtml = (value) => value.replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[character]));
 const inlineMarkup = (value) => escapeHtml(value).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
@@ -66,12 +69,15 @@ const SourceList = ({ sources = [] }) => !sources.length ? null : <div className
 
 const AITutor = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
   const [conversationId, setConversationId] = useState(null);
   const [conversationTitle, setConversationTitle] = useState('New conversation');
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [distressDetection, setDistressDetection] = useState(null);
+  const [distressStatus, setDistressStatus] = useState('');
   const inputRef = useRef(null);
 
   const sendMessage = async (event) => {
@@ -106,6 +112,7 @@ const AITutor = () => {
           const data = JSON.parse(line.slice(6));
           if (data.conversation_id) setConversationId(String(data.conversation_id));
           if (data.conversation_title) setConversationTitle(data.conversation_title);
+          if (data.distress_detection?.flagged) setDistressDetection(data.distress_detection);
           setMessages((current) => {
             const copy = [...current];
             const last = copy[copy.length - 1];
@@ -123,8 +130,16 @@ const AITutor = () => {
     }
   };
 
+  const confirmDistress = async () => {
+    const lastUser = [...messages].reverse().find((message) => message.role === 'user');
+    const lastAssistant = [...messages].reverse().find((message) => message.role === 'assistant');
+    await safetyService.confirmDistress({ prompt: lastUser?.content, response: lastAssistant?.content });
+    setDistressStatus('help_on_the_way');
+  };
+
   return (
     <section className="flex min-h-[calc(100vh-11rem)] min-w-0 flex-col gap-6">
+      <DistressPrompt detection={distressDetection} status={distressStatus} onConfirm={confirmDistress} onDismiss={() => setDistressDetection(null)} />
       <header className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-r from-surface-container-low via-slate-900/90 to-surface-container p-6 text-on-surface shadow-panel sm:p-8">
         <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
         <div className="relative z-10 flex items-center gap-4">
@@ -187,6 +202,7 @@ const AITutor = () => {
       {error && <p role="alert" className="rounded-xl bg-error-container/15 p-3 text-sm text-error">{error}</p>}
 
       <form onSubmit={sendMessage} className="flex items-center gap-3 rounded-2xl border border-surface-variant/40 bg-surface-container-low p-3 shadow-panel">
+        <button type="button" onClick={() => navigate('/student/report-hallucination')} className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-amber-300/25 text-amber-200" aria-label="Report AI response"><FileWarning size={17} /></button>
         <input
           ref={inputRef}
           value={prompt}

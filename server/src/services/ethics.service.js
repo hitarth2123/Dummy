@@ -19,8 +19,12 @@ const findConfig = async (department) => {
   return sortedQuery?.lean ? sortedQuery.lean() : sortedQuery;
 };
 
-const layerOneMatch = (prompt, configuredCategories) => {
-  const matches = DEFAULT_RULES.flatMap((rule) => {
+const layerOneMatch = (prompt, configuredCategories, configuredRules = []) => {
+  const customRules = configuredRules.filter((rule) => rule.is_active !== false).map((rule) => ({
+    ...rule,
+    patterns: rule.patterns.map((pattern) => new RegExp(pattern, 'i')),
+  }));
+  const matches = [...DEFAULT_RULES, ...customRules].flatMap((rule) => {
     if (!configuredCategories.has(rule.category)) return [];
     const count = rule.patterns.filter((pattern) => pattern.test(prompt)).length;
     return count ? [{ rule, count }] : [];
@@ -38,7 +42,7 @@ const checkEthics = async ({ prompt, user, req }) => {
   const department = user?.dept || user?.department;
   const config = await findConfig(department);
   const configuredCategories = new Set(config?.prohibited_categories || DEFAULT_RULES.map((rule) => rule.category));
-  const layerOne = layerOneMatch(prompt, configuredCategories);
+  const layerOne = layerOneMatch(prompt, configuredCategories, config?.rules || []);
   const actor = user?._id || user?.id;
   await logAction({
     actor,

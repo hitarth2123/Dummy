@@ -1,12 +1,13 @@
 const HallucinationReport = require('../models/HallucinationReport');
+const { logAction } = require('../services/audit.service');
 const User = require('../models/User');
 const { sendHallucinationReport } = require('../services/mailer.service');
 const catchAsync = require('../utils/catchAsync');
 
 const createReport = catchAsync(async (req, res) => {
-  const { audit_log_ref, original_prompt, hallucinated_response, correct_response, category, severity, subject, topic, llm_model } = req.body;
-  if (!audit_log_ref || !original_prompt || !hallucinated_response || !category || !severity) {
-    return res.status(400).json({ success: false, message: 'audit_log_ref, original_prompt, hallucinated_response, category, and severity are required.' });
+  const { audit_log_ref, original_prompt, hallucinated_response, correct_response, category, severity, subject, topic, llm_model, screenshot_url, screenshot_name } = req.body;
+  if (!original_prompt || !hallucinated_response || !category || !severity) {
+    return res.status(400).json({ success: false, message: 'original_prompt, hallucinated_response, category, and severity are required.' });
   }
 
   const report = await HallucinationReport.create({
@@ -21,6 +22,21 @@ const createReport = catchAsync(async (req, res) => {
     subject,
     topic,
     llm_model,
+    screenshot_url,
+    screenshot_name,
+  });
+
+  await logAction({
+    actor: req.user.id,
+    actor_role: req.user.role,
+    action: 'hallucination_report_submitted',
+    resource_type: 'hallucination_report',
+    resource_id: String(report._id),
+    department: req.user.department,
+    ip_address: req.ip,
+    user_agent: req.get('user-agent'),
+    metadata: { category, severity, audit_log_ref: audit_log_ref || null },
+    severity: severity === 'high' ? 'critical' : 'warning',
   });
 
   const recipients = await User.find({

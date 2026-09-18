@@ -1,4 +1,6 @@
 import { ExternalLink, Mail, MapPin, Phone, ShieldAlert } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { safetyService } from '@services/api.service';
 
 const contacts = [
   {
@@ -46,6 +48,9 @@ const ContactAction = ({ entry }) => {
 };
 
 export default function EmergencyDirectory({ admin = false }) {
+  const [remoteContacts, setRemoteContacts] = useState([]);
+  useEffect(() => { if (!admin) safetyService.getEmergencyContacts().then((result) => setRemoteContacts(result.data?.contacts || [])).catch(() => setRemoteContacts([])); }, [admin]);
+  const displayedContacts = remoteContacts.length ? [{ group: 'Verified emergency contacts', tone: 'rose', entries: remoteContacts.map((entry) => ({ label: entry.type, name: entry.name, phone: entry.phone, note: entry.address || entry.notes })) }] : contacts;
   return (
     <div className="space-y-6">
       <header className="relative overflow-hidden rounded-lg border border-rose-300/25 bg-gradient-to-br from-rose-950/70 via-slate-950/80 to-cyan-950/50 p-6 shadow-panel sm:p-8">
@@ -60,7 +65,7 @@ export default function EmergencyDirectory({ admin = false }) {
       {admin && <div className="rounded-md border border-cyan-300/25 bg-cyan-300/10 px-4 py-3 text-sm leading-6 text-cyan-100">Admin setup note: replace the three local placeholders and the education office email with verified campus contacts before release.</div>}
 
       <div className="grid gap-5 xl:grid-cols-3">
-        {contacts.map((section) => {
+        {displayedContacts.map((section) => {
           const styles = toneStyles[section.tone];
           return <section key={section.group} className={`rounded-lg border ${styles.border} bg-slate-950/55 p-5 shadow-panel`}><div className="flex items-center justify-between gap-3"><h2 className="text-lg font-semibold text-white">{section.group}</h2><span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider ${styles.badge}`}>{section.entries.length} contacts</span></div><div className="mt-4 space-y-3">{section.entries.map((entry) => <article key={entry.label} className="rounded-md border border-white/10 bg-white/[0.03] p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div className="min-w-0"><p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{entry.label}</p><h3 className="mt-1 text-base font-semibold text-white">{entry.name}</h3><p className="mt-1 text-sm leading-5 text-slate-400">{entry.note}</p>{entry.email && <p className="mt-2 break-all text-xs text-cyan-200">{entry.email}</p>}</div><div className={styles.icon}><ContactAction entry={entry} /></div></div></article>)}</div></section>;
         })}

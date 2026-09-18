@@ -1,0 +1,3 @@
+import ProfileRequestQueue from '@components/shared/ProfileRequestQueue';
+import { hierarchyService } from '@services/api.service';
+export default function AdminProfileChangeRequests() { return <ProfileRequestQueue service={{ list: hierarchyService.getAdminProfileRequests, review: hierarchyService.reviewAdminProfileRequest }} title="Profile appeals" subtitle="View student, faculty, and HOD requests across the institution. Review only requests assigned to Admin." actions={['approve', 'reject']} actionableStatus="pending_admin" />; }

@@ -84,6 +84,11 @@ const ethicsFlagSchema = new Schema(
       },
       default: 'open',
     },
+    hod_review_status: {
+      type: String,
+      enum: ['pending', 'reviewed', 'false_positive', 'escalated'],
+      default: 'pending',
+    },
     resolved_by: {
       type: Schema.Types.ObjectId,
       ref: 'User',

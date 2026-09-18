@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AlertTriangle, CheckCircle2, ChevronRight, LoaderCircle, Send, ShieldAlert, Sparkles, FileText, Info } from 'lucide-react';
-import { feedbackService } from '@services/api.service';
+import { hallucinationService } from '@services/api.service';
 
 const categories = [
   { id: 'ai_hallucination', label: 'AI Hallucination / Inaccurate Fact', desc: 'The AI generated factually incorrect information or wrong equations.' },
@@ -30,6 +30,7 @@ export default function ReportHallucination() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [submittedIssue, setSubmittedIssue] = useState(null);
+  const [screenshot, setScreenshot] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,7 +51,16 @@ export default function ReportHallucination() {
         ratings: { overall: 2 },
       };
 
-      await feedbackService.submit(payload);
+      await hallucinationService.report({
+        original_prompt: formData.prompt_used || 'Not provided by reporter',
+        hallucinated_response: formData.ai_response || formData.explanation,
+        category: formData.category === 'ai_hallucination' ? 'factual_error' : 'other',
+        severity: formData.severity,
+        subject: formData.subject,
+        correct_response: formData.explanation,
+        screenshot_url: screenshot?.dataUrl,
+        screenshot_name: screenshot?.name,
+      });
       setSuccess(true);
       setSubmittedIssue({ ...formData, timestamp: new Date().toISOString() });
       setFormData({
@@ -61,6 +71,7 @@ export default function ReportHallucination() {
         explanation: '',
         severity: 'medium',
       });
+      setScreenshot(null);
     } catch (err) {
       setError(err.response?.data?.message || 'Could not submit issue report. Please try again.');
     } finally {
@@ -150,6 +161,17 @@ export default function ReportHallucination() {
               </button>
             ))}
           </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-wider text-outline mb-2">Screenshot (Optional)</label>
+          <input type="file" accept="image/*" onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => setScreenshot({ name: file.name, dataUrl: reader.result });
+            reader.readAsDataURL(file);
+          }} className="w-full rounded-xl border border-surface-variant/40 bg-surface-container px-4 py-3 text-sm text-on-surface" />
         </div>
 
         {/* 2. Subject & Severity */}

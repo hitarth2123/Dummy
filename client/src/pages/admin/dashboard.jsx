@@ -20,7 +20,7 @@ export default function AdminDashboard() {
 		adminService.getDashboard().then((response) => setDashboard(response.data)).catch((requestError) => setError(requestError.response?.data?.message || 'Dashboard data could not be loaded.'));
 	};
 
-	useEffect(() => { loadDashboard(); }, []);
+	useEffect(() => { loadDashboard(); const timer = setInterval(loadDashboard, 30000); return () => clearInterval(timer); }, []);
 
 	if (error) return <section className="rounded-lg border border-rose-400/30 bg-rose-950/30 p-6 text-rose-100"><p>{error}</p><button type="button" onClick={loadDashboard} className="mt-4 inline-flex items-center gap-2 rounded bg-rose-400/15 px-3 py-2 text-sm"><RefreshCw size={15} /> Retry</button></section>;
 	if (!dashboard) return <section className="rounded-lg border border-white/10 bg-slate-950/50 p-6 text-slate-300">Loading dashboard...</section>;

@@ -79,7 +79,11 @@ const scanDistress = async ({ prompt, user, req }) => {
   return { flagged: true, pattern: match.source, severity: getDistressSeverity(prompt) };
 };
 
-const escalateDistress = async ({ prompt, response, user, req }) => {
+const escalateDistress = async ({ prompt, response, user, req, confirmed = false }) => {
+  if (confirmed !== true && req?.body?.confirmed !== true && req?.confirmed !== true) {
+    const detection = await scanDistress({ prompt, user, req });
+    return { ...detection, notified: false, confirmation_required: Boolean(detection.flagged) };
+  }
   const result = await scanDistress({ prompt, user, req });
   if (!result.flagged) return { flagged: false, notified: false };
 
@@ -116,6 +120,9 @@ const escalateDistress = async ({ prompt, response, user, req }) => {
   if (addresses.length) {
     await sendDistressAlert(addresses.join(','), {
       STUDENT_ID: profile.institution_id || profile._id,
+      STUDENT_NAME: profile.name,
+      PROMPT: String(prompt || ''),
+      AI_RESPONSE: String(response || ''),
       GRIEVANCE_REF: `SAFETY-${profile._id}`,
       SEVERITY: result.severity,
     });
@@ -128,8 +135,13 @@ const distressGuard = (req, _res, next) => {
     prompt: req.body?.message || req.body?.prompt || '',
     user: req.user,
     req,
-  }).catch((error) => console.error('[Safety] Distress scan failed:', error.message));
-  next();
+  }).then((result) => {
+    req.distress_detection = result;
+    next();
+  }).catch((error) => {
+    console.error('[Safety] Distress scan failed:', error.message);
+    next();
+  });
 };
 
 module.exports = { scanDistress, escalateDistress, distressGuard, isDistressPrompt, getDistressSeverity, DISTRESS_PATTERNS };

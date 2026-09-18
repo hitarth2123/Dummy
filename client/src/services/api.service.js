@@ -181,7 +181,16 @@ export const facultyService = {
   updateRequest:    (id, data) => api.put(`/faculty/session-requests/${id}`, data).then(r => r.data),
   getSessions:      () => api.get('/faculty/sessions').then(r => r.data),
   getProfileChangeRequests: () => api.get('/faculty/profile-change-requests').then(r => r.data),
+  createProfileChangeRequest: (data) => api.post('/faculty/profile-change-requests', data).then(r => r.data),
   reviewProfileChangeRequest: (id, data) => api.patch(`/faculty/profile-change-requests/${id}`, data).then(r => r.data),
+};
+
+export const hierarchyService = {
+  getHodProfileRequests: (params) => api.get('/hod/profile-change-requests', { params }).then(r => r.data),
+  createHodProfileRequest: (data) => api.post('/hod/profile-change-requests', data).then(r => r.data),
+  reviewHodProfileRequest: (id, data) => api.patch(`/hod/profile-change-requests/${id}`, data).then(r => r.data),
+  getAdminProfileRequests: () => api.get('/admin/profile-change-requests').then(r => r.data),
+  reviewAdminProfileRequest: (id, data) => api.patch(`/admin/profile-change-requests/${id}`, data).then(r => r.data),
 };
 
 export const adminService = {
@@ -206,6 +215,16 @@ export const aiAvailabilityService = {
 
 export const safetyService = {
   getAlerts: () => api.get('/safety/alerts').then(r => r.data),
+  getEmergencyContacts: () => api.get('/safety/emergency-contacts').then(r => r.data),
+  confirmDistress: (data) => api.post('/safety/distress', { ...data, confirmed: true }).then(r => r.data),
+};
+
+export const hodService = {
+  getDashboard: () => api.get('/hod/dashboard').then(r => r.data),
+  getAuditLog: (params) => api.get('/hod/audit-log', { params }).then(r => r.data),
+  auditAction: (id, action) => api.put(`/hod/audit-log/${id}/actions`, { action }).then(r => r.data),
+  getEthicsConfig: () => api.get('/hod/ethics-config').then(r => r.data),
+  updateEthicsConfig: (data) => api.put('/hod/ethics-config', data).then(r => r.data),
 };
 
 export const mockTestService = {

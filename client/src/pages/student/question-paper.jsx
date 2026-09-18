@@ -40,7 +40,7 @@ const QuestionPaper = () => {
         <ArrowLeft size={16} /> Back to question papers
       </Link>
 
-      <header className="rounded-3xl bg-ink p-6 text-white shadow-panel sm:p-8">
+      <header className="rounded-3xl border border-surface-variant/40 bg-surface-container-low p-6 text-on-surface shadow-panel sm:p-8">
         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-secondary"><FileText size={15} /> Previous year paper</div>
         <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div><p className="text-sm text-outline">{paper?.year || 'Exam paper'} · {paper?.subject || subject}</p><h1 className="mt-1 text-3xl font-bold tracking-tight">{setName}</h1><p className="mt-2 text-sm text-outline">Attempt the questions from this paper and practise any topic you want to revise.</p></div>

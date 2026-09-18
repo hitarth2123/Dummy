@@ -7,7 +7,10 @@ export default function FacultyDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    facultyService.getDashboard().then((res) => setData(res.data || res)).finally(() => setLoading(false));
+    const load = () => facultyService.getDashboard().then((res) => setData(res.data || res)).finally(() => setLoading(false));
+    load();
+    const timer = setInterval(load, 30000);
+    return () => clearInterval(timer);
   }, []);
 
   if (loading) return <div className="flex min-h-[300px] items-center justify-center"><LoaderCircle className="animate-spin text-primary" /></div>;

@@ -15,6 +15,7 @@ router.put('/availability',       controller.updateAvailability);
 // GET  /api/faculty/session-requests
 router.get('/session-requests',   controller.sessionRequests);
 router.get('/profile-change-requests', controller.profileChangeRequests);
+router.post('/profile-change-requests', controller.createProfileChangeRequest);
 router.patch('/profile-change-requests/:id', controller.reviewProfileChangeRequest);
 // PUT  /api/faculty/session-requests/:id
 router.put('/session-requests/:id', controller.updateSession);

@@ -162,8 +162,9 @@ const tutorChatHandler = async (req, res) => {
       topic_sequence: savedKnowledge.topicSequence,
       ...savedKnowledge.classification,
     } : { saved: false, source: 'mongo_vector_search' },
+    distress_detection: req.distress_detection || { flagged: false },
   };
-  await escalateDistress({ prompt, response, user: req.user, req }).catch((error) => console.error('[Safety] Distress escalation failed:', error.message));
+  await escalateDistress({ prompt, response, user: req.user, req, confirmed: false }).catch((error) => console.error('[Safety] Distress escalation failed:', error.message));
   if (req.body?.stream === false || typeof res.write !== 'function') {
     return res.json({ success: true, data: payload });
   }
@@ -177,7 +178,7 @@ const tutorChatHandler = async (req, res) => {
     res.write(`data: ${JSON.stringify({ delta: part })}\n\n`);
     await new Promise((resolve) => setTimeout(resolve, 28));
   }
-  res.write(`data: ${JSON.stringify({ rag_sources: payload.rag_sources, knowledge: payload.knowledge, conversation_id: payload.conversation_id, conversation_title: payload.conversation_title, done: true })}\n\n`);
+  res.write(`data: ${JSON.stringify({ rag_sources: payload.rag_sources, knowledge: payload.knowledge, distress_detection: payload.distress_detection, conversation_id: payload.conversation_id, conversation_title: payload.conversation_title, done: true })}\n\n`);
   return res.end();
 };
 

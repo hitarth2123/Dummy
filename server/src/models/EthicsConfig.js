@@ -27,6 +27,15 @@ const ethicsConfigSchema = new Schema(
         message: 'prohibited_categories must contain at least one category',
       },
     },
+    rules: {
+      type: [{
+        category: { type: String, required: true, trim: true },
+        severity: { type: String, enum: ['low', 'medium', 'high', 'critical'], default: 'high' },
+        patterns: { type: [String], default: [] },
+        is_active: { type: Boolean, default: true },
+      }],
+      default: [],
+    },
     severity_thresholds: {
       low: { type: Number, default: 1 },
       medium: { type: Number, default: 3 },

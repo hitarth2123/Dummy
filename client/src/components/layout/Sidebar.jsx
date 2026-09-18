@@ -41,6 +41,7 @@ const navigation = {
       ['Audit Log', '/hod/audit-log', FileText],
       ['Ethics Config', '/hod/ethics-config', ShieldAlert],
       ['Faculty Mgmt', '/hod/faculty', Users],
+      ['Profile Appeals', '/hod/profile-change-requests', ClipboardList],
     ]},
   ],
   admin: [
@@ -52,6 +53,7 @@ const navigation = {
       ['Timetable', '/admin/timetable', CalendarDays],
       ['Emergency Contacts', '/admin/emergency-contacts', ShieldAlert],
       ['Feedback', '/admin/feedback', FileText],
+      ['Profile Appeals', '/admin/profile-change-requests', ClipboardList],
     ]},
   ],
 };
@@ -167,7 +169,7 @@ const Sidebar = ({ open, collapsed, onClose, onToggleCollapse }) => {
         {/* Bottom footer */}
         <div className="p-3 border-t border-surface-variant/30 space-y-2">
           <NavLink
-            to={user?.role === 'student' ? '/student/settings' : '/unauthorized'}
+            to={`/${user?.role || 'student'}/settings`}
             title={collapsed ? 'Settings' : undefined}
             className={`flex items-center gap-3 rounded-xl py-2.5 text-xs font-semibold text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors ${
               collapsed ? 'lg:justify-center lg:px-0 px-3' : 'px-3'

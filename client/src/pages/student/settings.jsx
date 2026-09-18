@@ -48,7 +48,7 @@ const Settings = () => {
   if (loading) return <section className="grid min-h-64 place-items-center text-sm text-on-surface-variant">Loading profile...</section>;
 
   const currentProfile = profile || {};
-  const pendingRequest = requests.find((request) => request.status === 'pending');
+  const pendingRequest = requests.find((request) => ['pending_faculty', 'pending_hod', 'pending_admin', 'pending'].includes(request.status));
 
   return (
     <section className="space-y-6">

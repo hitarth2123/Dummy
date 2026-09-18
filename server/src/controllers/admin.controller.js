@@ -11,6 +11,7 @@ const TutorConversation = require('../models/TutorConversation');
 const LearningPath = require('../models/LearningPath');
 const bcrypt = require('bcryptjs');
 const { getAvailability, updateAvailability } = require('../services/aiAvailability.service');
+const ProfileChangeRequest = require('../models/ProfileChangeRequest');
 
 const parseCsv = (input) => {
   const lines = String(input || '').trim().split(/\r?\n/).filter(Boolean);
@@ -69,6 +70,26 @@ const getUsers = catchAsync(async (req, res) => {
   return res.json({ success: true, data: users });
 });
 
+const profileChangeRequests = catchAsync(async (req, res) => {
+  const requests = await ProfileChangeRequest.find({ requester_role: { $in: ['student', 'faculty', 'hod'] } }).populate('student', 'name email department semester specialization').sort({ createdAt: -1 }).lean();
+  return res.json({ success: true, data: requests });
+});
+
+const reviewProfileChangeRequest = catchAsync(async (req, res) => {
+  const { action, review_notes = '' } = req.body;
+  if (!['approve', 'reject'].includes(action)) return res.status(400).json({ success: false, message: 'Admin action must be approve or reject.' });
+  const request = await ProfileChangeRequest.findOne({ _id: req.params.id, status: 'pending_admin' });
+  if (!request) return res.status(404).json({ success: false, message: 'Admin profile change request not found.' });
+  if (action === 'approve') await User.findByIdAndUpdate(request.student, { [request.change_field]: request.proposed_value }, { runValidators: true });
+  request.status = action === 'approve' ? 'approved' : 'rejected';
+  request.current_reviewer_role = null;
+  request.reviewed_by = req.user.id;
+  request.reviewed_at = new Date();
+  request.review_notes = review_notes.trim();
+  await request.save();
+  return res.json({ success: true, data: request });
+});
+
 const parseUserCsv = (input) => {
   const lines = String(input || '').trim().split(/\r?\n/).filter(Boolean);
   const required = ['institution_id', 'name', 'email', 'role', 'dept'];
@@ -114,8 +135,10 @@ const createUser = catchAsync(async (req, res) => {
 
 const updateUser = catchAsync(async (req, res) => {
   if (String(req.params.id) === String(req.user.id) && req.body.is_active === false) return res.status(400).json({ success: false, message: 'You cannot deactivate your own admin account.' });
-  const allowed = ['name', 'role', 'department', 'semester', 'is_active'];
+  const allowed = ['name', 'email', 'role', 'department', 'semester', 'is_active'];
   const updates = Object.fromEntries(Object.entries(req.body).filter(([key]) => allowed.includes(key)));
+  if (updates.email) updates.email = String(updates.email).trim().toLowerCase();
+  if (updates.email && !/^\S+@\S+\.\S+$/.test(updates.email)) return res.status(400).json({ success: false, message: 'A valid email address is required.' });
   if (updates.role && !['student', 'faculty', 'hod', 'admin'].includes(updates.role)) return res.status(400).json({ success: false, message: 'Invalid user role.' });
   if (updates.semester !== undefined) updates.semester = Number(updates.semester);
   const update = { $set: updates };
@@ -256,4 +279,4 @@ const updateAiAvailability = catchAsync(async (req, res) => {
   return res.json({ success: true, data: await updateAvailability(updates, req.user.id) });
 });
 
-module.exports = { uploadTimetable, getTimetable, getUsers, createUser, updateUser, bulkImportUsers, deactivateUser, resetUserPassword, unlockTimetable, getDashboard, getStudentActivity, getAuditLog, getAiAvailability, updateAiAvailability };
+module.exports = { uploadTimetable, getTimetable, getUsers, profileChangeRequests, reviewProfileChangeRequest, createUser, updateUser, bulkImportUsers, deactivateUser, resetUserPassword, unlockTimetable, getDashboard, getStudentActivity, getAuditLog, getAiAvailability, updateAiAvailability };

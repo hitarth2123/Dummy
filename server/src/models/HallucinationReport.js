@@ -22,7 +22,7 @@ const hallucinationReportSchema = new Schema(
     audit_log_ref: {
       type: Schema.Types.ObjectId,
       ref: 'AuditLog',
-      required: [true, 'audit_log_ref is required'],
+      default: null,
     },
     // Prompt that triggered the hallucination
     original_prompt: {
@@ -79,6 +79,8 @@ const hallucinationReportSchema = new Schema(
       type: Date,
       default: null,
     },
+    screenshot_url: { type: String, trim: true, default: null },
+    screenshot_name: { type: String, trim: true, default: null },
     vendor_ticket_id: {
       type: String,
       trim: true,

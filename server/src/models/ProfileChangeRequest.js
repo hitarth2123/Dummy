@@ -9,6 +9,7 @@ const profileChangeRequestSchema = new Schema(
       ref: 'User',
       required: true,
     },
+    requester_role: { type: String, enum: ['student', 'faculty', 'hod'], default: 'student' },
     department: {
       type: String,
       required: true,
@@ -39,9 +40,17 @@ const profileChangeRequestSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ['pending', 'approved', 'rejected'],
-      default: 'pending',
+      enum: ['pending_faculty', 'pending_hod', 'pending_admin', 'approved', 'rejected'],
+      default: 'pending_faculty',
     },
+    current_reviewer_role: { type: String, enum: ['faculty', 'hod', 'admin', null], default: 'faculty' },
+    escalation_history: [{
+      from_role: String,
+      to_role: String,
+      by: { type: Schema.Types.ObjectId, ref: 'User' },
+      at: { type: Date, default: Date.now },
+      note: String,
+    }],
     reviewed_by: {
       type: Schema.Types.ObjectId,
       ref: 'User',

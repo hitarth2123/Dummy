@@ -1,0 +1,3 @@
+import ProfileRequestQueue from '@components/shared/ProfileRequestQueue';
+import { hierarchyService } from '@services/api.service';
+export default function HODProfileChangeRequests() { return <ProfileRequestQueue service={{ list: hierarchyService.getHodProfileRequests, review: hierarchyService.reviewHodProfileRequest }} title="Profile appeals" subtitle="View student and faculty requests for your department. Review only requests assigned to HOD." actions={['approve', 'reject', 'escalate']} actionableStatus="pending_hod" />; }

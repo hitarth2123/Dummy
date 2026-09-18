@@ -49,6 +49,7 @@ describe('Distress safety scan', () => {
       response: 'I am sorry you are under pressure. Please contact a trusted person now.',
       user: { id: 'student-1', role: 'student', department: 'CS' },
       req: { ip: '127.0.0.1', get: () => 'test' },
+      confirmed: true,
     });
 
     expect(result).toMatchObject({ flagged: true, notified: true, recipient_count: 3 });

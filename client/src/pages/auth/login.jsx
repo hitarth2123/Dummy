@@ -67,17 +67,17 @@ const Login = () => {
 
   return (
     <div className="grid min-h-screen bg-background lg:grid-cols-[1.05fr_0.95fr]">
-      <section className="hidden bg-ink px-10 py-12 text-white lg:flex lg:flex-col lg:justify-between xl:px-20">
+      <section className="hidden border-r border-surface-variant/20 bg-surface-container-low px-10 py-12 text-on-surface lg:flex lg:flex-col lg:justify-between xl:px-20">
         <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-container">
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-container text-on-primary-container">
             <ShieldCheck size={21} />
           </span>
-          <span className="text-lg font-semibold">AI Buddy</span>
+          <span className="text-lg font-semibold text-on-surface">AI Buddy</span>
         </div>
         <div className="max-w-lg">
           <p className="mb-5 text-sm font-semibold uppercase tracking-[0.2em] text-secondary">Institutional learning support</p>
           <h1 className="text-5xl font-semibold leading-tight tracking-tight">A calmer way to move through your semester.</h1>
-          <p className="mt-6 max-w-md text-base leading-7 text-outline">One secure workspace for academic guidance, faculty support, and department operations.</p>
+          <p className="mt-6 max-w-md text-base leading-7 text-on-surface-variant">One secure workspace for academic guidance, faculty support, and department operations.</p>
         </div>
         <p className="text-sm text-outline">Connected to your institution&apos;s identity provider.</p>
       </section>

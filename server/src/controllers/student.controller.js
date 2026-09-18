@@ -38,13 +38,14 @@ const createProfileChangeRequest = catchAsync(async (req, res) => {
   }
   const requestedChanges = `${change_field}: ${proposed_value.trim()}`;
 
-  const pendingRequest = await ProfileChangeRequest.findOne({ student: req.user.id, status: 'pending' });
+  const pendingRequest = await ProfileChangeRequest.findOne({ student: req.user.id, status: { $in: ['pending_faculty', 'pending_hod', 'pending_admin'] } });
   if (pendingRequest) {
     return res.status(409).json({ success: false, message: 'You already have a profile change request awaiting faculty review.' });
   }
 
   const request = await ProfileChangeRequest.create({
     student: req.user.id,
+    requester_role: 'student',
     department: req.department,
     change_field,
     proposed_value: proposed_value.trim(),

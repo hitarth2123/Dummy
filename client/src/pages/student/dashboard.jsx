@@ -29,11 +29,14 @@ export default function StudentDashboard() {
   const [selectedSubject, setSelectedSubject] = useState('');
 
   useEffect(() => {
-    studentService
+    const load = () => studentService
       .getDashboard()
       .then((res) => setData(res.data || res))
       .catch((err) => setError(err.response?.data?.message || 'Could not load dashboard.'))
       .finally(() => setLoading(false));
+    load();
+    const timer = setInterval(load, 30000);
+    return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {

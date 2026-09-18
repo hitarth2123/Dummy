@@ -13,6 +13,8 @@ router.get('/ai-availability',    controller.getAiAvailability);
 router.put('/ai-availability',    controller.updateAiAvailability);
 // GET  /api/admin/users
 router.get('/users',              controller.getUsers);
+router.get('/profile-change-requests', controller.profileChangeRequests);
+router.patch('/profile-change-requests/:id', controller.reviewProfileChangeRequest);
 // POST /api/admin/users
 router.post('/users',             controller.createUser);
 	// POST /api/admin/users/bulk-import

@@ -31,7 +31,10 @@ const sessionRequests = catchAsync(async (req, res) => {
 });
 
 const profileChangeRequests = catchAsync(async (req, res) => {
-  const requests = await ProfileChangeRequest.find({ department: req.department })
+  const requests = await ProfileChangeRequest.find({
+    department: req.department,
+    requester_role: 'student',
+  })
     .populate('student', 'name email department semester specialization')
     .populate('reviewed_by', 'name')
     .sort({ status: 1, createdAt: -1 })
@@ -39,17 +42,38 @@ const profileChangeRequests = catchAsync(async (req, res) => {
   return res.json({ success: true, data: requests });
 });
 
+const createProfileChangeRequest = catchAsync(async (req, res) => {
+  const { change_field, proposed_value, reason } = req.body;
+  if (!['name', 'email', 'department'].includes(change_field) || !proposed_value?.trim() || !reason?.trim()) return res.status(400).json({ success: false, message: 'Select a field, enter the requested value, and explain why.' });
+  const pending = await ProfileChangeRequest.findOne({ student: req.user.id, requester_role: 'faculty', status: { $in: ['pending_hod', 'pending_admin'] } });
+  if (pending) return res.status(409).json({ success: false, message: 'You already have a faculty settings request awaiting review.' });
+  const request = await ProfileChangeRequest.create({ student: req.user.id, requester_role: 'faculty', department: req.department, change_field, proposed_value: proposed_value.trim(), requested_changes: `${change_field}: ${proposed_value.trim()}`, reason: reason.trim(), status: 'pending_hod', current_reviewer_role: 'hod' });
+  return res.status(201).json({ success: true, data: request, message: 'Your settings request was sent to the HOD.' });
+});
+
 const reviewProfileChangeRequest = catchAsync(async (req, res) => {
   const { action, review_notes = '' } = req.body;
-  if (!['approve', 'reject'].includes(action)) {
-    return res.status(400).json({ success: false, message: 'Review action must be approve or reject.' });
+  if (!['approve', 'reject', 'escalate'].includes(action)) {
+    return res.status(400).json({ success: false, message: 'Review action must be approve, reject, or escalate.' });
   }
-  const request = await ProfileChangeRequest.findOne({ _id: req.params.id, department: req.department })
+  const request = await ProfileChangeRequest.findOne({
+    _id: req.params.id,
+    department: req.department,
+    requester_role: 'student',
+    status: { $in: ['pending_faculty', 'pending'] },
+  })
     .populate('student', 'name email');
   if (!request) return res.status(404).json({ success: false, message: 'Profile change request not found.' });
-  if (request.status !== 'pending') return res.status(409).json({ success: false, message: 'This request has already been reviewed.' });
+  if (action === 'escalate') {
+    request.status = 'pending_hod';
+    request.current_reviewer_role = 'hod';
+    request.escalation_history.push({ from_role: 'faculty', to_role: 'hod', by: req.user.id, note: review_notes.trim() });
+    await request.save();
+    return res.json({ success: true, data: request, message: 'Request escalated to the HOD.' });
+  }
 
   request.status = action === 'approve' ? 'approved' : 'rejected';
+  request.current_reviewer_role = null;
   request.reviewed_by = req.user.id;
   request.reviewed_at = new Date();
   request.review_notes = review_notes.trim();
@@ -118,4 +142,4 @@ const dashboard = catchAsync(async (req, res) => {
   return res.json({ success: true, data: { availability, pending_requests: pending, today_sessions: today } });
 });
 
-module.exports = { getAvailability, updateAvailability, sessionRequests, profileChangeRequests, reviewProfileChangeRequest, updateSession, confirmSession, declineSession, facultySessions, dashboard };
+module.exports = { getAvailability, updateAvailability, sessionRequests, profileChangeRequests, createProfileChangeRequest, reviewProfileChangeRequest, updateSession, confirmSession, declineSession, facultySessions, dashboard };

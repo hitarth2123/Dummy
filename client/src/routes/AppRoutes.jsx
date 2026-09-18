@@ -41,6 +41,7 @@ import HODDashboard  from '@pages/hod/dashboard';
 import AuditLog      from '@pages/hod/audit-log';
 import EthicsConfig  from '@pages/hod/ethics-config';
 import FacultyMgmt   from '@pages/hod/faculty-mgmt';
+import HODProfileChangeRequests from '@pages/hod/profile-change-requests';
 
 // Admin pages
 import AdminDashboard     from '@pages/admin/dashboard';
@@ -49,7 +50,9 @@ import Users              from '@pages/admin/users';
 import Timetable          from '@pages/admin/timetable';
 import EmergencyContacts  from '@pages/admin/emergency-contacts';
 import AdminFeedback      from '@pages/admin/feedback';
+import AdminProfileChangeRequests from '@pages/admin/profile-change-requests';
 import AdminAuditLog      from '@pages/admin/audit-log';
+import AccountSettings    from '@pages/shared/account-settings';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -64,6 +67,7 @@ const AppRoutes = () => (
     {/* Public */}
     <Route path="/login"        element={<Login />} />
     <Route path="/unauthorized" element={<Unauthorized />} />
+    <Route path="/student/emergency" element={<Emergency />} />
 
     {/* Student */}
     <Route path="/student" element={<PrivateRoute allowedRoles={['student']}><DashboardLayout /></PrivateRoute>}>
@@ -93,6 +97,7 @@ const AppRoutes = () => (
       <Route path="session-requests" element={<SessionRequests />} />
       <Route path="profile-change-requests" element={<ProfileChangeRequests />} />
       <Route path="my-sessions"     element={<FacultyMySessions />} />
+      <Route path="settings"        element={<AccountSettings />} />
     </Route>
 
     {/* HOD */}
@@ -102,6 +107,8 @@ const AppRoutes = () => (
       <Route path="audit-log"    element={<AuditLog />} />
       <Route path="ethics-config" element={<EthicsConfig />} />
       <Route path="faculty"      element={<FacultyMgmt />} />
+      <Route path="profile-change-requests" element={<HODProfileChangeRequests />} />
+      <Route path="settings"        element={<AccountSettings />} />
     </Route>
 
     {/* Admin */}
@@ -114,6 +121,8 @@ const AppRoutes = () => (
       <Route path="timetable"         element={<Timetable />} />
       <Route path="emergency-contacts" element={<EmergencyContacts />} />
       <Route path="feedback"          element={<AdminFeedback />} />
+      <Route path="profile-change-requests" element={<AdminProfileChangeRequests />} />
+      <Route path="settings"         element={<AccountSettings />} />
     </Route>
 
     {/* Fallback */}
