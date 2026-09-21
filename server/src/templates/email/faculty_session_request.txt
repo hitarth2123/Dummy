@@ -1,0 +1,10 @@
+New doubt-session request
+
+Hello {{FACULTY_NAME}},
+{{STUDENT_NAME}} requested a session about {{SUBJECT}}.
+Topic: {{TOPIC}}
+When: {{SCHEDULED_AT}}
+
+{{DESCRIPTION}}
+
+Please open AI Buddy to confirm or decline this request.

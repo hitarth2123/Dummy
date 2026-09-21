@@ -1,0 +1,510 @@
+[
+  {
+    "topic": "Introduction to DBMS & Data Models",
+    "order": 1,
+    "subject": "DBMS",
+    "department": "BTech",
+    "estimated_minutes": 30,
+    "description": "Understand what a Database Management System is, why we use it over file systems, and the different data models (Hierarchical, Network, Relational, Object-Oriented).",
+    "reading_material": "## What is a DBMS?\n\nImagine you have a huge notebook where you write down everything — student names, marks, courses, fees. Now imagine 100 people need to read and update that notebook at the same time. Chaos, right? That's what happens with plain file systems.\n\nA **Database Management System (DBMS)** is software that helps you **store, organize, retrieve, and manage data** efficiently. Think of it as a smart librarian who knows exactly where every book is, who borrowed it, and can handle 100 people asking questions at once.\n\n### Why DBMS over File Systems?\n\n| Problem with File Systems | How DBMS Solves It |\n|---|---|\n| **Data Redundancy** — Same data stored in multiple files | Centralized storage, data stored once |\n| **Data Inconsistency** — Different copies have different values | Single source of truth |\n| **No Concurrent Access** — Two people can't edit simultaneously | Transaction management handles this |\n| **No Security** — Anyone can read any file | Role-based access control |\n| **No Backup/Recovery** — Power cut = data lost | Automatic backup and recovery mechanisms |\n\n### Types of Data Models\n\n1. **Hierarchical Model** — Data organized like a family tree (parent-child). Example: IBM's IMS. Fast but rigid — a child can only have one parent.\n\n2. **Network Model** — Like hierarchical but a child can have multiple parents (graph structure). More flexible but complex to manage.\n\n3. **Relational Model** — Data stored in **tables** (rows and columns). This is what MySQL, PostgreSQL, Oracle use. Most popular because it's intuitive — think of it like Excel spreadsheets that can talk to each other.\n\n4. **Object-Oriented Model** — Data stored as objects (like in programming). Used in multimedia databases.\n\n### Key Terms to Remember\n- **Schema**: The blueprint/structure of your database (like a building plan)\n- **Instance**: The actual data at a given moment (like the building itself)\n- **Data Independence**: Ability to change storage structure without changing the application\n  - *Logical Independence*: Change the schema without changing external applications\n  - *Physical Independence*: Change storage without changing the schema\n\n### Three-Schema Architecture\nThink of it as three levels of abstraction:\n- **External Level** (View) — What individual users see (customized views)\n- **Conceptual Level** (Logical) — The overall structure of the entire database\n- **Internal Level** (Physical) — How data is actually stored on disk",
+    "key_concepts": [
+      "DBMS vs File System",
+      "Data Models (Hierarchical, Network, Relational, Object-Oriented)",
+      "Schema vs Instance",
+      "Three-Schema Architecture",
+      "Data Independence (Logical & Physical)",
+      "DBMS Users and Roles (DBA, End User, Application Programmer)"
+    ],
+    "exercises": [
+      {
+        "type": "short_answer",
+        "question": "List any 4 advantages of DBMS over a traditional file system.",
+        "hint": "Think about redundancy, consistency, security, and concurrent access."
+      },
+      {
+        "type": "short_answer",
+        "question": "Explain the difference between logical and physical data independence with an example.",
+        "hint": "Logical = changing tables without breaking apps. Physical = changing storage location without changing tables."
+      },
+      {
+        "type": "mcq",
+        "question": "Which data model organizes data in a parent-child hierarchy?",
+        "options": ["Relational Model", "Hierarchical Model", "Network Model", "Object-Oriented Model"],
+        "correct": 1,
+        "explanation": "The Hierarchical Model uses a tree-like structure where each child node has exactly one parent."
+      },
+      {
+        "type": "think",
+        "question": "Your college stores student data in separate Excel files for each department. What problems might arise? How would a DBMS solve them?",
+        "hint": "Consider what happens when a student changes department, or when two offices update the same student's record."
+      }
+    ]
+  },
+  {
+    "topic": "ER Model & ER Diagrams",
+    "order": 2,
+    "subject": "DBMS",
+    "department": "BTech",
+    "estimated_minutes": 40,
+    "description": "Learn to design databases visually using Entity-Relationship diagrams — entities, attributes, relationships, cardinality, and participation constraints.",
+    "reading_material": "## ER Model — Designing Databases Visually\n\nBefore you build a house, you draw a blueprint. Similarly, before creating a database, you draw an **ER Diagram** (Entity-Relationship Diagram).\n\n### Core Building Blocks\n\n**1. Entity** — A real-world thing you want to store data about.\n- Examples: Student, Course, Department, Book\n- Drawn as a **rectangle** in ER diagrams\n- **Strong Entity**: Can exist independently (has its own primary key). Example: Student\n- **Weak Entity**: Cannot exist without a strong entity. Example: Dependent (of an Employee) — if the employee is deleted, the dependent record is meaningless\n\n**2. Attribute** — A property of an entity.\n- Drawn as an **oval** connected to its entity\n- Types:\n  - **Simple**: Cannot be divided further (e.g., Roll Number)\n  - **Composite**: Can be broken down (e.g., Full Name → First Name + Last Name)\n  - **Derived**: Calculated from other attributes (e.g., Age derived from Date of Birth) — drawn with **dashed oval**\n  - **Multi-valued**: Can have multiple values (e.g., Phone Numbers) — drawn with **double oval**\n  - **Key Attribute**: Uniquely identifies an entity (e.g., Student ID) — drawn with **underlined text**\n\n**3. Relationship** — An association between entities.\n- Drawn as a **diamond** shape\n- Example: Student *enrolls in* Course\n\n### Cardinality (How Many?)\n\nThis tells you how many instances of one entity relate to another:\n\n| Cardinality | Example | Meaning |\n|---|---|---|\n| **1:1** (One-to-One) | Person ↔ Passport | Each person has exactly one passport |\n| **1:N** (One-to-Many) | Department → Employees | One department has many employees |\n| **M:N** (Many-to-Many) | Students ↔ Courses | A student takes many courses, a course has many students |\n\n### Participation Constraints\n\n- **Total Participation** (double line): Every entity MUST participate. Example: Every employee MUST belong to a department.\n- **Partial Participation** (single line): Some entities MAY participate. Example: Not every employee manages a department.\n\n### Generalization & Specialization\n\n- **Generalization**: Combining sub-entities into a super-entity (bottom-up). Example: Car + Truck → Vehicle\n- **Specialization**: Splitting a super-entity into sub-entities (top-down). Example: Employee → Full-Time, Part-Time\n- **Aggregation**: Treating a relationship as a higher-level entity when you need a relationship between relationships.",
+    "key_concepts": [
+      "Entity (Strong & Weak)",
+      "Attributes (Simple, Composite, Derived, Multi-valued, Key)",
+      "Relationships and Relationship Sets",
+      "Cardinality Ratios (1:1, 1:N, M:N)",
+      "Participation Constraints (Total & Partial)",
+      "Generalization, Specialization, Aggregation"
+    ],
+    "exercises": [
+      {
+        "type": "design",
+        "question": "Draw an ER diagram for a Library Management System with entities: Book, Member, and Loan. Include appropriate attributes and relationships.",
+        "hint": "A Member borrows Books. Each loan has a borrow_date and return_date. A book has ISBN, title, author. Think about cardinality."
+      },
+      {
+        "type": "mcq",
+        "question": "A weak entity is represented in an ER diagram by:",
+        "options": ["A single rectangle", "A double rectangle", "A dashed rectangle", "An oval"],
+        "correct": 1,
+        "explanation": "Weak entities are drawn with a double (bold-bordered) rectangle to distinguish them from strong entities."
+      },
+      {
+        "type": "short_answer",
+        "question": "What is the difference between total participation and partial participation? Give an example of each.",
+        "hint": "Total = every instance must participate (double line). Partial = some may not (single line)."
+      },
+      {
+        "type": "think",
+        "question": "In a hospital database, Patient and Doctor have a 'consults' relationship. Is this 1:1, 1:N, or M:N? Justify your answer.",
+        "hint": "Can a patient see multiple doctors? Can a doctor see multiple patients?"
+      }
+    ]
+  },
+  {
+    "topic": "Relational Model & Relational Algebra",
+    "order": 3,
+    "subject": "DBMS",
+    "department": "BTech",
+    "estimated_minutes": 45,
+    "description": "Understand tables, keys, integrity constraints, and the mathematical foundation of queries using relational algebra operations.",
+    "reading_material": "## The Relational Model — Tables That Talk to Each Other\n\nThe **Relational Model** (proposed by E.F. Codd in 1970) is the foundation of almost every modern database. It organizes data into **relations** (tables).\n\n### Key Terminology\n\n| Formal Term | Common Term | Example |\n|---|---|---|\n| Relation | Table | Student |\n| Tuple | Row / Record | (101, 'Rahul', 'CS', 8.5) |\n| Attribute | Column / Field | Name, Department, CGPA |\n| Domain | Data Type | Integer, VARCHAR(50), Date |\n| Degree | Number of columns | 4 columns = degree 4 |\n| Cardinality | Number of rows | 100 rows = cardinality 100 |\n\n### Types of Keys\n\n- **Super Key**: Any set of attributes that can uniquely identify a tuple. (StudentID), (StudentID, Name) are both super keys.\n- **Candidate Key**: A *minimal* super key — remove any attribute and it stops being unique. Example: StudentID, Email (if both are unique).\n- **Primary Key**: The candidate key chosen by the DBA to uniquely identify records. Example: StudentID.\n- **Foreign Key**: An attribute in one table that references the primary key of another table. It creates a **link** between tables.\n- **Alternate Key**: Candidate keys that were NOT chosen as primary key.\n\n### Integrity Constraints\n\n1. **Domain Constraint**: Values must belong to the defined domain (e.g., age must be a positive integer)\n2. **Key Constraint**: No two tuples can have the same primary key value\n3. **Entity Integrity**: Primary key cannot be NULL\n4. **Referential Integrity**: Foreign key must either be NULL or match an existing primary key in the referenced table\n\n### Relational Algebra (The Math Behind SQL)\n\nRelational Algebra is a **procedural query language** — you specify *how* to get the data step by step.\n\n**Basic Operations:**\n\n1. **σ (Selection / Sigma)**: Filter rows based on a condition\n   - σ_age>20 (Student) → Returns students older than 20\n\n2. **π (Projection / Pi)**: Select specific columns\n   - π_name,dept (Student) → Returns only name and dept columns\n\n3. **∪ (Union)**: Combine rows from two compatible tables\n\n4. **− (Set Difference)**: Rows in first table but not in second\n\n5. **× (Cartesian Product)**: Every row of table A combined with every row of table B\n\n6. **ρ (Rename)**: Rename a table or attributes\n\n**Derived Operations:**\n\n7. **⋈ (Natural Join)**: Combine tables on common attributes (the most important one!)\n   - Student ⋈ Enrollment → Combines on matching StudentID\n\n8. **⟕ ⟖ ⟗ (Outer Joins)**: Like natural join but keeps unmatched rows too\n   - Left Outer Join: Keeps all rows from left table\n   - Right Outer Join: Keeps all rows from right table\n   - Full Outer Join: Keeps all rows from both tables\n\n9. **÷ (Division)**: Find tuples in A that are associated with ALL tuples in B",
+    "key_concepts": [
+      "Relation, Tuple, Attribute, Domain, Degree, Cardinality",
+      "Keys: Super, Candidate, Primary, Foreign, Alternate",
+      "Integrity Constraints (Domain, Key, Entity, Referential)",
+      "Selection (σ) and Projection (π)",
+      "Union, Intersection, Set Difference",
+      "Cartesian Product and Joins (Natural, Outer)",
+      "Division Operation",
+      "Relational Algebra vs Relational Calculus"
+    ],
+    "exercises": [
+      {
+        "type": "short_answer",
+        "question": "Given a relation Student(RollNo, Name, Dept, CGPA), identify all possible candidate keys and explain why.",
+        "hint": "Which attribute(s) can uniquely identify each student?"
+      },
+      {
+        "type": "practice",
+        "question": "Write relational algebra expressions for: (a) Find names of all CS department students with CGPA > 8.0, (b) Find students enrolled in both 'DBMS' and 'OS' courses.",
+        "hint": "(a) Use σ followed by π. (b) Use intersection or division."
+      },
+      {
+        "type": "mcq",
+        "question": "Which relational algebra operation is used to select specific columns from a relation?",
+        "options": ["Selection (σ)", "Projection (π)", "Join (⋈)", "Division (÷)"],
+        "correct": 1,
+        "explanation": "Projection (π) extracts specific columns/attributes from a relation, while Selection (σ) filters rows."
+      },
+      {
+        "type": "think",
+        "question": "Why can't a foreign key reference a non-primary key column? What problems would that cause?",
+        "hint": "Think about what happens if the referenced column has duplicate values."
+      }
+    ]
+  },
+  {
+    "topic": "SQL Fundamentals (DDL, DML, DCL)",
+    "order": 4,
+    "subject": "DBMS",
+    "department": "BTech",
+    "estimated_minutes": 50,
+    "description": "Master SQL commands — creating tables, inserting/updating/deleting data, basic queries, and access control.",
+    "reading_material": "## SQL — The Language of Databases\n\nSQL (Structured Query Language) is how you *talk* to a relational database. Think of it as giving instructions to that smart librarian we mentioned earlier.\n\n### SQL Command Categories\n\n**1. DDL (Data Definition Language)** — Define the structure\n\n```sql\n-- CREATE: Build a new table\nCREATE TABLE Student (\n  roll_no    INT PRIMARY KEY,\n  name       VARCHAR(50) NOT NULL,\n  dept       VARCHAR(20) DEFAULT 'CS',\n  cgpa       DECIMAL(3,1) CHECK (cgpa >= 0 AND cgpa <= 10),\n  email      VARCHAR(100) UNIQUE\n);\n\n-- ALTER: Modify table structure\nALTER TABLE Student ADD phone VARCHAR(15);\nALTER TABLE Student DROP COLUMN phone;\nALTER TABLE Student MODIFY name VARCHAR(100);\n\n-- DROP: Delete entire table (structure + data)\nDROP TABLE Student;\n\n-- TRUNCATE: Delete all rows but keep structure\nTRUNCATE TABLE Student;\n```\n\n**2. DML (Data Manipulation Language)** — Work with the data\n\n```sql\n-- INSERT: Add new records\nINSERT INTO Student VALUES (101, 'Rahul', 'CS', 8.5, 'rahul@email.com');\nINSERT INTO Student (roll_no, name) VALUES (102, 'Priya');\n\n-- UPDATE: Modify existing records\nUPDATE Student SET cgpa = 9.0 WHERE roll_no = 101;\n\n-- DELETE: Remove specific records\nDELETE FROM Student WHERE cgpa < 5.0;\n\n-- SELECT: Retrieve data (the most used command!)\nSELECT name, cgpa FROM Student WHERE dept = 'CS' ORDER BY cgpa DESC;\n```\n\n**3. DCL (Data Control Language)** — Control access\n\n```sql\n-- GRANT: Give permissions\nGRANT SELECT, INSERT ON Student TO user1;\n\n-- REVOKE: Take back permissions\nREVOKE INSERT ON Student FROM user1;\n```\n\n**4. TCL (Transaction Control Language)**\n\n```sql\nCOMMIT;    -- Save all changes permanently\nROLLBACK;  -- Undo all changes since last COMMIT\nSAVEPOINT sp1;  -- Create a checkpoint\nROLLBACK TO sp1;  -- Undo to checkpoint\n```\n\n### Important Clauses\n\n- **WHERE**: Filter rows → `WHERE age > 20`\n- **ORDER BY**: Sort results → `ORDER BY name ASC`\n- **GROUP BY**: Group rows for aggregation → `GROUP BY dept`\n- **HAVING**: Filter groups (like WHERE for groups) → `HAVING COUNT(*) > 5`\n- **DISTINCT**: Remove duplicates → `SELECT DISTINCT dept`\n- **LIMIT**: Restrict number of results → `LIMIT 10`\n\n### Aggregate Functions\n\n| Function | Purpose | Example |\n|---|---|---|\n| COUNT() | Count rows | `SELECT COUNT(*) FROM Student` |\n| SUM() | Total of values | `SELECT SUM(cgpa) FROM Student` |\n| AVG() | Average | `SELECT AVG(cgpa) FROM Student` |\n| MAX() | Highest value | `SELECT MAX(cgpa) FROM Student` |\n| MIN() | Lowest value | `SELECT MIN(cgpa) FROM Student` |\n\n### Constraints Quick Reference\n\n- **PRIMARY KEY**: Unique + NOT NULL identifier\n- **FOREIGN KEY**: Links to another table's primary key\n- **UNIQUE**: No duplicate values allowed\n- **NOT NULL**: Must have a value\n- **CHECK**: Custom validation rule\n- **DEFAULT**: Auto-fill value if none provided",
+    "key_concepts": [
+      "DDL: CREATE, ALTER, DROP, TRUNCATE",
+      "DML: SELECT, INSERT, UPDATE, DELETE",
+      "DCL: GRANT, REVOKE",
+      "TCL: COMMIT, ROLLBACK, SAVEPOINT",
+      "Aggregate Functions (COUNT, SUM, AVG, MAX, MIN)",
+      "Clauses: WHERE, ORDER BY, GROUP BY, HAVING, DISTINCT",
+      "Constraints: PRIMARY KEY, FOREIGN KEY, UNIQUE, NOT NULL, CHECK, DEFAULT"
+    ],
+    "exercises": [
+      {
+        "type": "practice",
+        "question": "Write SQL to: (a) Create an Employee table with empid (PK), name, salary (> 0), dept. (b) Insert 3 records. (c) Find the average salary per department. (d) Find departments where average salary exceeds 50000.",
+        "hint": "Use CREATE TABLE with CHECK, INSERT INTO, SELECT with GROUP BY, and HAVING."
+      },
+      {
+        "type": "mcq",
+        "question": "Which SQL command removes all rows from a table but keeps the table structure?",
+        "options": ["DELETE", "DROP", "TRUNCATE", "ALTER"],
+        "correct": 2,
+        "explanation": "TRUNCATE removes all data but keeps the table structure. DROP removes both data and structure. DELETE can remove specific rows."
+      },
+      {
+        "type": "short_answer",
+        "question": "What is the difference between WHERE and HAVING? When would you use each?",
+        "hint": "WHERE filters individual rows before grouping. HAVING filters groups after GROUP BY."
+      },
+      {
+        "type": "practice",
+        "question": "Write a query to find the second highest salary from an Employee table.",
+        "hint": "You can use subquery with MAX, or ORDER BY with LIMIT/OFFSET."
+      }
+    ]
+  },
+  {
+    "topic": "Advanced SQL (Joins, Subqueries, Views)",
+    "order": 5,
+    "subject": "DBMS",
+    "department": "BTech",
+    "estimated_minutes": 50,
+    "description": "Deep dive into multi-table queries, nested subqueries, correlated queries, views, and set operations.",
+    "reading_material": "## Advanced SQL — Connecting and Combining Data\n\n### Joins — Combining Tables\n\nJoins are how you combine data from two or more tables. Think of it as matching rows from different tables based on a common column.\n\n```sql\n-- Tables for examples:\n-- Student(roll_no, name, dept_id)\n-- Department(dept_id, dept_name)\n-- Enrollment(roll_no, course_id, grade)\n```\n\n**1. INNER JOIN** — Only matching rows from both tables\n```sql\nSELECT s.name, d.dept_name\nFROM Student s INNER JOIN Department d ON s.dept_id = d.dept_id;\n-- Only shows students who have a valid department\n```\n\n**2. LEFT (OUTER) JOIN** — All rows from left table + matching from right\n```sql\nSELECT s.name, d.dept_name\nFROM Student s LEFT JOIN Department d ON s.dept_id = d.dept_id;\n-- Shows ALL students, even those without a department (dept_name = NULL)\n```\n\n**3. RIGHT (OUTER) JOIN** — All from right + matching from left\n\n**4. FULL OUTER JOIN** — All rows from both tables\n\n**5. CROSS JOIN** — Every combination (Cartesian product)\n```sql\nSELECT * FROM Student CROSS JOIN Department;\n-- If Student has 5 rows and Department has 3, result has 15 rows\n```\n\n**6. SELF JOIN** — A table joined with itself\n```sql\n-- Find employees who earn more than their manager\nSELECT e.name AS Employee, m.name AS Manager\nFROM Employee e JOIN Employee m ON e.manager_id = m.emp_id\nWHERE e.salary > m.salary;\n```\n\n### Subqueries (Nested Queries)\n\nA query inside another query. Like Russian nesting dolls!\n\n**Types:**\n\n1. **Scalar Subquery** — Returns a single value\n```sql\nSELECT name FROM Student WHERE cgpa > (SELECT AVG(cgpa) FROM Student);\n```\n\n2. **Row Subquery** — Returns a single row\n```sql\nSELECT * FROM Student WHERE (dept, cgpa) = (SELECT dept, MAX(cgpa) FROM Student WHERE dept = 'CS');\n```\n\n3. **Table Subquery** — Returns multiple rows (used with IN, ANY, ALL, EXISTS)\n```sql\n-- Students enrolled in DBMS course\nSELECT name FROM Student WHERE roll_no IN (SELECT roll_no FROM Enrollment WHERE course_id = 'DBMS');\n```\n\n4. **Correlated Subquery** — Inner query references outer query (runs once per outer row)\n```sql\n-- Students who scored above their department average\nSELECT s.name, s.cgpa FROM Student s\nWHERE s.cgpa > (SELECT AVG(s2.cgpa) FROM Student s2 WHERE s2.dept = s.dept);\n```\n\n### Views — Virtual Tables\n\nA View is a **saved query** that acts like a table. It doesn't store data — it computes results on the fly.\n\n```sql\nCREATE VIEW TopStudents AS\nSELECT name, cgpa, dept FROM Student WHERE cgpa > 9.0;\n\n-- Use it like a regular table:\nSELECT * FROM TopStudents WHERE dept = 'CS';\n```\n\n**Why use Views?**\n- **Security**: Show only specific columns to certain users\n- **Simplicity**: Hide complex joins behind a simple name\n- **Consistency**: Everyone uses the same query logic\n\n### Set Operations\n\n```sql\n-- UNION: Combine results (removes duplicates)\nSELECT name FROM Student UNION SELECT name FROM Faculty;\n\n-- UNION ALL: Combine without removing duplicates\n-- INTERSECT: Common rows only\n-- EXCEPT / MINUS: Rows in first but not in second\n```",
+    "key_concepts": [
+      "Joins: INNER, LEFT, RIGHT, FULL OUTER, CROSS, SELF",
+      "Subqueries: Scalar, Row, Table, Correlated",
+      "EXISTS, IN, ANY, ALL operators",
+      "Views (CREATE VIEW, WITH CHECK OPTION)",
+      "Set Operations (UNION, INTERSECT, EXCEPT)",
+      "Common Table Expressions (CTEs / WITH clause)"
+    ],
+    "exercises": [
+      {
+        "type": "practice",
+        "question": "Write SQL queries: (a) List all students with their department names (include students without departments). (b) Find students who are enrolled in ALL courses offered by the CS department.",
+        "hint": "(a) Use LEFT JOIN. (b) Use NOT EXISTS with a correlated subquery."
+      },
+      {
+        "type": "mcq",
+        "question": "Which type of JOIN returns all rows from both tables, filling NULLs where there's no match?",
+        "options": ["INNER JOIN", "LEFT JOIN", "CROSS JOIN", "FULL OUTER JOIN"],
+        "correct": 3,
+        "explanation": "FULL OUTER JOIN returns all rows from both tables, using NULL for columns where there's no match."
+      },
+      {
+        "type": "short_answer",
+        "question": "What is the difference between a correlated and a non-correlated subquery? Which one is typically slower and why?",
+        "hint": "Correlated subquery references the outer query and runs once per outer row."
+      },
+      {
+        "type": "practice",
+        "question": "Create a View 'DeptStats' that shows department name, total students, and average CGPA. Then query it to find departments with more than 50 students.",
+        "hint": "Use CREATE VIEW with GROUP BY, then SELECT from the view with WHERE."
+      }
+    ]
+  },
+  {
+    "topic": "Normalization (1NF to BCNF)",
+    "order": 6,
+    "subject": "DBMS",
+    "department": "BTech",
+    "estimated_minutes": 50,
+    "description": "Master functional dependencies and systematically decompose tables through normal forms (1NF, 2NF, 3NF, BCNF) to eliminate redundancy.",
+    "reading_material": "## Normalization — Cleaning Up Your Tables\n\nImagine a single table that stores everything: student name, course, professor, department, department phone. Every time a professor teaches another course, you repeat their name and phone. That's **redundancy**, and it causes three nasty problems:\n\n- **Insertion Anomaly**: Can't add a new department without adding a student\n- **Update Anomaly**: Change a professor's phone → must update 100 rows\n- **Deletion Anomaly**: Delete the last student in a dept → lose the department info\n\n**Normalization** fixes this by decomposing tables step by step.\n\n### Functional Dependencies (FDs)\n\nAn FD `X → Y` means: if two rows have the same X value, they MUST have the same Y value.\n\n- `StudentID → Name` ✓ (Same ID always maps to same name)\n- `Name → StudentID` ✗ (Two people can share a name)\n\n**Armstrong's Axioms** (rules to derive new FDs):\n1. **Reflexivity**: If Y ⊆ X, then X → Y\n2. **Augmentation**: If X → Y, then XZ → YZ\n3. **Transitivity**: If X → Y and Y → Z, then X → Z\n\n**Closure of Attributes (X⁺)**: All attributes that can be determined from X using the given FDs. If X⁺ contains all attributes, X is a **super key**.\n\n### The Normal Forms\n\n#### 1NF (First Normal Form)\n**Rule**: Every cell must have a **single atomic value** (no lists, no repeating groups).\n\n❌ Bad: `Student(ID, Name, Courses: 'DBMS, OS, CN')`\n✓ Good: Separate row for each course, or create a separate Enrollment table.\n\n#### 2NF (Second Normal Form)\n**Rule**: Must be in 1NF + no **partial dependencies** (non-key attribute depends on only PART of a composite key).\n\nExample: `Enrollment(StudentID, CourseID, StudentName, Grade)`\n- Key: (StudentID, CourseID)\n- `StudentID → StudentName` — StudentName depends on only PART of the key!\n- **Fix**: Move StudentName to a separate Student table.\n\n#### 3NF (Third Normal Form)\n**Rule**: Must be in 2NF + no **transitive dependencies** (non-key → non-key).\n\nExample: `Student(ID, Name, DeptID, DeptName)`\n- Key: ID\n- `ID → DeptID → DeptName` — DeptName depends on ID *through* DeptID!\n- **Fix**: Create a separate Department table.\n\n**Formal 3NF Test**: For every FD `X → Y`:\n- X is a super key, OR\n- Y is part of a candidate key (prime attribute)\n\n#### BCNF (Boyce-Codd Normal Form)\n**Rule**: Stricter version of 3NF. For every FD `X → Y`, X MUST be a **super key**. Period.\n\nThe difference from 3NF: BCNF doesn't allow the exception for prime attributes.\n\n### Quick Decision Flow\n```\nTable → Has multi-valued cells? → Violates 1NF → Decompose\n      → Partial dependency? → Violates 2NF → Decompose  \n      → Transitive dependency? → Violates 3NF → Decompose\n      → Non-superkey determinant? → Violates BCNF → Decompose\n```\n\n### Lossless Join & Dependency Preservation\nWhen decomposing, ensure:\n1. **Lossless Join**: You can reconstruct the original table by joining decomposed tables (no spurious tuples)\n2. **Dependency Preservation**: All original FDs can be checked within individual decomposed tables",
+    "key_concepts": [
+      "Functional Dependencies (FDs)",
+      "Armstrong's Axioms (Reflexivity, Augmentation, Transitivity)",
+      "Attribute Closure (X⁺) and Candidate Key Finding",
+      "1NF: Atomic values, no repeating groups",
+      "2NF: No partial dependencies",
+      "3NF: No transitive dependencies",
+      "BCNF: Every determinant is a super key",
+      "Lossless Join Decomposition",
+      "Dependency Preservation"
+    ],
+    "exercises": [
+      {
+        "type": "practice",
+        "question": "Given R(A, B, C, D, E) with FDs: {A→B, BC→D, D→E, E→A}. Find all candidate keys and determine the highest normal form.",
+        "hint": "Start by finding A⁺, then try other combinations. Check for partial and transitive dependencies."
+      },
+      {
+        "type": "mcq",
+        "question": "A relation is in 2NF if it is in 1NF and has no:",
+        "options": ["Transitive dependencies", "Partial dependencies", "Multi-valued dependencies", "Join dependencies"],
+        "correct": 1,
+        "explanation": "2NF eliminates partial dependencies — where a non-prime attribute depends on only part of a composite candidate key."
+      },
+      {
+        "type": "practice",
+        "question": "Decompose the relation StudentCourse(StudentID, StudentName, CourseID, CourseName, InstructorName, InstructorPhone) into BCNF. Show each step.",
+        "hint": "Identify FDs first: StudentID→StudentName, CourseID→CourseName, CourseID→InstructorName, InstructorName→InstructorPhone."
+      },
+      {
+        "type": "short_answer",
+        "question": "Can a relation be in 3NF but not in BCNF? Give an example.",
+        "hint": "Yes — when a prime attribute is determined by a non-superkey. Think of a relation with multiple candidate keys."
+      }
+    ]
+  },
+  {
+    "topic": "Transactions & ACID Properties",
+    "order": 7,
+    "subject": "DBMS",
+    "department": "BTech",
+    "estimated_minutes": 40,
+    "description": "Understand database transactions, ACID guarantees, transaction states, and serializability for maintaining data integrity.",
+    "reading_material": "## Transactions — The 'All or Nothing' Promise\n\nImagine transferring ₹500 from Account A to Account B. Two steps:\n1. Deduct ₹500 from A\n2. Add ₹500 to B\n\nWhat if the system crashes after step 1 but before step 2? You just lost ₹500! A **transaction** prevents this.\n\n### What is a Transaction?\n\nA transaction is a **logical unit of work** — a sequence of operations that must either ALL succeed or ALL fail. There's no middle ground.\n\n### ACID Properties\n\n| Property | Meaning | Bank Transfer Example |\n|---|---|---|\n| **Atomicity** | All or nothing | Either both deduct AND add happen, or neither does |\n| **Consistency** | Valid state → Valid state | Total money in the system stays the same |\n| **Isolation** | Concurrent transactions don't interfere | If someone checks balance during transfer, they see a consistent value |\n| **Durability** | Once committed, changes survive crashes | Even if power goes off after COMMIT, the transfer is saved |\n\n### Transaction States\n\n```\nActive → Partially Committed → Committed\n  ↓              ↓\nFailed ←────── Failed\n  ↓\nAborted (Rollback)\n```\n\n1. **Active**: Transaction is executing operations\n2. **Partially Committed**: All operations done, waiting for final write to disk\n3. **Committed**: Changes are permanent ✓\n4. **Failed**: An error occurred\n5. **Aborted**: All changes rolled back, database restored to previous state\n\n### Schedule & Serializability\n\nWhen multiple transactions run concurrently, the order of their operations matters.\n\n**Serial Schedule**: Transactions run one after another (T1 completely, then T2). Always correct but slow.\n\n**Concurrent Schedule**: Operations of T1 and T2 are interleaved. Fast but might cause problems.\n\nA concurrent schedule is **serializable** if its result is the same as SOME serial schedule.\n\n**Two types of serializability:**\n\n1. **Conflict Serializability**: Check if conflicting operations can be reordered to match a serial schedule.\n   - Conflicting operations: Same data item, at least one is WRITE\n   - Build a **precedence graph** — if no cycle, it's conflict serializable!\n\n2. **View Serializability**: Broader — same reads see same values, same final writes.\n\n### Problems Without Proper Isolation\n\n- **Dirty Read**: T2 reads data written by T1 before T1 commits (T1 might rollback!)\n- **Non-Repeatable Read**: T1 reads same data twice, gets different values because T2 modified it between reads\n- **Phantom Read**: T1 re-runs a query and gets extra rows because T2 inserted new rows\n\n### Isolation Levels (from weakest to strongest)\n\n| Level | Dirty Read | Non-Repeatable | Phantom |\n|---|---|---|---|\n| Read Uncommitted | ✗ Possible | ✗ Possible | ✗ Possible |\n| Read Committed | ✓ Prevented | ✗ Possible | ✗ Possible |\n| Repeatable Read | ✓ Prevented | ✓ Prevented | ✗ Possible |\n| Serializable | ✓ Prevented | ✓ Prevented | ✓ Prevented |",
+    "key_concepts": [
+      "Transaction definition and properties",
+      "ACID Properties (Atomicity, Consistency, Isolation, Durability)",
+      "Transaction States (Active, Partially Committed, Committed, Failed, Aborted)",
+      "Serial vs Concurrent Schedules",
+      "Conflict Serializability and Precedence Graphs",
+      "View Serializability",
+      "Isolation Levels (Read Uncommitted/Committed, Repeatable Read, Serializable)",
+      "Concurrency Problems (Dirty Read, Non-Repeatable Read, Phantom Read)"
+    ],
+    "exercises": [
+      {
+        "type": "short_answer",
+        "question": "Explain each ACID property with a real-world analogy (not the bank transfer example).",
+        "hint": "Think of online shopping: Atomicity = order placed only if payment succeeds, etc."
+      },
+      {
+        "type": "practice",
+        "question": "Given schedule S: r1(A), r2(A), w1(A), w2(A), r1(B), r2(B), w1(B), w2(B). Draw the precedence graph and determine if S is conflict serializable.",
+        "hint": "Identify conflicting pairs, draw edges in the precedence graph, check for cycles."
+      },
+      {
+        "type": "mcq",
+        "question": "Which isolation level prevents all three concurrency problems (dirty read, non-repeatable read, phantom read)?",
+        "options": ["Read Uncommitted", "Read Committed", "Repeatable Read", "Serializable"],
+        "correct": 3,
+        "explanation": "Serializable is the strictest isolation level and prevents all concurrency anomalies by effectively running transactions as if they were serial."
+      },
+      {
+        "type": "think",
+        "question": "Why don't all databases use the Serializable isolation level by default? What trade-off are they making?",
+        "hint": "Think about performance and throughput. More isolation = more locking = slower concurrent operations."
+      }
+    ]
+  },
+  {
+    "topic": "Concurrency Control & Locking",
+    "order": 8,
+    "subject": "DBMS",
+    "department": "BTech",
+    "estimated_minutes": 45,
+    "description": "Learn how databases handle multiple simultaneous transactions using locking protocols, two-phase locking, deadlock handling, and timestamp ordering.",
+    "reading_material": "## Concurrency Control — Managing the Traffic\n\nWhen 1000 users access a database simultaneously, we need traffic rules. That's what concurrency control provides.\n\n### Lock-Based Protocols\n\nA **lock** is like raising your hand before touching a data item.\n\n**Types of Locks:**\n- **Shared Lock (S-lock / Read Lock)**: Multiple transactions can read simultaneously. Like a library — everyone can read the same book reference.\n- **Exclusive Lock (X-lock / Write Lock)**: Only one transaction can hold this. Like checking out a book — only you have it.\n\n**Lock Compatibility Matrix:**\n\n|  | S-lock | X-lock |\n|---|---|---|\n| **S-lock** | ✓ Compatible | ✗ Conflict |\n| **X-lock** | ✗ Conflict | ✗ Conflict |\n\n### Two-Phase Locking (2PL)\n\nThe most important protocol! A transaction's lifecycle has two phases:\n\n1. **Growing Phase**: Can acquire new locks but CANNOT release any\n2. **Shrinking Phase**: Can release locks but CANNOT acquire any\n\nOnce you release your first lock, you can never acquire another. This guarantees conflict serializability!\n\n**Variations:**\n- **Strict 2PL**: Hold ALL exclusive locks until COMMIT/ABORT. Prevents cascading rollbacks.\n- **Rigorous 2PL**: Hold ALL locks (shared and exclusive) until COMMIT/ABORT. Even safer.\n\n### Deadlocks\n\nA **deadlock** occurs when two or more transactions are waiting for each other's locks in a cycle:\n- T1 holds Lock(A), wants Lock(B)\n- T2 holds Lock(B), wants Lock(A)\n- Neither can proceed → Deadlock! 🔒🔒\n\n**Deadlock Prevention:**\n- **Wait-Die** (Old waits, Young dies): If T1 is older than T2, T1 waits. Otherwise T1 is aborted.\n- **Wound-Wait** (Old wounds, Young waits): If T1 is older, T2 is aborted. Otherwise T1 waits.\n- **No-Wait**: Never wait — abort immediately if lock unavailable.\n- **Timeout**: Wait for a fixed time, then abort.\n\n**Deadlock Detection:**\n- Build a **Wait-For Graph**: Nodes = transactions, Edge T1→T2 means T1 waits for T2's lock.\n- If the graph has a **cycle** → Deadlock detected!\n- **Recovery**: Abort the youngest transaction (victim selection) and rollback.\n\n### Timestamp-Based Protocols\n\nEvery transaction gets a unique **timestamp** when it starts (TS(T)). Older transactions get priority.\n\n**Rules:**\n- If T tries to READ X, but a younger transaction already WROTE X → T is too late → Abort T\n- If T tries to WRITE X, but a younger transaction already READ X → T is too late → Abort T\n\n**Thomas' Write Rule**: An optimization — if T tries to WRITE X but a younger transaction already WROTE X, just skip T's write (it would be overwritten anyway).\n\n### Multiversion Concurrency Control (MVCC)\n\nInstead of blocking readers, keep **multiple versions** of each data item. Readers see an appropriate old version while writers create new versions. Used by PostgreSQL, MySQL InnoDB, Oracle.\n\nThis achieves: **Readers never block writers, Writers never block readers.**",
+    "key_concepts": [
+      "Shared Lock (S-lock) and Exclusive Lock (X-lock)",
+      "Lock Compatibility Matrix",
+      "Two-Phase Locking (2PL, Strict 2PL, Rigorous 2PL)",
+      "Deadlock: Detection (Wait-For Graph), Prevention (Wait-Die, Wound-Wait)",
+      "Timestamp-Based Protocol and Thomas' Write Rule",
+      "Multiversion Concurrency Control (MVCC)",
+      "Starvation and its prevention"
+    ],
+    "exercises": [
+      {
+        "type": "practice",
+        "question": "Two transactions: T1 reads A then writes B. T2 reads B then writes A. Show how deadlock can occur under lock-based protocol and how 2PL prevents it (or does it?).",
+        "hint": "2PL prevents serializability issues but does NOT prevent deadlocks by itself!"
+      },
+      {
+        "type": "mcq",
+        "question": "In the Wait-Die deadlock prevention scheme, when an older transaction requests a lock held by a younger one:",
+        "options": ["The older transaction is aborted", "The younger transaction is aborted", "The older transaction waits", "Both transactions are aborted"],
+        "correct": 2,
+        "explanation": "In Wait-Die: Older waits for Younger. If a Younger transaction requests a lock held by Older, the Younger dies (is aborted)."
+      },
+      {
+        "type": "short_answer",
+        "question": "Explain why Strict 2PL prevents cascading rollbacks while basic 2PL does not.",
+        "hint": "In basic 2PL, a transaction can release locks before committing. Another transaction might read that data and then the first transaction aborts."
+      },
+      {
+        "type": "think",
+        "question": "PostgreSQL uses MVCC instead of traditional locking. What advantages does this give for a web application with thousands of concurrent users?",
+        "hint": "Think about read-heavy workloads and how MVCC avoids blocking."
+      }
+    ]
+  },
+  {
+    "topic": "Indexing & Hashing",
+    "order": 9,
+    "subject": "DBMS",
+    "department": "BTech",
+    "estimated_minutes": 40,
+    "description": "Understand how databases speed up queries using indexes (B-tree, B+ tree) and hashing (static, dynamic/extendible).",
+    "reading_material": "## Indexing — The Speed Boost\n\nWithout an index, finding a record means scanning EVERY row (like searching a book page by page). An **index** is like the book's table of contents — jump directly to what you need.\n\n### Types of Indexes\n\n**1. Primary Index (Clustering Index)**\n- Built on the **primary key** of a sorted file\n- One index entry per disk block\n- File is physically sorted by the indexed field\n\n**2. Secondary Index (Non-Clustering Index)**\n- Built on a **non-key** field\n- One entry per record (denser)\n- File is NOT sorted by this field\n\n**3. Dense vs Sparse Index**\n- **Dense**: One index entry for EVERY record → More entries, faster lookups\n- **Sparse**: One index entry per DISK BLOCK → Fewer entries, saves space, but slightly slower\n\n### B-Tree (Balanced Tree)\n\nA self-balancing search tree designed for disk-based storage.\n\n**Properties of B-Tree of order m:**\n- Each node has at most m children\n- Each node (except root) has at least ⌈m/2⌉ children\n- Root has at least 2 children (if not a leaf)\n- All leaves are at the same level\n- Data pointers exist at ALL nodes (internal + leaf)\n\n### B+ Tree (The Database Favorite)\n\nAn improvement over B-Tree — used by MySQL, PostgreSQL, Oracle, and almost every RDBMS.\n\n**Key differences from B-Tree:**\n- **Data pointers ONLY at leaf nodes** → Internal nodes are smaller → More keys per node → Fewer disk reads\n- **Leaf nodes are linked** → Range queries are super fast (just follow the links)\n- **All keys appear at leaf level** → Consistent search time for every query\n\n**Why B+ Tree is preferred:**\n```\nScenario: Find all students with CGPA between 8.0 and 9.5\n\nB-Tree: Must traverse internal + leaf nodes, jumping around\nB+ Tree: Find 8.0 at leaf level, then follow leaf links until 9.5 → Sequential!\n```\n\n### Hashing\n\nInstead of a tree structure, use a **hash function** to directly compute the storage location.\n\n**h(key) → bucket address**\n\n**Static Hashing:**\n- Fixed number of buckets\n- Problem: **Bucket overflow** when too many records hash to the same bucket\n- Solutions: Overflow chaining, Open addressing\n\n**Dynamic Hashing (Extendible Hashing):**\n- Number of buckets can grow/shrink dynamically\n- Uses a **directory** of pointers and a **global depth** to determine which bits of the hash to use\n- When a bucket overflows → split that bucket and update the directory\n- Avoids the overflow problem elegantly\n\n### When to Use What?\n\n| Scenario | Best Choice |\n|---|---|\n| Exact match queries (WHERE id = 5) | Hash Index |\n| Range queries (WHERE age BETWEEN 20 AND 30) | B+ Tree Index |\n| Sorted output needed | B+ Tree Index |\n| Frequently updated tables | Hash (simpler reorganization) |",
+    "key_concepts": [
+      "Primary, Secondary, Dense, Sparse Indexes",
+      "B-Tree properties and operations",
+      "B+ Tree: structure, advantages over B-Tree, range queries",
+      "Static Hashing (overflow handling)",
+      "Dynamic/Extendible Hashing",
+      "Index selection: When to use B+ Tree vs Hash Index",
+      "Multi-level Indexing"
+    ],
+    "exercises": [
+      {
+        "type": "practice",
+        "question": "Construct a B+ Tree of order 3 by inserting the following keys in sequence: 5, 15, 25, 35, 45, 10, 20. Show the tree after each insertion that causes a split.",
+        "hint": "Order 3 means max 2 keys per node. When a node overflows (3 keys), split it and push the middle key up."
+      },
+      {
+        "type": "mcq",
+        "question": "In a B+ Tree, data record pointers are stored at:",
+        "options": ["All nodes", "Only internal nodes", "Only leaf nodes", "Only root node"],
+        "correct": 2,
+        "explanation": "In B+ Trees, data pointers are stored only at leaf nodes. Internal nodes contain only keys and child pointers for navigation."
+      },
+      {
+        "type": "short_answer",
+        "question": "Why is B+ Tree better than B-Tree for range queries? Explain with an example.",
+        "hint": "B+ Tree leaf nodes are linked in a doubly-linked list, allowing sequential access."
+      },
+      {
+        "type": "think",
+        "question": "Should you create an index on every column? What are the downsides of too many indexes?",
+        "hint": "Think about storage space, INSERT/UPDATE/DELETE performance, and index maintenance."
+      }
+    ]
+  },
+  {
+    "topic": "Query Processing & Optimization",
+    "order": 10,
+    "subject": "DBMS",
+    "department": "BTech",
+    "estimated_minutes": 40,
+    "description": "Learn how the DBMS converts SQL queries into execution plans, and how the query optimizer chooses the most efficient strategy.",
+    "reading_material": "## Query Processing — From SQL to Results\n\nWhen you write `SELECT * FROM Student WHERE cgpa > 8`, the DBMS doesn't just execute it literally. It goes through several stages to find the FASTEST way to get your answer.\n\n### Query Processing Steps\n\n```\nSQL Query → Parsing → Optimization → Evaluation → Result\n```\n\n**Step 1: Parsing & Translation**\n- Check syntax (is the SQL valid?)\n- Check semantics (do the tables/columns exist?)\n- Convert to **Relational Algebra** expression\n\n**Step 2: Query Optimization**\n- Generate multiple equivalent execution plans\n- Estimate the **cost** of each plan\n- Pick the cheapest plan\n\n**Step 3: Evaluation**\n- Execute the chosen plan\n- Return results\n\n### Query Cost Estimation\n\nCost is primarily measured in **disk I/O** (number of block reads/writes). Why? Because disk access is 100,000x slower than memory access!\n\n**Key statistics the optimizer uses:**\n- `n_r` = number of tuples in relation r\n- `b_r` = number of disk blocks for relation r\n- `f_r` = blocking factor (tuples per block)\n- `V(A, r)` = number of distinct values of attribute A\n\n### Optimization Heuristics\n\nThe optimizer uses rules of thumb (heuristics) to transform queries:\n\n**1. Perform Selection (σ) Early**\nReduce the number of rows as soon as possible.\n```\n❌ Slow: π_name(Student ⋈ Enrollment) then σ_dept='CS'\n✓ Fast: π_name(σ_dept='CS'(Student) ⋈ Enrollment)\n```\n\n**2. Perform Projection (π) Early**\nReduce the number of columns to save memory.\n\n**3. Choose the Right Join Algorithm**\n\n| Algorithm | When to Use | Cost |\n|---|---|---|\n| **Nested Loop Join** | One table is very small | O(n × m) |\n| **Block Nested Loop** | Better than simple nested loop | O(b_r × b_s) |\n| **Sort-Merge Join** | Both tables are large, join key is indexed | O(b_r + b_s) after sorting |\n| **Hash Join** | Equality joins, one table fits in memory | O(b_r + b_s) |\n\n**4. Use Indexes**\nIf an index exists on the selection condition, use it instead of a full table scan.\n\n### Equivalence Rules\n\nThese rules let the optimizer rearrange operations without changing the result:\n\n1. **Selection cascade**: σ(A AND B) = σ(A)(σ(B))\n2. **Selection commutativity**: σ(A)(σ(B)) = σ(B)(σ(A))\n3. **Projection cascade**: π(L1)(π(L2)) = π(L1) if L1 ⊆ L2\n4. **Join commutativity**: R ⋈ S = S ⋈ R\n5. **Join associativity**: (R ⋈ S) ⋈ T = R ⋈ (S ⋈ T)\n\n### EXPLAIN in Practice\n\nMost databases let you see the execution plan:\n```sql\nEXPLAIN SELECT * FROM Student WHERE roll_no = 101;\n-- Shows: Index Scan on student_pkey (fast)\n\nEXPLAIN SELECT * FROM Student WHERE name = 'Rahul';\n-- Shows: Sequential Scan (slow, no index on name)\n```",
+    "key_concepts": [
+      "Query Processing Pipeline (Parsing → Optimization → Evaluation)",
+      "Cost Estimation (disk I/O based)",
+      "Heuristic Optimization (push selection/projection down)",
+      "Join Algorithms (Nested Loop, Block Nested Loop, Sort-Merge, Hash Join)",
+      "Equivalence Rules for query transformation",
+      "Cost-Based vs Rule-Based Optimization",
+      "EXPLAIN / Query Execution Plan"
+    ],
+    "exercises": [
+      {
+        "type": "practice",
+        "question": "Given query: SELECT S.name FROM Student S, Enrollment E, Course C WHERE S.id = E.sid AND E.cid = C.id AND C.dept = 'CS' AND S.cgpa > 8.0. Write the optimized relational algebra expression by applying heuristics.",
+        "hint": "Push selections down first, then project early, then decide join order."
+      },
+      {
+        "type": "mcq",
+        "question": "Which join algorithm is most efficient when both relations are sorted on the join attribute?",
+        "options": ["Nested Loop Join", "Hash Join", "Sort-Merge Join", "Block Nested Loop Join"],
+        "correct": 2,
+        "explanation": "Sort-Merge Join is optimal for pre-sorted relations as it only needs a single pass through both tables, giving O(b_r + b_s) cost."
+      },
+      {
+        "type": "short_answer",
+        "question": "Why is 'push selection down' the most important optimization heuristic?",
+        "hint": "Think about what happens to the intermediate result size. Smaller intermediate results = faster joins."
+      },
+      {
+        "type": "think",
+        "question": "You notice a query is running slowly. The EXPLAIN plan shows 'Sequential Scan' on a large table. What steps would you take to optimize it?",
+        "hint": "Consider adding indexes, rewriting the query, checking if WHERE conditions are sargable."
+      }
+    ]
+  },
+  {
+    "topic": "Recovery System & Log-Based Recovery",
+    "order": 11,
+    "subject": "DBMS",
+    "department": "BTech",
+    "estimated_minutes": 35,
+    "description": "Understand how databases recover from crashes using write-ahead logging (WAL), checkpoints, UNDO/REDO recovery, and the ARIES algorithm.",
+    "reading_material": "## Recovery — Surviving the Crash\n\nDatabases must survive power outages, hardware failures, and software crashes. The **Recovery Manager** ensures that committed transactions are preserved (Durability) and aborted transactions are undone (Atomicity).\n\n### Types of Failures\n\n1. **Transaction Failure**: A transaction aborts due to logical error or deadlock\n2. **System Crash**: Power failure, OS crash — volatile memory (RAM) lost, but disk survives\n3. **Disk Failure**: Hard disk damaged — need backups\n\n### Log-Based Recovery\n\nThe database maintains a **log** — a sequential record of all database modifications.\n\n**Log Records:**\n- `<Ti START>` — Transaction Ti started\n- `<Ti, X, old_value, new_value>` — Ti changed X from old_value to new_value\n- `<Ti COMMIT>` — Ti successfully completed\n- `<Ti ABORT>` — Ti was aborted\n\n### Write-Ahead Logging (WAL) Rule\n\n**The Golden Rule**: Before writing any data to disk, write the log record FIRST.\n\nThis means even if the system crashes, we can always replay the log to figure out what happened.\n\n### Recovery Techniques\n\n**1. Deferred Modification (No-Undo / Redo)**\n- Don't write changes to database until COMMIT\n- On crash: Only REDO committed transactions (their changes might not be on disk yet)\n- No need to UNDO anything (uncommitted changes were never written)\n\n**2. Immediate Modification (Undo / Redo)**\n- Write changes to database as they happen (even before COMMIT)\n- On crash:\n  - **REDO** committed transactions (ensure their changes are on disk)\n  - **UNDO** uncommitted transactions (roll back their partial changes)\n\n### Recovery Process\n\n```\n1. Scan log BACKWARDS from end\n2. Build two lists:\n   - REDO list: Transactions with COMMIT record (need to be redone)\n   - UNDO list: Transactions with START but no COMMIT (need to be undone)\n3. REDO (forward): Replay all operations of committed transactions\n4. UNDO (backward): Reverse all operations of uncommitted transactions\n```\n\n### Checkpoints\n\nScanning the entire log on every crash is slow. **Checkpoints** are periodic markers that say \"everything before this point is safely on disk.\"\n\n**How Checkpointing Works:**\n1. Stop accepting new transactions momentarily\n2. Flush all modified buffers to disk\n3. Write `<CHECKPOINT>` record to log\n4. Resume normal operation\n\nDuring recovery, only scan from the last checkpoint — ignore everything before it!\n\n**Fuzzy Checkpoints**: Don't pause operations. Instead, note which pages are dirty and flush them in the background. Used in modern databases.\n\n### ARIES Algorithm (Simplified)\n\nThe industry-standard recovery algorithm (used by IBM DB2, PostgreSQL, etc.):\n\n1. **Analysis Phase**: Scan log from last checkpoint, determine which transactions were active and which pages were dirty\n2. **Redo Phase**: Redo ALL changes from dirty pages (even for aborted transactions, to bring database to crash-time state)\n3. **Undo Phase**: Undo changes of transactions that were active at crash time",
+    "key_concepts": [
+      "Types of Failures (Transaction, System, Disk)",
+      "Write-Ahead Logging (WAL) Protocol",
+      "Log Records (START, COMMIT, ABORT, Data modifications)",
+      "Deferred vs Immediate Modification",
+      "UNDO and REDO recovery operations",
+      "Checkpoints and Fuzzy Checkpoints",
+      "ARIES Recovery Algorithm (Analysis, Redo, Undo)",
+      "Shadow Paging (alternative to logging)"
+    ],
+    "exercises": [
+      {
+        "type": "practice",
+        "question": "Given this log: <T1 START>, <T1, A, 100, 200>, <T2 START>, <T2, B, 50, 150>, <T1 COMMIT>, <T3 START>, <T3, C, 300, 400>, <CRASH>. Which transactions are redone and which are undone?",
+        "hint": "T1 has COMMIT → REDO. T2 has START but no COMMIT → UNDO. T3 has START but no COMMIT → UNDO."
+      },
+      {
+        "type": "mcq",
+        "question": "The Write-Ahead Logging (WAL) protocol requires that:",
+        "options": ["Data is written to disk before the log", "The log is written to disk before data", "Both log and data are written simultaneously", "The log is written only after commit"],
+        "correct": 1,
+        "explanation": "WAL requires log records to be written to stable storage BEFORE the corresponding data modifications are written to disk."
+      },
+      {
+        "type": "short_answer",
+        "question": "Why do we need checkpoints? What problem do they solve?",
+        "hint": "Without checkpoints, recovery would need to scan the entire log from the beginning, which could be millions of records."
+      },
+      {
+        "type": "think",
+        "question": "In the ARIES algorithm, why does the Redo phase redo changes even for aborted transactions?",
+        "hint": "Think about bringing the database to the exact state it was at crash time, so that Undo can correctly reverse the aborted transactions."
+      }
+    ]
+  },
+  {
+    "topic": "NoSQL & Distributed Databases",
+    "order": 12,
+    "subject": "DBMS",
+    "department": "BTech",
+    "estimated_minutes": 35,
+    "description": "Explore alternatives to relational databases — NoSQL types, CAP theorem, distributed database concepts, and when to use what.",
+    "reading_material": "## Beyond Relational — NoSQL & Distributed Databases\n\nRelational databases are powerful, but when you need to handle millions of users, petabytes of data, or rapidly changing schemas, sometimes you need a different approach.\n\n### Why NoSQL?\n\nTraditional RDBMS struggles with:\n- **Massive Scale**: Billions of rows, thousands of writes/second (think Twitter, Instagram)\n- **Flexible Schema**: Data structure changes frequently (agile development)\n- **Unstructured Data**: JSON documents, images, logs, social graphs\n- **Horizontal Scaling**: Adding more servers instead of upgrading one server\n\n### Types of NoSQL Databases\n\n**1. Key-Value Stores**\n- Data model: Simple key → value pairs (like a dictionary/hashmap)\n- Examples: Redis, Amazon DynamoDB, Memcached\n- Best for: Caching, session management, real-time leaderboards\n- Think of it as: A giant, distributed HashMap\n\n**2. Document Stores**\n- Data model: Documents (JSON/BSON) with nested fields\n- Examples: **MongoDB**, CouchDB\n- Best for: Content management, user profiles, catalogs\n- Think of it as: Each row is a JSON object that can have different fields\n```json\n{ \"name\": \"Rahul\", \"courses\": [\"DBMS\", \"OS\"], \"address\": { \"city\": \"Delhi\" } }\n```\n\n**3. Column-Family Stores**\n- Data model: Columns grouped into families, rows identified by a row key\n- Examples: Apache Cassandra, HBase\n- Best for: Analytics, time-series data, write-heavy workloads\n- Think of it as: Spreadsheet where each row can have different columns\n\n**4. Graph Databases**\n- Data model: Nodes (entities) and Edges (relationships)\n- Examples: Neo4j, Amazon Neptune\n- Best for: Social networks, recommendation engines, fraud detection\n- Think of it as: A network diagram you can query\n\n### CAP Theorem\n\nIn a distributed system, you can only guarantee **two out of three**:\n\n- **C — Consistency**: Every read gets the most recent write\n- **A — Availability**: Every request gets a response (even if it's not the latest)\n- **P — Partition Tolerance**: System continues working despite network failures\n\n**You MUST choose P** (networks fail in real life), so the real choice is:\n- **CP** (Consistency + Partition Tolerance): Sacrifice availability. Example: MongoDB, HBase\n- **AP** (Availability + Partition Tolerance): Sacrifice consistency. Example: Cassandra, DynamoDB\n\n### Distributed Database Concepts\n\n**Sharding (Horizontal Partitioning)**\n- Split data across multiple servers by a **shard key**\n- Example: Users A-M on Server 1, N-Z on Server 2\n- Challenge: Cross-shard queries are expensive\n\n**Replication**\n- Copy data across multiple servers for redundancy and read performance\n- **Master-Slave**: One server for writes, copies for reads\n- **Master-Master**: Multiple servers accept writes (conflict resolution needed)\n\n**Eventual Consistency**\n- After a write, not all replicas are immediately updated\n- But given enough time (usually milliseconds), all replicas converge to the same value\n- Trade-off: Faster writes and better availability\n\n### SQL vs NoSQL — When to Use What?\n\n| Use SQL When | Use NoSQL When |\n|---|---|\n| Data has clear structure and relationships | Schema is flexible or unknown |\n| ACID transactions are critical | Eventual consistency is acceptable |\n| Complex queries with JOINs needed | Simple queries on large datasets |\n| Data size is moderate | Massive scale (petabytes) needed |\n| Examples: Banking, ERP, Inventory | Examples: Social media, IoT, Gaming |",
+    "key_concepts": [
+      "Limitations of RDBMS at scale",
+      "NoSQL Types: Key-Value, Document, Column-Family, Graph",
+      "CAP Theorem (Consistency, Availability, Partition Tolerance)",
+      "CP vs AP systems",
+      "Sharding (Horizontal Partitioning) and Shard Key selection",
+      "Replication (Master-Slave, Master-Master)",
+      "Eventual Consistency",
+      "SQL vs NoSQL decision criteria",
+      "BASE properties (Basically Available, Soft state, Eventually consistent)"
+    ],
+    "exercises": [
+      {
+        "type": "short_answer",
+        "question": "Explain the CAP theorem. Why can't a distributed system achieve all three properties simultaneously?",
+        "hint": "When a network partition occurs, the system must choose: reject requests (lose Availability) or serve potentially stale data (lose Consistency)."
+      },
+      {
+        "type": "mcq",
+        "question": "Which NoSQL database type is best suited for representing social network relationships?",
+        "options": ["Key-Value Store", "Document Store", "Column-Family Store", "Graph Database"],
+        "correct": 3,
+        "explanation": "Graph databases model data as nodes and edges, making them ideal for representing and querying relationships in social networks."
+      },
+      {
+        "type": "think",
+        "question": "You're building an e-commerce platform like Amazon. Which parts of the system would you build with SQL and which with NoSQL? Justify your choices.",
+        "hint": "Think about: Orders (need ACID) vs Product catalog (flexible schema) vs Shopping cart (needs speed) vs Reviews (document-like)."
+      },
+      {
+        "type": "short_answer",
+        "question": "What is the difference between horizontal scaling (sharding) and vertical scaling? Which does NoSQL typically prefer and why?",
+        "hint": "Vertical = bigger server. Horizontal = more servers. There's a limit to how big one server can get."
+      }
+    ]
+  }
+]

@@ -1,0 +1,804 @@
+{
+  "subject": "DBMS",
+  "department": "BTech",
+  "sets": [
+    {
+      "set_name": "Set A 2023",
+      "year": 2023,
+      "questions": [
+        {
+          "question_text": "Which of the following is NOT a level of data abstraction in the three-schema architecture?",
+          "options": [
+            { "label": "A", "text": "External Level" },
+            { "label": "B", "text": "Conceptual Level" },
+            { "label": "C", "text": "Internal Level" },
+            { "label": "D", "text": "Operational Level" }
+          ],
+          "correct_answer": "D",
+          "explanation": "The three-schema architecture has External (View), Conceptual (Logical), and Internal (Physical) levels. There is no 'Operational Level'.",
+          "topic": "Introduction to DBMS & Data Models",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "A foreign key in a relational database is used to:",
+          "options": [
+            { "label": "A", "text": "Uniquely identify a record within the same table" },
+            { "label": "B", "text": "Create a link between two tables by referencing the primary key of another table" },
+            { "label": "C", "text": "Allow NULL values in the primary key column" },
+            { "label": "D", "text": "Index the table for faster queries" }
+          ],
+          "correct_answer": "B",
+          "explanation": "A foreign key establishes a referential integrity constraint by referencing the primary key of another relation, creating a logical link between tables.",
+          "topic": "Relational Model & Relational Algebra",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "In an ER diagram, a multi-valued attribute is represented by:",
+          "options": [
+            { "label": "A", "text": "A single oval" },
+            { "label": "B", "text": "A dashed oval" },
+            { "label": "C", "text": "A double oval" },
+            { "label": "D", "text": "A rectangle" }
+          ],
+          "correct_answer": "C",
+          "explanation": "Multi-valued attributes (e.g., multiple phone numbers) are shown as double ovals. Single ovals represent simple attributes, and dashed ovals represent derived attributes.",
+          "topic": "ER Model & ER Diagrams",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "Which normal form eliminates transitive dependencies?",
+          "options": [
+            { "label": "A", "text": "First Normal Form (1NF)" },
+            { "label": "B", "text": "Second Normal Form (2NF)" },
+            { "label": "C", "text": "Third Normal Form (3NF)" },
+            { "label": "D", "text": "Fourth Normal Form (4NF)" }
+          ],
+          "correct_answer": "C",
+          "explanation": "3NF requires that no non-prime attribute is transitively dependent on any candidate key, eliminating transitive dependencies.",
+          "topic": "Normalization (1NF to BCNF)",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "The SQL command used to modify the structure of an existing table is:",
+          "options": [
+            { "label": "A", "text": "UPDATE" },
+            { "label": "B", "text": "MODIFY" },
+            { "label": "C", "text": "ALTER" },
+            { "label": "D", "text": "CHANGE" }
+          ],
+          "correct_answer": "C",
+          "explanation": "ALTER TABLE is a DDL command used to add, delete, or modify columns and constraints in an existing table. UPDATE is a DML command for data.",
+          "topic": "SQL Fundamentals (DDL, DML, DCL)",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "Which ACID property ensures that a transaction is treated as an indivisible unit?",
+          "options": [
+            { "label": "A", "text": "Consistency" },
+            { "label": "B", "text": "Isolation" },
+            { "label": "C", "text": "Durability" },
+            { "label": "D", "text": "Atomicity" }
+          ],
+          "correct_answer": "D",
+          "explanation": "Atomicity ensures 'all or nothing' — either all operations of a transaction complete successfully, or none of them take effect.",
+          "topic": "Transactions & ACID Properties",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "In relational algebra, the projection operation (π) is used to:",
+          "options": [
+            { "label": "A", "text": "Select rows satisfying a condition" },
+            { "label": "B", "text": "Select specific columns from a relation" },
+            { "label": "C", "text": "Join two relations" },
+            { "label": "D", "text": "Rename a relation" }
+          ],
+          "correct_answer": "B",
+          "explanation": "Projection (π) selects specific attributes (columns) from a relation, while Selection (σ) filters tuples (rows) based on conditions.",
+          "topic": "Relational Model & Relational Algebra",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "A schedule is conflict serializable if and only if its precedence graph is:",
+          "options": [
+            { "label": "A", "text": "Complete" },
+            { "label": "B", "text": "Cyclic" },
+            { "label": "C", "text": "Acyclic" },
+            { "label": "D", "text": "Bipartite" }
+          ],
+          "correct_answer": "C",
+          "explanation": "A schedule is conflict serializable if and only if its precedence (serialization) graph has no cycles (is acyclic/DAG).",
+          "topic": "Transactions & ACID Properties",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "In the Two-Phase Locking (2PL) protocol, the growing phase allows a transaction to:",
+          "options": [
+            { "label": "A", "text": "Only release locks" },
+            { "label": "B", "text": "Acquire and release locks simultaneously" },
+            { "label": "C", "text": "Only acquire new locks" },
+            { "label": "D", "text": "Neither acquire nor release locks" }
+          ],
+          "correct_answer": "C",
+          "explanation": "In 2PL, the growing phase allows only lock acquisition. Once the first lock is released (shrinking phase begins), no new locks can be acquired.",
+          "topic": "Concurrency Control & Locking",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "Which SQL JOIN returns all rows from the left table and matched rows from the right table?",
+          "options": [
+            { "label": "A", "text": "INNER JOIN" },
+            { "label": "B", "text": "RIGHT JOIN" },
+            { "label": "C", "text": "LEFT JOIN" },
+            { "label": "D", "text": "CROSS JOIN" }
+          ],
+          "correct_answer": "C",
+          "explanation": "LEFT JOIN (LEFT OUTER JOIN) returns all rows from the left table. If no match is found in the right table, NULLs are returned for right table columns.",
+          "topic": "Advanced SQL (Joins, Subqueries, Views)",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "The difference between BCNF and 3NF is that BCNF:",
+          "options": [
+            { "label": "A", "text": "Allows partial dependencies" },
+            { "label": "B", "text": "Does not allow any non-superkey determinant, even for prime attributes" },
+            { "label": "C", "text": "Is a weaker form than 3NF" },
+            { "label": "D", "text": "Does not require the relation to be in 1NF" }
+          ],
+          "correct_answer": "B",
+          "explanation": "In 3NF, a non-superkey determinant is allowed if the dependent attribute is prime (part of a candidate key). BCNF removes this exception — every determinant must be a superkey.",
+          "topic": "Normalization (1NF to BCNF)",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "In a B+ tree, all data record pointers are stored at:",
+          "options": [
+            { "label": "A", "text": "Root node only" },
+            { "label": "B", "text": "All internal nodes" },
+            { "label": "C", "text": "Leaf nodes only" },
+            { "label": "D", "text": "Both internal and leaf nodes" }
+          ],
+          "correct_answer": "C",
+          "explanation": "In B+ trees, data pointers exist only at leaf nodes. Internal nodes contain only search keys and child pointers for navigation, making them smaller and allowing higher fan-out.",
+          "topic": "Indexing & Hashing",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "The Write-Ahead Logging (WAL) protocol requires:",
+          "options": [
+            { "label": "A", "text": "Data to be written before the log" },
+            { "label": "B", "text": "Log record to be written to stable storage before the data is written to disk" },
+            { "label": "C", "text": "Both log and data to be written simultaneously" },
+            { "label": "D", "text": "Log to be written only after transaction commits" }
+          ],
+          "correct_answer": "B",
+          "explanation": "WAL mandates that log records are flushed to stable storage BEFORE the corresponding data modifications reach the database disk. This ensures recoverability.",
+          "topic": "Recovery System & Log-Based Recovery",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "Which of the following is NOT a type of NoSQL database?",
+          "options": [
+            { "label": "A", "text": "Key-Value Store" },
+            { "label": "B", "text": "Document Store" },
+            { "label": "C", "text": "Relational Store" },
+            { "label": "D", "text": "Graph Database" }
+          ],
+          "correct_answer": "C",
+          "explanation": "NoSQL databases include Key-Value (Redis), Document (MongoDB), Column-Family (Cassandra), and Graph (Neo4j). Relational databases (SQL) are a separate category.",
+          "topic": "NoSQL & Distributed Databases",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "In query optimization, the heuristic 'perform selection early' aims to:",
+          "options": [
+            { "label": "A", "text": "Increase the number of tuples" },
+            { "label": "B", "text": "Reduce the size of intermediate results" },
+            { "label": "C", "text": "Avoid using indexes" },
+            { "label": "D", "text": "Delay the join operation indefinitely" }
+          ],
+          "correct_answer": "B",
+          "explanation": "Pushing selection (σ) down the query tree filters out unwanted tuples early, reducing the size of intermediate relations and making subsequent operations (especially joins) much cheaper.",
+          "topic": "Query Processing & Optimization",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "An entity that cannot exist without a related strong entity is called a:",
+          "options": [
+            { "label": "A", "text": "Regular entity" },
+            { "label": "B", "text": "Strong entity" },
+            { "label": "C", "text": "Weak entity" },
+            { "label": "D", "text": "Associative entity" }
+          ],
+          "correct_answer": "C",
+          "explanation": "A weak entity depends on a strong (owner) entity for its existence and identification. It has a partial key and is represented by a double rectangle in ER diagrams.",
+          "topic": "ER Model & ER Diagrams",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "Given the functional dependency A → B and B → C, which dependency can be inferred?",
+          "options": [
+            { "label": "A", "text": "C → A" },
+            { "label": "B", "text": "A → C" },
+            { "label": "C", "text": "B → A" },
+            { "label": "D", "text": "C → B" }
+          ],
+          "correct_answer": "B",
+          "explanation": "By Armstrong's Transitivity axiom: if A → B and B → C, then A → C. This is a transitive functional dependency.",
+          "topic": "Normalization (1NF to BCNF)",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "The HAVING clause in SQL is used to:",
+          "options": [
+            { "label": "A", "text": "Filter individual rows before grouping" },
+            { "label": "B", "text": "Sort the result set" },
+            { "label": "C", "text": "Filter groups after GROUP BY" },
+            { "label": "D", "text": "Join two tables" }
+          ],
+          "correct_answer": "C",
+          "explanation": "HAVING filters groups created by GROUP BY (e.g., HAVING COUNT(*) > 5). WHERE filters individual rows before grouping occurs.",
+          "topic": "SQL Fundamentals (DDL, DML, DCL)",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "The CAP theorem states that a distributed system can guarantee at most how many of the three properties simultaneously?",
+          "options": [
+            { "label": "A", "text": "One" },
+            { "label": "B", "text": "Two" },
+            { "label": "C", "text": "Three" },
+            { "label": "D", "text": "None" }
+          ],
+          "correct_answer": "B",
+          "explanation": "The CAP theorem (Brewer's theorem) states that in the presence of a network partition, a distributed system can guarantee at most two of: Consistency, Availability, and Partition Tolerance.",
+          "topic": "NoSQL & Distributed Databases",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "Which deadlock prevention scheme aborts a younger transaction when it requests a lock held by an older transaction?",
+          "options": [
+            { "label": "A", "text": "Wait-Die" },
+            { "label": "B", "text": "Wound-Wait" },
+            { "label": "C", "text": "No-Wait" },
+            { "label": "D", "text": "Timeout" }
+          ],
+          "correct_answer": "A",
+          "explanation": "In Wait-Die: an older transaction waits for a younger one, but a younger transaction requesting a lock held by an older transaction is aborted (dies).",
+          "topic": "Concurrency Control & Locking",
+          "difficulty": "hard"
+        }
+      ]
+    },
+    {
+      "set_name": "Set B 2023",
+      "year": 2023,
+      "questions": [
+        {
+          "question_text": "Which of the following is an advantage of DBMS over file systems?",
+          "options": [
+            { "label": "A", "text": "Higher storage cost" },
+            { "label": "B", "text": "Data redundancy is eliminated" },
+            { "label": "C", "text": "Slower data retrieval" },
+            { "label": "D", "text": "No support for concurrent access" }
+          ],
+          "correct_answer": "B",
+          "explanation": "DBMS provides centralized data management which eliminates or minimizes data redundancy. File systems often duplicate data across different files.",
+          "topic": "Introduction to DBMS & Data Models",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "A relation is in 1NF if:",
+          "options": [
+            { "label": "A", "text": "It has no transitive dependencies" },
+            { "label": "B", "text": "Every attribute contains only atomic (indivisible) values" },
+            { "label": "C", "text": "Every determinant is a superkey" },
+            { "label": "D", "text": "It has no partial dependencies" }
+          ],
+          "correct_answer": "B",
+          "explanation": "First Normal Form (1NF) requires that all attribute values are atomic — no repeating groups, no multi-valued attributes, and no nested tables.",
+          "topic": "Normalization (1NF to BCNF)",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "The total participation of an entity in a relationship is represented in an ER diagram by:",
+          "options": [
+            { "label": "A", "text": "A dashed line" },
+            { "label": "B", "text": "A double line" },
+            { "label": "C", "text": "A dotted line" },
+            { "label": "D", "text": "A single line" }
+          ],
+          "correct_answer": "B",
+          "explanation": "Total participation is shown by a double line connecting the entity to the relationship, indicating every entity instance must participate in the relationship.",
+          "topic": "ER Model & ER Diagrams",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "Which of the following SQL statements is used to remove all rows from a table without removing the table structure?",
+          "options": [
+            { "label": "A", "text": "DROP TABLE" },
+            { "label": "B", "text": "DELETE FROM table_name" },
+            { "label": "C", "text": "TRUNCATE TABLE" },
+            { "label": "D", "text": "Both B and C" }
+          ],
+          "correct_answer": "D",
+          "explanation": "Both DELETE (without WHERE) and TRUNCATE remove all rows while keeping the table structure. TRUNCATE is faster but cannot be rolled back in most RDBMS.",
+          "topic": "SQL Fundamentals (DDL, DML, DCL)",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "A correlated subquery is one that:",
+          "options": [
+            { "label": "A", "text": "Runs only once for the entire outer query" },
+            { "label": "B", "text": "References a column from the outer query and runs once per outer row" },
+            { "label": "C", "text": "Cannot use aggregate functions" },
+            { "label": "D", "text": "Must return exactly one value" }
+          ],
+          "correct_answer": "B",
+          "explanation": "A correlated subquery references columns from the outer query, causing it to be re-evaluated for each row processed by the outer query.",
+          "topic": "Advanced SQL (Joins, Subqueries, Views)",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "The candidate key of a relation is:",
+          "options": [
+            { "label": "A", "text": "Any set of attributes that can identify a tuple" },
+            { "label": "B", "text": "A minimal superkey — no proper subset is a superkey" },
+            { "label": "C", "text": "The same as the primary key" },
+            { "label": "D", "text": "An attribute that allows NULL values" }
+          ],
+          "correct_answer": "B",
+          "explanation": "A candidate key is a minimal superkey — it can uniquely identify tuples, and removing any attribute from it destroys this uniqueness property.",
+          "topic": "Relational Model & Relational Algebra",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "Which join algorithm is generally most efficient when both input relations are already sorted on the join attribute?",
+          "options": [
+            { "label": "A", "text": "Nested Loop Join" },
+            { "label": "B", "text": "Hash Join" },
+            { "label": "C", "text": "Sort-Merge Join" },
+            { "label": "D", "text": "Block Nested Loop Join" }
+          ],
+          "correct_answer": "C",
+          "explanation": "Sort-Merge Join requires both relations to be sorted on the join attribute. If already sorted, it requires only a single linear pass through both, giving optimal O(b_r + b_s) cost.",
+          "topic": "Query Processing & Optimization",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "In ARIES recovery algorithm, the three phases in order are:",
+          "options": [
+            { "label": "A", "text": "Redo, Undo, Analysis" },
+            { "label": "B", "text": "Analysis, Redo, Undo" },
+            { "label": "C", "text": "Undo, Analysis, Redo" },
+            { "label": "D", "text": "Analysis, Undo, Redo" }
+          ],
+          "correct_answer": "B",
+          "explanation": "ARIES follows: Analysis (determine active transactions and dirty pages at crash time), Redo (replay all changes to bring DB to crash state), Undo (reverse uncommitted transactions).",
+          "topic": "Recovery System & Log-Based Recovery",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "MongoDB is an example of which type of NoSQL database?",
+          "options": [
+            { "label": "A", "text": "Key-Value Store" },
+            { "label": "B", "text": "Column-Family Store" },
+            { "label": "C", "text": "Document Store" },
+            { "label": "D", "text": "Graph Database" }
+          ],
+          "correct_answer": "C",
+          "explanation": "MongoDB stores data as JSON-like documents (BSON format) with flexible schemas, making it a Document Store type of NoSQL database.",
+          "topic": "NoSQL & Distributed Databases",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "Strict Two-Phase Locking differs from basic 2PL in that:",
+          "options": [
+            { "label": "A", "text": "It allows lock upgrades" },
+            { "label": "B", "text": "It holds all exclusive locks until the transaction commits or aborts" },
+            { "label": "C", "text": "It does not use shared locks" },
+            { "label": "D", "text": "It prevents starvation" }
+          ],
+          "correct_answer": "B",
+          "explanation": "Strict 2PL holds all exclusive (write) locks until COMMIT/ABORT, preventing cascading rollbacks because no other transaction can read uncommitted data.",
+          "topic": "Concurrency Control & Locking",
+          "difficulty": "hard"
+        },
+        {
+          "question_text": "A dense index has:",
+          "options": [
+            { "label": "A", "text": "One index entry per disk block" },
+            { "label": "B", "text": "One index entry per record in the data file" },
+            { "label": "C", "text": "No index entries" },
+            { "label": "D", "text": "Entries only for the first and last records" }
+          ],
+          "correct_answer": "B",
+          "explanation": "A dense index has one index entry for every search-key value (every record), as opposed to a sparse index which has entries only for some records (typically one per block).",
+          "topic": "Indexing & Hashing",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "Which of the following is true about a View in SQL?",
+          "options": [
+            { "label": "A", "text": "It stores data physically on disk" },
+            { "label": "B", "text": "It is a virtual table derived from a query" },
+            { "label": "C", "text": "It cannot be used in SELECT statements" },
+            { "label": "D", "text": "It must have a primary key" }
+          ],
+          "correct_answer": "B",
+          "explanation": "A View is a virtual table that does not store data physically. It is defined by a SQL query and computes its results dynamically from the underlying base tables.",
+          "topic": "Advanced SQL (Joins, Subqueries, Views)",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "The closure of a set of functional dependencies F is:",
+          "options": [
+            { "label": "A", "text": "The minimum set of FDs" },
+            { "label": "B", "text": "The set of all FDs that can be derived from F using Armstrong's axioms" },
+            { "label": "C", "text": "The set of all attributes in the relation" },
+            { "label": "D", "text": "The primary key of the relation" }
+          ],
+          "correct_answer": "B",
+          "explanation": "The closure F⁺ of a set of FDs F is the complete set of all functional dependencies that are logically implied by F, derivable using Armstrong's axioms.",
+          "topic": "Normalization (1NF to BCNF)",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "A checkpoint in database recovery serves to:",
+          "options": [
+            { "label": "A", "text": "Delete the log file" },
+            { "label": "B", "text": "Mark a point beyond which REDO is not needed for committed transactions" },
+            { "label": "C", "text": "Prevent new transactions from starting" },
+            { "label": "D", "text": "Create a copy of the entire database" }
+          ],
+          "correct_answer": "B",
+          "explanation": "A checkpoint flushes all modified buffers to disk and records the event in the log. During recovery, only log records after the last checkpoint need to be processed.",
+          "topic": "Recovery System & Log-Based Recovery",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "The Cartesian product of a relation with 5 tuples and a relation with 4 tuples produces:",
+          "options": [
+            { "label": "A", "text": "9 tuples" },
+            { "label": "B", "text": "20 tuples" },
+            { "label": "C", "text": "5 tuples" },
+            { "label": "D", "text": "4 tuples" }
+          ],
+          "correct_answer": "B",
+          "explanation": "Cartesian product combines every tuple of the first relation with every tuple of the second. Result cardinality = 5 × 4 = 20 tuples.",
+          "topic": "Relational Model & Relational Algebra",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "Which isolation level allows dirty reads?",
+          "options": [
+            { "label": "A", "text": "Serializable" },
+            { "label": "B", "text": "Repeatable Read" },
+            { "label": "C", "text": "Read Committed" },
+            { "label": "D", "text": "Read Uncommitted" }
+          ],
+          "correct_answer": "D",
+          "explanation": "Read Uncommitted is the weakest isolation level and allows dirty reads — a transaction can read data written by another transaction that has not yet committed.",
+          "topic": "Transactions & ACID Properties",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "Extendible hashing uses which mechanism to handle bucket overflow?",
+          "options": [
+            { "label": "A", "text": "Overflow chaining" },
+            { "label": "B", "text": "Splitting the overflowed bucket and doubling the directory if needed" },
+            { "label": "C", "text": "Rehashing all records" },
+            { "label": "D", "text": "Linear probing" }
+          ],
+          "correct_answer": "B",
+          "explanation": "Extendible hashing handles overflow by splitting the full bucket into two and potentially doubling the directory size, using additional bits of the hash value.",
+          "topic": "Indexing & Hashing",
+          "difficulty": "hard"
+        },
+        {
+          "question_text": "In horizontal partitioning (sharding), data is distributed across servers by:",
+          "options": [
+            { "label": "A", "text": "Splitting columns across servers" },
+            { "label": "B", "text": "Splitting rows across servers based on a shard key" },
+            { "label": "C", "text": "Storing the same data on all servers" },
+            { "label": "D", "text": "Creating views on different servers" }
+          ],
+          "correct_answer": "B",
+          "explanation": "Horizontal partitioning (sharding) distributes rows across multiple servers based on a shard key. Each server holds a subset of rows. Vertical partitioning splits columns.",
+          "topic": "NoSQL & Distributed Databases",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "The generalization relationship in EER model is a:",
+          "options": [
+            { "label": "A", "text": "Top-down approach — dividing a higher-level entity into sub-entities" },
+            { "label": "B", "text": "Bottom-up approach — combining sub-entities into a higher-level entity" },
+            { "label": "C", "text": "Method to create many-to-many relationships" },
+            { "label": "D", "text": "Way to enforce referential integrity" }
+          ],
+          "correct_answer": "B",
+          "explanation": "Generalization is bottom-up: combining multiple lower-level entity types (e.g., Car, Truck) into a single higher-level entity (Vehicle). Specialization is the top-down inverse.",
+          "topic": "ER Model & ER Diagrams",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "Which of the following aggregate functions ignores NULL values?",
+          "options": [
+            { "label": "A", "text": "COUNT(*)" },
+            { "label": "B", "text": "SUM()" },
+            { "label": "C", "text": "Both A and B" },
+            { "label": "D", "text": "Neither A nor B" }
+          ],
+          "correct_answer": "B",
+          "explanation": "SUM(), AVG(), MAX(), MIN(), and COUNT(column) all ignore NULLs. COUNT(*) counts all rows including those with NULLs since it counts rows, not values.",
+          "topic": "SQL Fundamentals (DDL, DML, DCL)",
+          "difficulty": "medium"
+        }
+      ]
+    },
+    {
+      "set_name": "Set A 2024",
+      "year": 2024,
+      "questions": [
+        {
+          "question_text": "Physical data independence means:",
+          "options": [
+            { "label": "A", "text": "The ability to change the physical schema without affecting the logical schema" },
+            { "label": "B", "text": "The ability to change the logical schema without affecting external views" },
+            { "label": "C", "text": "The ability to add new data types" },
+            { "label": "D", "text": "The ability to delete records without logging" }
+          ],
+          "correct_answer": "A",
+          "explanation": "Physical data independence allows changes to the internal/physical schema (like changing storage structures or adding indexes) without requiring changes to the conceptual/logical schema.",
+          "topic": "Introduction to DBMS & Data Models",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "A derived attribute in an ER diagram is represented by:",
+          "options": [
+            { "label": "A", "text": "A single oval" },
+            { "label": "B", "text": "A dashed/dotted oval" },
+            { "label": "C", "text": "A double oval" },
+            { "label": "D", "text": "An underlined oval" }
+          ],
+          "correct_answer": "B",
+          "explanation": "Derived attributes (like Age derived from Date of Birth) are shown with a dashed or dotted oval boundary in ER diagrams.",
+          "topic": "ER Model & ER Diagrams",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "Entity Integrity constraint states that:",
+          "options": [
+            { "label": "A", "text": "Foreign keys can be NULL" },
+            { "label": "B", "text": "No primary key attribute can contain NULL" },
+            { "label": "C", "text": "All attributes must have default values" },
+            { "label": "D", "text": "Duplicate rows are allowed" }
+          ],
+          "correct_answer": "B",
+          "explanation": "Entity Integrity requires that no attribute participating in the primary key of a relation can accept NULL values, as the primary key must uniquely identify each tuple.",
+          "topic": "Relational Model & Relational Algebra",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "Which SQL clause is used to eliminate duplicate rows from query results?",
+          "options": [
+            { "label": "A", "text": "UNIQUE" },
+            { "label": "B", "text": "DISTINCT" },
+            { "label": "C", "text": "DIFFERENT" },
+            { "label": "D", "text": "SEPARATE" }
+          ],
+          "correct_answer": "B",
+          "explanation": "SELECT DISTINCT eliminates duplicate rows from query results. UNIQUE is a constraint used in table definitions, not a query clause.",
+          "topic": "SQL Fundamentals (DDL, DML, DCL)",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "A Self Join is used when:",
+          "options": [
+            { "label": "A", "text": "Joining a table with another different table" },
+            { "label": "B", "text": "Joining a table with itself using table aliases" },
+            { "label": "C", "text": "Creating a cross product" },
+            { "label": "D", "text": "Performing an outer join" }
+          ],
+          "correct_answer": "B",
+          "explanation": "A Self Join joins a table with itself. Table aliases are required to distinguish the two 'copies'. Common use: finding employees and their managers in the same Employee table.",
+          "topic": "Advanced SQL (Joins, Subqueries, Views)",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "A relation has the functional dependencies: AB → C, C → D, D → A. How many candidate keys does this relation have?",
+          "options": [
+            { "label": "A", "text": "1" },
+            { "label": "B", "text": "2" },
+            { "label": "C", "text": "3" },
+            { "label": "D", "text": "4" }
+          ],
+          "correct_answer": "C",
+          "explanation": "Finding closures: (AB)⁺ = ABCD ✓, since C→D→A we get (BC)⁺ = BCDA ✓, and (BD)⁺ = BDAC ✓. So AB, BC, BD are all candidate keys.",
+          "topic": "Normalization (1NF to BCNF)",
+          "difficulty": "hard"
+        },
+        {
+          "question_text": "A 'phantom read' anomaly occurs when:",
+          "options": [
+            { "label": "A", "text": "A transaction reads uncommitted data" },
+            { "label": "B", "text": "A transaction reads the same row twice and gets different values" },
+            { "label": "C", "text": "A transaction re-executes a query and finds new rows inserted by another committed transaction" },
+            { "label": "D", "text": "A transaction is aborted due to deadlock" }
+          ],
+          "correct_answer": "C",
+          "explanation": "A phantom read occurs when a transaction re-executes a range query and discovers new 'phantom' rows that were inserted (and committed) by another transaction between the two executions.",
+          "topic": "Transactions & ACID Properties",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "In the Wait-For Graph used for deadlock detection, a cycle indicates:",
+          "options": [
+            { "label": "A", "text": "A serializable schedule" },
+            { "label": "B", "text": "A deadlock exists" },
+            { "label": "C", "text": "All transactions can proceed" },
+            { "label": "D", "text": "Lock compatibility" }
+          ],
+          "correct_answer": "B",
+          "explanation": "In a Wait-For Graph, nodes represent transactions and an edge Ti → Tj means Ti is waiting for a lock held by Tj. A cycle means mutual waiting = deadlock.",
+          "topic": "Concurrency Control & Locking",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "The key advantage of B+ tree over B-tree for range queries is:",
+          "options": [
+            { "label": "A", "text": "B+ trees have fewer levels" },
+            { "label": "B", "text": "B+ tree leaf nodes are linked, allowing sequential access" },
+            { "label": "C", "text": "B+ trees use less memory" },
+            { "label": "D", "text": "B+ trees don't need balancing" }
+          ],
+          "correct_answer": "B",
+          "explanation": "B+ trees store all data pointers at leaf level and link leaf nodes together. For range queries, once the starting key is found, subsequent keys are accessed sequentially through leaf links.",
+          "topic": "Indexing & Hashing",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "Which of the following is NOT a query optimization technique?",
+          "options": [
+            { "label": "A", "text": "Pushing selection operations down the query tree" },
+            { "label": "B", "text": "Using indexes for selection conditions" },
+            { "label": "C", "text": "Performing Cartesian product before selection" },
+            { "label": "D", "text": "Choosing optimal join order" }
+          ],
+          "correct_answer": "C",
+          "explanation": "Performing Cartesian product before selection is an anti-pattern — it creates a huge intermediate result. Optimization pushes selections DOWN (early) to reduce intermediate sizes.",
+          "topic": "Query Processing & Optimization",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "Deferred modification recovery technique requires:",
+          "options": [
+            { "label": "A", "text": "Only UNDO operations" },
+            { "label": "B", "text": "Only REDO operations" },
+            { "label": "C", "text": "Both UNDO and REDO" },
+            { "label": "D", "text": "Neither UNDO nor REDO" }
+          ],
+          "correct_answer": "B",
+          "explanation": "In deferred modification, database writes happen only after COMMIT. So uncommitted changes never reach the disk (no UNDO needed), but committed changes might not be on disk yet (REDO needed).",
+          "topic": "Recovery System & Log-Based Recovery",
+          "difficulty": "hard"
+        },
+        {
+          "question_text": "The BASE properties of NoSQL systems stand for:",
+          "options": [
+            { "label": "A", "text": "Basically Available, Soft state, Eventually consistent" },
+            { "label": "B", "text": "Balanced Architecture, Secure Environment" },
+            { "label": "C", "text": "Binary Access, Simple Execution" },
+            { "label": "D", "text": "Batch Available, Strong Execution" }
+          ],
+          "correct_answer": "A",
+          "explanation": "BASE (contrasted with ACID) stands for Basically Available (system appears to work most of the time), Soft state (state may change without input), Eventually consistent (data converges over time).",
+          "topic": "NoSQL & Distributed Databases",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "The relational algebra operation that combines two union-compatible relations and removes duplicates is:",
+          "options": [
+            { "label": "A", "text": "Cartesian Product (×)" },
+            { "label": "B", "text": "Natural Join (⋈)" },
+            { "label": "C", "text": "Union (∪)" },
+            { "label": "D", "text": "Division (÷)" }
+          ],
+          "correct_answer": "C",
+          "explanation": "Union (∪) combines tuples from two union-compatible (same degree and domain) relations and removes duplicate tuples from the result.",
+          "topic": "Relational Model & Relational Algebra",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "A relation R(A, B, C) with FDs {A → B, B → C} is in which highest normal form?",
+          "options": [
+            { "label": "A", "text": "1NF" },
+            { "label": "B", "text": "2NF" },
+            { "label": "C", "text": "3NF" },
+            { "label": "D", "text": "BCNF" }
+          ],
+          "correct_answer": "B",
+          "explanation": "A is the candidate key (A⁺ = ABC). A→B is fine (A is key). But B→C is a transitive dependency (non-prime B determines non-prime C through non-key). So it's in 2NF but not 3NF.",
+          "topic": "Normalization (1NF to BCNF)",
+          "difficulty": "hard"
+        },
+        {
+          "question_text": "GRANT and REVOKE commands belong to which category of SQL?",
+          "options": [
+            { "label": "A", "text": "DDL (Data Definition Language)" },
+            { "label": "B", "text": "DML (Data Manipulation Language)" },
+            { "label": "C", "text": "DCL (Data Control Language)" },
+            { "label": "D", "text": "TCL (Transaction Control Language)" }
+          ],
+          "correct_answer": "C",
+          "explanation": "GRANT and REVOKE are DCL commands used to control access permissions. GRANT gives privileges to users, and REVOKE takes them back.",
+          "topic": "SQL Fundamentals (DDL, DML, DCL)",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "The Thomas' Write Rule in timestamp ordering:",
+          "options": [
+            { "label": "A", "text": "Prevents all write operations" },
+            { "label": "B", "text": "Allows an outdated write to be safely ignored instead of aborting the transaction" },
+            { "label": "C", "text": "Requires all writes to be logged" },
+            { "label": "D", "text": "Enforces strict two-phase locking" }
+          ],
+          "correct_answer": "B",
+          "explanation": "Thomas' Write Rule is an optimization: if Ti tries to write X but a younger Tj already wrote X, Ti's write is simply skipped (obsolete write) instead of aborting Ti, reducing unnecessary aborts.",
+          "topic": "Concurrency Control & Locking",
+          "difficulty": "hard"
+        },
+        {
+          "question_text": "In a B+ tree of order m, the maximum number of keys in an internal node is:",
+          "options": [
+            { "label": "A", "text": "m" },
+            { "label": "B", "text": "m - 1" },
+            { "label": "C", "text": "m + 1" },
+            { "label": "D", "text": "m / 2" }
+          ],
+          "correct_answer": "B",
+          "explanation": "In a B+ tree of order m, each internal node has at most m children and m-1 keys. The keys act as separators directing searches to the appropriate child subtree.",
+          "topic": "Indexing & Hashing",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "Neo4j is an example of which type of NoSQL database?",
+          "options": [
+            { "label": "A", "text": "Key-Value" },
+            { "label": "B", "text": "Document" },
+            { "label": "C", "text": "Column-Family" },
+            { "label": "D", "text": "Graph" }
+          ],
+          "correct_answer": "D",
+          "explanation": "Neo4j is a graph database that models data as nodes (entities) and edges (relationships), optimized for traversing complex relationships like social networks.",
+          "topic": "NoSQL & Distributed Databases",
+          "difficulty": "easy"
+        },
+        {
+          "question_text": "Which of the following conditions is NOT one of the four Coffman conditions for deadlock?",
+          "options": [
+            { "label": "A", "text": "Mutual Exclusion" },
+            { "label": "B", "text": "Hold and Wait" },
+            { "label": "C", "text": "Preemption" },
+            { "label": "D", "text": "Circular Wait" }
+          ],
+          "correct_answer": "C",
+          "explanation": "The four Coffman conditions are: Mutual Exclusion, Hold and Wait, NO Preemption (resources cannot be forcibly taken), and Circular Wait. 'Preemption' is the opposite of the actual condition.",
+          "topic": "Concurrency Control & Locking",
+          "difficulty": "medium"
+        },
+        {
+          "question_text": "Which of the following is an example of a DML command?",
+          "options": [
+            { "label": "A", "text": "CREATE TABLE" },
+            { "label": "B", "text": "ALTER TABLE" },
+            { "label": "C", "text": "INSERT INTO" },
+            { "label": "D", "text": "GRANT" }
+          ],
+          "correct_answer": "C",
+          "explanation": "INSERT INTO is a DML (Data Manipulation Language) command used to add new records. CREATE and ALTER are DDL, and GRANT is DCL.",
+          "topic": "SQL Fundamentals (DDL, DML, DCL)",
+          "difficulty": "easy"
+        }
+      ]
+    }
+  ]
+}

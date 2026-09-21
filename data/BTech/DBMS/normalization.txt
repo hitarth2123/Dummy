@@ -1,0 +1,9 @@
+Database Normalization
+
+Normalization is the process of organizing relational database tables to reduce redundancy and prevent update anomalies. A relation is in First Normal Form (1NF) when every attribute contains atomic values and there are no repeating groups.
+
+Second Normal Form (2NF) requires the relation to be in 1NF and every non-key attribute to depend on the whole candidate key. This matters especially when a table has a composite key. Partial dependencies should be moved into separate relations.
+
+Third Normal Form (3NF) requires the relation to be in 2NF and contain no transitive dependency. A non-key attribute must not depend on another non-key attribute. Decomposing a relation into smaller related tables can improve consistency while preserving dependencies where possible.
+
+Normalization reduces insertion, update, and deletion anomalies. Database designers balance normalization with query performance and may use controlled denormalization when read speed is more important than eliminating every redundancy.
