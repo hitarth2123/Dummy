@@ -51,6 +51,7 @@ const vectorSearch = async (queryEmbedding, filter = {}, topK = DEFAULT_TOP_K) =
   const preFilter = {};
   if (filter.department) preFilter.department = { $eq: filter.department };
   if (filter.subject)    preFilter.subject    = { $eq: filter.subject };
+  if (filter.topic)      preFilter.topic      = { $eq: filter.topic };
 
   const pipeline = [
     {
@@ -58,7 +59,7 @@ const vectorSearch = async (queryEmbedding, filter = {}, topK = DEFAULT_TOP_K) =
         index:         INDEX_NAME,
         path:          'embedding',
         queryVector:   queryEmbedding,
-        numCandidates: topK * 10, // oversample for accuracy
+        numCandidates: Math.min(topK * 10, 50), // bounded oversampling keeps latency predictable
         limit:         topK,
         ...(Object.keys(preFilter).length > 0 && { filter: preFilter }),
       },
@@ -72,6 +73,7 @@ const vectorSearch = async (queryEmbedding, filter = {}, topK = DEFAULT_TOP_K) =
         department:      1,
         subject:         1,
         topic:           1,
+        subtopic:        1,
         score: { $meta: 'vectorSearchScore' },
       },
     },

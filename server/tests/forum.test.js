@@ -47,4 +47,55 @@ describe('Forum service', () => {
       body: { type: 'announcement', title: 'Notice', body: 'Body' },
     })).rejects.toMatchObject({ statusCode: 403 });
   });
+
+  test('limits private posts to their author for students', async () => {
+    const query = {
+      populate: jest.fn().mockReturnThis(),
+      sort: jest.fn().mockReturnThis(),
+      skip: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      lean: jest.fn().mockResolvedValue([]),
+    };
+    ForumPost.find.mockReturnValue(query);
+    ForumPost.countDocuments.mockResolvedValue(0);
+
+    await listPosts({
+      user: { role: 'student', id: 'student-1', department: 'CS' },
+      department: 'CS',
+      query: {},
+    });
+
+    expect(ForumPost.find).toHaveBeenCalledWith(expect.objectContaining({
+      $or: [
+        { visibility: { $ne: 'private' } },
+        { author: 'student-1' },
+      ],
+    }));
+  });
+
+  test('allows faculty and HOD to see private department posts', async () => {
+    const query = {
+      populate: jest.fn().mockReturnThis(),
+      sort: jest.fn().mockReturnThis(),
+      skip: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      lean: jest.fn().mockResolvedValue([]),
+    };
+    ForumPost.find.mockReturnValue(query);
+    ForumPost.countDocuments.mockResolvedValue(0);
+
+    await listPosts({
+      user: { role: 'faculty', id: 'faculty-1', department: 'CS' },
+      department: 'CS',
+      query: {},
+    });
+
+    expect(ForumPost.find).toHaveBeenCalledWith(expect.objectContaining({
+      $or: [
+        { visibility: { $ne: 'private' } },
+        { author: 'faculty-1' },
+        { visibility: 'private' },
+      ],
+    }));
+  });
 });

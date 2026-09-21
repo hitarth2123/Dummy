@@ -2,8 +2,9 @@ const catchAsync = require('../utils/catchAsync');
 const FacultyAvailability = require('../models/FacultyAvailability');
 const DoubtSession = require('../models/DoubtSession');
 const User = require('../models/User');
+const ProfileChangeRequest = require('../models/ProfileChangeRequest');
 const { createMeetingLink, getConfiguredZoomLink } = require('../services/meeting.service');
-const { sendSessionConfirmed, sendSessionDeclined } = require('../services/mailer.service');
+const { sendSessionConfirmed, sendSessionDeclined, sendMail } = require('../services/mailer.service');
 
 const getAvailability = catchAsync(async (req, res) => {
   const availability = await FacultyAvailability.findOneAndUpdate(
@@ -27,6 +28,40 @@ const updateAvailability = catchAsync(async (req, res) => {
 const sessionRequests = catchAsync(async (req, res) => {
   const sessions = await DoubtSession.find({ faculty: req.user.id }).populate('student', 'name email semester').sort({ scheduled_at: 1 }).lean();
   return res.json({ success: true, data: sessions });
+});
+
+const profileChangeRequests = catchAsync(async (req, res) => {
+  const requests = await ProfileChangeRequest.find({ department: req.department })
+    .populate('student', 'name email department semester specialization')
+    .populate('reviewed_by', 'name')
+    .sort({ status: 1, createdAt: -1 })
+    .lean();
+  return res.json({ success: true, data: requests });
+});
+
+const reviewProfileChangeRequest = catchAsync(async (req, res) => {
+  const { action, review_notes = '' } = req.body;
+  if (!['approve', 'reject'].includes(action)) {
+    return res.status(400).json({ success: false, message: 'Review action must be approve or reject.' });
+  }
+  const request = await ProfileChangeRequest.findOne({ _id: req.params.id, department: req.department })
+    .populate('student', 'name email');
+  if (!request) return res.status(404).json({ success: false, message: 'Profile change request not found.' });
+  if (request.status !== 'pending') return res.status(409).json({ success: false, message: 'This request has already been reviewed.' });
+
+  request.status = action === 'approve' ? 'approved' : 'rejected';
+  request.reviewed_by = req.user.id;
+  request.reviewed_at = new Date();
+  request.review_notes = review_notes.trim();
+  await request.save();
+
+  await sendMail(
+    request.student.email,
+    `Profile change request ${request.status}`,
+    `<p>Your profile change request has been <strong>${request.status}</strong> by faculty.</p>${request.review_notes ? `<p><strong>Faculty note:</strong> ${request.review_notes}</p>` : ''}`,
+    `Your profile change request has been ${request.status} by faculty.${request.review_notes ? ` Faculty note: ${request.review_notes}` : ''}`,
+  ).catch(() => {});
+  return res.json({ success: true, data: request });
 });
 
 const updateSession = catchAsync(async (req, res) => {
@@ -83,4 +118,4 @@ const dashboard = catchAsync(async (req, res) => {
   return res.json({ success: true, data: { availability, pending_requests: pending, today_sessions: today } });
 });
 
-module.exports = { getAvailability, updateAvailability, sessionRequests, updateSession, confirmSession, declineSession, facultySessions, dashboard };
+module.exports = { getAvailability, updateAvailability, sessionRequests, profileChangeRequests, reviewProfileChangeRequest, updateSession, confirmSession, declineSession, facultySessions, dashboard };

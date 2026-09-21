@@ -38,6 +38,11 @@ const forumPostSchema = new Schema(
       required: [true, 'body is required'],
       trim: true,
     },
+    visibility: {
+      type: String,
+      enum: ['public', 'private'],
+      default: 'public',
+    },
     tags: {
       type: [String],
       default: [],
@@ -100,6 +105,7 @@ const forumPostSchema = new Schema(
 );
 
 forumPostSchema.index({ department: 1, type: 1, createdAt: -1 });
+forumPostSchema.index({ department: 1, visibility: 1, createdAt: -1 });
 forumPostSchema.index({ is_grievance: 1 });
 forumPostSchema.index({ parent_post: 1 });
 forumPostSchema.index({ author: 1 });

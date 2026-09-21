@@ -2,10 +2,15 @@ const catchAsync = require('../utils/catchAsync');
 const { searchKnowledge } = require('../services/rag.service');
 const { generateMcqSet } = require('../services/mcq.service');
 const { chat } = require('../services/llm.service');
+const { searchDevDocs } = require('../services/devdocs.service');
+const { classifyQuestion, captureKnowledge } = require('../services/knowledgeCapture.service');
+const { saveConversationTurn } = require('../services/conversationPersistence.service');
 const { logAction } = require('../services/audit.service');
-const { requestLlmWorker, workerEnabled } = require('../services/llmGateway.service');
-const { generateMockTest, submitMockTest, upsertLearningPath } = require('../services/mockTest.service');
+const { generateMockTest, submitMockTest } = require('../services/mockTest.service');
+const { upsertLearningPath, generateTopicMaterial } = require('../services/learningPath.service');
+const TutorConversation = require('../models/TutorConversation');
 const LearningPath = require('../models/LearningPath');
+const QuestionBank = require('../models/QuestionBank');
 const User = require('../models/User');
 
 const getUserOptions = (req) => ({
@@ -16,33 +21,108 @@ const getUserOptions = (req) => ({
 const generateMcq = catchAsync(async (req, res) => {
   const { topic, count, subject } = req.body;
   const payload = { topic, count, subject, ...getUserOptions(req) };
-  const result = workerEnabled()
-    ? await requestLlmWorker('/v1/mcq/generate', payload)
-    : await generateMcqSet(payload);
+  const result = await generateMcqSet(payload);
+  const newQuestions = result.questions.filter((question) => !question._id).map((question) => ({
+    ...question,
+    department: question.department || payload.department || 'General',
+    subject: question.subject || subject || topic,
+    source: 'practice-mcq',
+    is_verified: false,
+  }));
+  if (newQuestions.length) await QuestionBank.insertMany(newQuestions, { ordered: false });
   res.json({ success: true, data: result });
+});
+
+const generateQuestionSets = catchAsync(async (req, res) => {
+  const { subject, topic, count = 5, set_count = 3 } = req.body;
+  if (!subject || !topic) return res.status(400).json({ success: false, message: 'subject and topic are required.' });
+  const totalSets = Math.max(3, Math.min(Number(set_count) || 3, 5));
+  const sets = [];
+  for (let index = 0; index < totalSets; index += 1) {
+    const setName = `AI Generated Set ${index + 1}`;
+    const result = await generateMcqSet({ topic: `${topic} - ${setName}`, subject, count, reuseCache: false });
+    const documents = result.questions.map((question) => ({
+      ...question,
+      topic,
+      subject,
+      department: req.user.dept || req.user.department || 'General',
+      source: 'question-bank-generated',
+      set_name: setName,
+      is_verified: false,
+      created_by: req.user.id,
+    }));
+    if (documents.length) await QuestionBank.insertMany(documents, { ordered: false });
+    sets.push({ set_name: setName, subject, topic, question_count: documents.length });
+  }
+  return res.status(201).json({ success: true, data: sets });
 });
 
 const tutorChatHandler = async (req, res) => {
   const prompt = req.body?.message || req.body?.prompt;
-  if (/\b(weather|temperature|forecast|rain|raining|sunny)\b/i.test(prompt || '')) {
-    const response = 'I do not have a live weather feed, so I cannot give today\'s forecast. I can still help with your coursework, revision, or study planning.';
-    if (req.body?.stream === false || typeof res.write !== 'function') return res.json({ success: true, data: { response, rag_sources: [] } });
-    res.status(200); res.setHeader('Content-Type', 'text/event-stream'); res.setHeader('Cache-Control', 'no-cache'); res.setHeader('Connection', 'keep-alive');
-    res.write(`data: ${JSON.stringify({ delta: response })}\n\n`); res.write(`data: ${JSON.stringify({ rag_sources: [], done: true })}\n\n`); return res.end();
-  }
+  const isWeatherRequest = /\b(weather|temperature|forecast|rain|raining|sunny)\b/i.test(prompt || '');
   const userOptions = getUserOptions(req);
-  const workerResult = workerEnabled()
-    ? await requestLlmWorker('/v1/tutor/chat', {
-      message: prompt,
-      history: req.body?.history || [],
-      ...userOptions,
+  const history = Array.isArray(req.body?.history) ? req.body.history.filter((message) => message?.role && message?.content).slice(-20) : [];
+  const followupTopic = String(prompt || '').match(/^\s*(?:in|about|within)\s+([a-z][a-z0-9 -]{2,})[?.!]?\s*$/i)?.[1];
+  const classification = classifyQuestion(prompt, followupTopic
+    ? { ...userOptions, topic: followupTopic.replace(/\b\w/g, (character) => character.toUpperCase()) }
+    : userOptions);
+  const conversationTitle = `${classification.topic} / ${classification.subtopic}`;
+  let conversation = null;
+  try {
+    if (req.body?.conversation_id && /^[a-f\d]{24}$/i.test(String(req.body.conversation_id))) {
+      conversation = await TutorConversation.findOne({ _id: req.body.conversation_id, user: req.user.id });
+    }
+    if (!conversation) {
+      conversation = await TutorConversation.create({ user: req.user.id, title: conversationTitle, topic: classification.topic, subtopic: classification.subtopic });
+    }
+    if (conversation && conversation.messages.length === 0) {
+      conversation.title = conversationTitle;
+      conversation.topic = classification.topic;
+      conversation.subtopic = classification.subtopic;
+    }
+  } catch (error) {
+    console.warn(`[Conversation] Could not load conversation: ${error.message}`);
+  }
+  const rag = isWeatherRequest
+    ? { relevant: false, chunks: [], context: '', chunkIds: [], rag_sources: [] }
+    : await searchKnowledge(prompt, { ...userOptions, topic: classification.topic, topK: 5 });
+  const devdocs = isWeatherRequest ? { context: '', sources: [] } : await searchDevDocs(prompt, { topK: 2 });
+  const context = [rag.context, devdocs.context].filter(Boolean).join('\n\n');
+  const useStoredKnowledge = rag.relevant && !devdocs.context && rag.chunks[0]?.content;
+  const response = isWeatherRequest
+    ? 'I do not have a live weather feed, so I cannot give today\'s forecast. I can still help with your coursework, revision, or study planning.'
+    : useStoredKnowledge
+    ? rag.chunks[0].content
+    : await chat(prompt, {
+      systemPrompt: 'Answer naturally for normal conversation. For academic or coding questions, use the supplied context when relevant, explain clearly, and cite source names or URLs when you use them. Do not invent documentation details.',
+      history,
+      context,
+    });
+
+  const savedKnowledge = !isWeatherRequest && !useStoredKnowledge
+    ? await captureKnowledge({ question: prompt, answer: response, classification }).catch((error) => {
+      console.warn(`[Knowledge] Could not persist generated answer: ${error.message}`);
+      return null;
     })
     : null;
-  const rag = workerResult ? { chunkIds: workerResult.rag_sources.map((source) => source.chunk_id), rag_sources: workerResult.rag_sources } : await searchKnowledge(prompt, { ...userOptions, topK: 5 });
-  const response = workerResult?.response || await chat(prompt, {
-    systemPrompt: 'Use only the supplied academic context. Cite the sources by chunk ID. If context is insufficient, say so.',
-    history: req.body?.history || [],
-    context: rag.context,
+
+  if (conversation) {
+    conversation.messages.push({ role: 'user', content: prompt }, { role: 'assistant', content: response });
+    conversation.last_sequence += 2;
+    await conversation.save().catch((error) => console.warn(`[Conversation] Could not save conversation: ${error.message}`));
+  }
+
+  const localConversation = await saveConversationTurn({
+    conversationId: conversation?._id || req.body?.conversation_id,
+    userId: req.user?.id,
+    title: conversation?.title || conversationTitle,
+    topic: classification.topic,
+    subtopic: classification.subtopic,
+    question: prompt,
+    answer: response,
+  }).catch((error) => {
+    console.warn(`[Conversation] Could not save local conversation: ${error.message}`);
+    return null;
   });
 
   await logAction({
@@ -53,10 +133,22 @@ const tutorChatHandler = async (req, res) => {
     department: req.user?.dept || req.user?.department,
     ip_address: req.ip,
     user_agent: req.get('user-agent'),
-    metadata: { rag_sources: rag.chunkIds, prompt_length: prompt?.length || 0 },
+    metadata: { rag_sources: [...rag.chunkIds, ...devdocs.sources.map((source) => source.chunk_id)], prompt_length: prompt?.length || 0 },
   });
 
-  const payload = { response, rag_sources: rag.rag_sources };
+  const payload = {
+    response,
+    conversation_id: conversation?._id || localConversation?.conversationId,
+    conversation_title: conversation?.title || conversationTitle,
+    rag_sources: [...rag.rag_sources, ...devdocs.sources],
+    knowledge: savedKnowledge ? {
+      saved: true,
+      mongo_saved: savedKnowledge.mongoSaved,
+      sequence: savedKnowledge.sequence,
+      topic_sequence: savedKnowledge.topicSequence,
+      ...savedKnowledge.classification,
+    } : { saved: false, source: 'mongo_vector_search' },
+  };
   if (req.body?.stream === false || typeof res.write !== 'function') {
     return res.json({ success: true, data: payload });
   }
@@ -65,9 +157,12 @@ const tutorChatHandler = async (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
-  const parts = String(response).match(/[\s\S]{1,80}/g) || [''];
-  for (const part of parts) res.write(`data: ${JSON.stringify({ delta: part })}\n\n`);
-  res.write(`data: ${JSON.stringify({ rag_sources: rag.rag_sources, done: true })}\n\n`);
+  const parts = String(response).match(/\S+\s*/g) || [''];
+  for (const part of parts) {
+    res.write(`data: ${JSON.stringify({ delta: part })}\n\n`);
+    await new Promise((resolve) => setTimeout(resolve, 28));
+  }
+  res.write(`data: ${JSON.stringify({ rag_sources: payload.rag_sources, knowledge: payload.knowledge, conversation_id: payload.conversation_id, conversation_title: payload.conversation_title, done: true })}\n\n`);
   return res.end();
 };
 
@@ -79,7 +174,7 @@ const chatLegacy = catchAsync(async (req, res) => {
 });
 
 const generateMock = catchAsync(async (req, res) => {
-  const result = await generateMockTest({ user: req.user, subject: req.body.subject, setName: req.body.set_name, count: req.body.count, durationMinutes: req.body.duration_minutes });
+  const result = await generateMockTest({ user: req.user, subject: req.body.subject, topic: req.body.topic, setName: req.body.set_name, count: req.body.count, durationMinutes: req.body.duration_minutes });
   res.status(201).json({ success: true, data: result });
 });
 
@@ -115,4 +210,12 @@ const generateLearningPath = catchAsync(async (req, res) => {
   res.json({ success: true, data: path });
 });
 
-module.exports = { generateMcq, tutorChat, chatLegacy, generateMock, submitMock, generateLearningPath };
+const generateLearningTopic = catchAsync(async (req, res) => {
+  const { subject, topic } = req.body;
+  if (!subject || !topic) return res.status(400).json({ success: false, message: 'subject and topic are required.' });
+  const material = await generateTopicMaterial({ user: req.user, subject, topic });
+  if (!material) return res.status(404).json({ success: false, message: 'Learning-path topic not found.' });
+  return res.json({ success: true, data: material });
+});
+
+module.exports = { generateMcq, generateQuestionSets, tutorChat, chatLegacy, generateMock, submitMock, generateLearningPath, generateLearningTopic };

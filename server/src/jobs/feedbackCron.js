@@ -6,9 +6,14 @@ const cron = require('node-cron');
 const User = require('../models/User');
 const FeedbackForm = require('../models/FeedbackForm');
 const { sendFeedbackReminder } = require('../services/mailer.service');
+const { isDatabaseReady } = require('../config/db');
 
 // Every Monday at 09:00 India Standard Time.
 cron.schedule('0 9 * * 1', async () => {
+  if (!isDatabaseReady()) {
+    console.warn('[FeedbackCron] Skipped: MongoDB is not connected.');
+    return;
+  }
   const now = new Date();
   const weekNumber = getISOWeek(now);
   const academicYear = getAcademicYear(now);

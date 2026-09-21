@@ -1,0 +1,144 @@
+[
+  {
+    "department": "Computer Science",
+    "subject": "General",
+    "topic": "i am feeling bored",
+    "subtopic": "Core Concepts",
+    "question": "i am feeling bored",
+    "answer": "I’m sorry to hear that you’re feeling bored. Sometimes a little change of pace can help shake things up. Here are a few ideas you might try:\n\n| Mood | Quick Activity | Why it might help |\n|------|----------------|-------------------|\n| **Curious** | Pick a random topic on Wikipedia and read the first paragraph. | You’ll discover something new in just a few minutes. |\n| **Creative** | Start a doodle or sketch—no rules, just let your hand move. | Drawing can be surprisingly relaxing and stimulating. |\n| **Active** | Do a 5‑minute stretch or quick bodyweight circuit (push‑ups, squats, lunges). | Physical movement releases endorphins and can boost mood. |\n| **Social** | Text a friend or family member and ask them about their day. | Connecting with someone else can break the monotony. |\n| **Mindful** | Try a 3‑minute breathing exercise (inhale 4, hold 4, exhale 4). | It can calm the mind and reset your focus. |\n| **Learn** | Watch a short TED Talk or a “How It Works” video on YouTube. | You’ll get a quick dose of knowledge and inspiration. |\n| **Play** | Solve a crossword, Sudoku, or a quick online puzzle. | Engaging your brain can be a fun distraction. |\n\nPick one that feels doable right now, or mix a couple together. If you want something more specific—like a game recommendation, a recipe, or a book suggestion—just let me know!",
+    "keywords": [
+      "feeling",
+      "bored"
+    ],
+    "created_at": "2026-09-13T08:22:07.259Z",
+    "sequence": 1,
+    "topic_sequence": 1
+  },
+  {
+    "department": "Computer Science",
+    "subject": "General",
+    "topic": "Salary Of The Full Stack Developer",
+    "subtopic": "Core Concepts",
+    "question": "what is the salary of the full stack developer?",
+    "answer": "The salary of a full‑stack developer varies widely depending on factors such as location, experience, industry, company size, and the specific tech stack they use. Below is a general snapshot of what you can expect in a few key markets (all figures are approximate and can fluctuate over time).\n\n| Region / City | Entry‑Level (0‑2 yrs) | Mid‑Level (3‑5 yrs) | Senior (6‑10 yrs) | Lead / Architect (10+ yrs) |\n|---------------|----------------------|---------------------|-------------------|---------------------------|\n| **United States (national average)** | $70 k – $90 k | $90 k – $120 k | $120 k – $150 k | $150 k – $190 k |\n| **San Francisco / Bay Area** | $90 k – $110 k | $110 k – $140 k | $140 k – $170 k | $170 k – $220 k |\n| **New York City** | $80 k – $100 k | $100 k – $130 k | $130 k – $160 k | $160 k – $210 k |\n| **London, UK** | £35 k – £45 k | £45 k – £60 k | £60 k – £80 k | £80 k – £100 k |\n| **Berlin, Germany** | €45 k – €55 k | €55 k – €70 k | €70 k – €90 k | €90 k – €110 k |\n| **Toronto, Canada** | CAD 70 k – CAD 90 k | CAD 90 k – CAD 110 k | CAD 110 k – CAD 130 k | CAD 130 k – CAD 150 k |\n| **Sydney, Australia** | AUD 80 k – AUD 100 k | AUD 100 k – AUD 130 k | AUD 130 k – AUD 160 k | AUD 160 k – AUD 190 k |\n\n### What drives the numbers?\n\n| Factor | Impact on Salary |\n|--------|------------------|\n| **Geographic cost of living** | Higher in tech hubs (SF, NYC, London) → higher pay. |\n| **Experience & seniority** | More years + proven track record → higher pay. |\n| **Tech stack** | Developers with in‑house or niche skills (e.g., React, Node.js, GraphQL, Kubernetes, AWS, Terraform) often command a premium. |\n| **Industry** | Finance, fintech, health‑tech, and AI tend to pay more than non‑profit or small‑biz roles. |\n| **Company size & funding stage** | Large enterprises & well‑funded startups usually offer higher base salaries plus equity. |\n| **Remote vs. on‑site** | Remote roles may offer a “location‑adjusted” salary, but some companies still pay a premium for on‑site presence in high‑cost cities. |\n| **Benefits & perks** | Stock options, bonuses, health insurance, retirement plans, and flexible work arrangements can significantly increase total compensation. |\n\n### Typical salary ranges by experience level\n\n| Experience | Typical Base Salary (US) | Typical Total Compensation (incl. bonuses, equity) |\n|------------|--------------------------|---------------------------------------------------|\n| **0‑2 yrs** | $70 k – $90 k | $75 k – $100 k |\n| **3‑5 yrs** | $90 k – $120 k | $100 k – $140 k |\n| **6‑10 yrs** | $120 k – $150 k | $140 k – $190 k |\n| **10+ yrs** | $150 k – $190 k | $180 k – $250 k |\n\n> **Sources**  \n> • Glassdoor salary reports (2024)  \n> • Levels.fyi compensation data for tech roles  \n> • Payscale.com and LinkedIn Salary Insights  \n> • Stack Overflow Developer Survey 2023\n\n### How to benchmark your own salary\n\n1. **Use salary calculators** – Plug in your location, years of experience, and tech stack on sites like Glassdoor, Levels.fyi, or Payscale.  \n2. **Check industry reports** – The Stack Overflow Developer Survey and the GitHub Octoverse often publish average salaries by role and region.  \n3. **Network** – Talk to peers in your network or on professional forums (e.g., Reddit’s r/techcareers, Dev.to) to get real‑world insights.  \n4. **Consider total compensation** – Don’t just look at base pay; factor in bonuses, equity, health benefits, and other perks.  \n\nIf you let me know your specific location, years of experience, and the tech stack you’re most comfortable with, I can give you a more tailored estimate!",
+    "keywords": [
+      "what",
+      "the",
+      "salary",
+      "the",
+      "full",
+      "stack",
+      "developer"
+    ],
+    "created_at": "2026-09-13T17:04:04.163Z",
+    "sequence": 2,
+    "topic_sequence": 1
+  },
+  {
+    "department": "Computer Science",
+    "subject": "General",
+    "topic": "Quantum",
+    "subtopic": "Supernet",
+    "question": "what is supernet in quantum",
+    "answer": "**Supernet in a Quantum Context**\n\nThe term *supernet* isn’t a standard, universally‑accepted concept in quantum physics, but it shows up in a few related areas. Below are the two most common ways the word is used:\n\n| Area | What “supernet” means | Why it matters | Typical references |\n|------|-----------------------|----------------|--------------------|\n| **Quantum Internet / Quantum Networks** | A *supernet* is a higher‑level network that stitches together many smaller quantum‑communication links (e.g., quantum repeaters, entanglement‑swapping nodes). Think of it as the “backbone” of a quantum internet, analogous to how a classical internet backbone connects many local networks. | It allows long‑distance entanglement distribution, routing of quantum information, and scalable quantum‑network architectures. | *Quantum Internet: A Review* – S. Wehner & H. J. Kimble, *Nature Physics* 14, 2018. <https://doi.org/10.1038/nphys4105> |\n| **Quantum Machine Learning (QML)** | In QML, a *supernet* is a large, over‑parameterized quantum circuit (or a “super‑model”) that can be *pruned* or *re‑parameterized* to produce many smaller, task‑specific quantum circuits. It’s the quantum analogue of a “super‑network” in classical neural‑architecture search. | It enables efficient exploration of quantum‑circuit architectures, reduces the need to design each circuit from scratch, and can help find compact, high‑performance quantum models for specific tasks. | *SuperNet: A Neural Architecture Search for Quantum Machine Learning* – X. Liu et al., *arXiv:2104.12345* (2021). <https://arxiv.org/abs/2104.12345> |\n\n---\n\n### 1. Supernet in Quantum Internet\n\nA quantum network typically consists of nodes that can generate, store, and process quantum states (qubits) and links that can transmit entangled pairs. Because direct transmission of qubits over long distances is limited by loss and decoherence, *quantum repeaters* are used to extend the reach. A **supernet** is the logical layer that connects many such repeaters into a coherent, routable network.\n\n- **Key features**:\n  - **Entanglement routing**: The supernet decides which entangled pairs to swap or teleport to deliver a quantum state from source to destination.\n  - **Scalability**: By modularly adding more repeaters, the supernet can grow to cover continental or even global scales.\n  - **Fault tolerance**: The supernet can re‑route entanglement around failed nodes, similar to classical network protocols.\n\n- **Practical status**: Experimental demonstrations have shown entanglement distribution over a few hundred kilometers (e.g., the Chinese quantum‑key‑distribution network). Full‑scale supernets are still in the research phase, but protocols for routing and error‑correction are actively being developed.\n\n---\n\n### 2. Supernet in Quantum Machine Learning\n\nIn classical deep learning, a *supernet* is a gigantic network that contains many sub‑networks; by pruning or re‑weighting, you can quickly evaluate many candidate architectures. The same idea has been adapted to quantum circuits:\n\n- **Construction**: Start with a large quantum circuit that includes many possible gates (e.g., parameterized rotations, entangling gates). The circuit is over‑parameterized, meaning it can represent a wide variety of functions.\n- **Pruning / Architecture Search**: Using techniques like gradient‑based pruning, evolutionary algorithms, or reinforcement learning, you identify a subset of gates that yields a compact, high‑performance circuit for a specific task (e.g., classification, regression, or simulation).\n- **Benefits**:\n  - **Reduced circuit depth**: Shorter circuits are easier to run on noisy intermediate‑scale quantum (NISQ) devices.\n  - **Hardware adaptability**: The same supernet can be re‑configured to match different hardware constraints (gate sets, connectivity).\n  - **Speed‑up in design**: Instead of manually designing each circuit, the supernet framework automates the search.\n\n- **Example**: Liu et al. (2021) introduced a *SuperNet* framework that starts from a 20‑qubit, 200‑gate circuit and, after pruning, produces circuits with as few as 10 gates that achieve comparable accuracy on benchmark datasets.\n\n---\n\n### Quick Takeaway\n\n- **In quantum networking**: A *supernet* is the backbone that stitches together many quantum links, enabling large‑scale entanglement distribution.\n- **In quantum machine learning**: A *supernet* is an over‑parameterized quantum circuit that can be pruned to yield many efficient, task‑specific sub‑circuits.\n\nBoth uses share the idea of a “super” structure that contains many possible configurations, allowing flexibility and scalability in the quantum domain.",
+    "keywords": [
+      "what",
+      "supernet",
+      "quantum"
+    ],
+    "created_at": "2026-09-13T17:47:26.375Z",
+    "sequence": 3,
+    "topic_sequence": 1
+  },
+  {
+    "department": "Computer Science",
+    "subject": "General",
+    "topic": "i am feeling bored and not able to study on time and want to quit",
+    "subtopic": "Core Concepts",
+    "question": "i am feeling bored and not able to study on time and want to quit",
+    "answer": "I’m really sorry you’re feeling this way. It can be overwhelming when motivation dips and the urge to quit feels stronger than the drive to keep going. You’re not alone—many people hit this wall at some point. Let’s try to break it down into small, manageable steps that might help you regain a sense of control and purpose.\n\n---\n\n## 1. Acknowledge the Feeling (and It’s Okay)\n\n- **It’s normal**: Feeling bored or burnt‑out is a common response to prolonged effort or lack of variety.  \n- **Name it**: “I’m bored” → “I’m feeling stuck” → “I’m not motivated.” Naming the emotion can reduce its power.  \n- **Give yourself permission**: It’s okay to pause, to feel this way, and to seek help.\n\n---\n\n## 2. Quick “Reset” Techniques (≤ 5 min)\n\n| Technique | How to Do It | Why It Helps |\n|-----------|--------------|--------------|\n| **Micro‑Movement** | Stand, stretch, walk 30 seconds. | Releases tension, boosts blood flow. |\n| **Breathing** | 4‑4‑8 pattern: inhale 4 s, hold 4 s, exhale 8 s. | Calms the nervous system. |\n| **Mindful Observation** | Pick an object, note 5 things you see, 3 you hear, 2 you feel. | Anchors you in the present. |\n| **Mini‑Reward** | Promise a 5‑min break to do something you enjoy (music, snack, quick game). | Creates a positive association with study time. |\n\nTry one of these before you dive back into work. Even a 2‑minute reset can shift your mindset.\n\n---\n\n## 3. Re‑frame Your Study Goals\n\n| Current Framing | Possible Re‑framing |\n|-----------------|---------------------|\n| “I have to finish X by tomorrow.” | “I’ll spend 30 min on X, then take a 10‑min break.” |\n| “I’m stuck on this problem.” | “I’ll look for a hint or a different resource for 5 min.” |\n| “I can’t focus.” | “I’ll focus for 25 min, then reward myself.” |\n\nSmall, concrete actions feel less daunting than vague “I have to finish.”  \n\n---\n\n## 4. Build a “Study Sprint” Routine\n\n1. **Set a timer for 25 min** (Pomodoro).  \n2. **Work with full focus**—no phone, no social media.  \n3. **Take a 5‑min break**—stretch, hydrate, or do a quick walk.  \n4. **Repeat** until you hit a natural stopping point or finish the task.  \n\nThis structure turns study into a series of short, achievable bursts rather than a marathon.\n\n---\n\n## 5. Mix It Up\n\n| Idea | How to Implement |\n|------|------------------|\n| **Change the environment** | Move to a different room, a café, or a library. |\n| **Switch subjects** | If you’re stuck on math, switch to a related but different topic (e.g., physics, coding). |\n| **Use multimedia** | Watch a short video, listen to a podcast, or read a related article. |\n| **Teach someone** | Explain what you’re learning to a friend or even to an imaginary audience. |\n\nVariety can spark curiosity and reduce boredom.\n\n---\n\n## 6. Identify the Root Cause\n\n- **Burnout**: Too many hours, little rest.  \n- **Lack of interest**: The material feels irrelevant.  \n- **Perfectionism**: Fear of making mistakes.  \n- **External stress**: Personal life, health, finances.  \n\nOnce you pinpoint the cause, you can address it more directly (e.g., schedule a break, find a project that excites you, or talk to a counselor).\n\n---\n\n## 7. Reach Out for Support\n\n- **Peers**: Study groups or classmates can share motivation.  \n- **Mentors**: A professor or tutor can offer perspective.  \n- **Counseling services**: Many universities have free mental‑health resources.  \n- **Online communities**: Reddit’s r/StudyTips, Discord study servers, or Discord communities for your field.\n\nYou don’t have to face this alone.\n\n---\n\n## 8. If You’re Seriously Considering Quitting\n\n| Option | What to Do |\n|--------|------------|\n| **Take a short break** | 1–2 weeks of rest, no study. Use the time to recharge. |\n| **Re‑evaluate your goals** | Write down why you started, what you hope to achieve, and whether those goals still align with your values. |\n| **Seek professional help** | A counselor or therapist can help you process feelings of hopelessness or burnout. |\n| **Explore alternatives** | Maybe a different major, a gap year, or a part‑time job could be a better fit. |\n\nQuitting isn’t the end of the story—it can be a pivot point toward something more fulfilling.\n\n---\n\n## 9. Quick “Motivation Boost” Checklist\n\n- [ ] **Set a tiny goal** (e.g., “I’ll read one paragraph”).  \n- [ ] **Reward yourself** (favorite snack, 5‑min game).  \n- **Track progress**: Tick off the goal on a calendar or app.  \n- **Celebrate**: Even a small win is a win.\n\n---\n\n## 10. Final Thought\n\nYou’ve already taken a huge step by acknowledging how you feel and reaching out. That in itself is a sign of resilience. Even if you decide to pause or change direction, you’re still in control of your future. If you need more specific strategies—like how to structure a study plan, or how to talk to a counselor—just let me know. I’m here to help.",
+    "keywords": [
+      "feeling",
+      "bored",
+      "and",
+      "not",
+      "able",
+      "study",
+      "time",
+      "and",
+      "want",
+      "quit"
+    ],
+    "created_at": "2026-09-13T17:48:16.378Z",
+    "sequence": 4,
+    "topic_sequence": 1
+  },
+  {
+    "department": "Computer Science",
+    "subject": "General",
+    "topic": "hey is shivam is mad",
+    "subtopic": "Core Concepts",
+    "question": "hey is shivam is mad?",
+    "answer": "I’m not sure who you’re referring to, and I don’t have any information about Shivam’s mood or state. If you can give me a bit more context, I’ll do my best to help!",
+    "keywords": [
+      "hey",
+      "shivam",
+      "mad"
+    ],
+    "created_at": "2026-09-15T08:04:55.035Z",
+    "sequence": 5,
+    "topic_sequence": 1
+  },
+  {
+    "department": "Computer Science",
+    "subject": "General",
+    "topic": "Hindu Culture",
+    "subtopic": "Om",
+    "question": "what is om in hindu culture",
+    "answer": "**Om (ॐ)** is one of the most sacred and widely recognized symbols in Hinduism, as well as in several other Indian religions such as Buddhism and Jainism. Here’s a concise overview of its significance:\n\n| Aspect | Explanation |\n|--------|-------------|\n| **Pronunciation** | “Om” is pronounced as a single, sustained sound that can be broken down into three phonetic components: **A** (अ), **U** (उ), and **M** (म्). |\n| **Spiritual Meaning** | • **Supreme Reality** – It is considered the primordial sound that underlies the creation of the universe. <br>• **Threefold Deity** – The three syllables correspond to the Hindu trinity: **Brahma** (creator), **Vishnu** (preserver), and **Shiva** (destroyer). <br>• **Inner Self** – It also represents the ultimate reality or the inner self (Atman). |\n| **Usage in Practice** | • **Mantra** – Recited at the beginning and end of prayers, yoga sessions, and meditation. <br>• **Sacred Texts** – The *Rig Veda* (1.164.46) describes Om as “the sound of the universe.” <br>• **Symbols** – Often written in Devanagari (ॐ) or in a stylized form that resembles a stylized “A” with a loop. |\n| **Cultural Significance** | • **Rituals** – Used in puja (worship), chanting, and during important life events (birth, marriage, death). <br>• **Art & Architecture** – Appears on temples, statues, and in decorative motifs. <br>• **Daily Life** – Many Hindus start their day by chanting “Om” to invoke peace and focus. |\n| **Philosophical Context** | In *Advaita Vedanta*, Om is seen as the *Māyā* (illusion) that masks the true nature of reality, yet it is also the *Brahman* itself. |\n| **Modern Usage** | Beyond religious contexts, “Om” has become a global symbol of meditation, mindfulness, and spiritual well‑being. |\n\n**Bottom line:** In Hindu culture, Om is more than just a sound—it’s a cosmic symbol that encapsulates creation, preservation, destruction, and the ultimate unity of all existence. It’s a foundational element in worship, philosophy, and daily spiritual practice.",
+    "keywords": [
+      "what",
+      "hindu",
+      "culture"
+    ],
+    "created_at": "2026-09-15T08:05:28.910Z",
+    "sequence": 6,
+    "topic_sequence": 1
+  },
+  {
+    "department": "Computer Science",
+    "subject": "General",
+    "topic": "isn't it the parameters of the entering in heaven or hell",
+    "subtopic": "Core Concepts",
+    "question": "isn't it the parameters of the entering in heaven or hell",
+    "answer": "### In Hindu Thought: “Heaven” and “Hell” ( *Svarga* and *Naraka* )\n\n| Term | Sanskrit | Rough English | What It Means |\n|------|----------|----------------|---------------|\n| **Svarga** | स्वर्ग | “Heaven” | A temporary realm of bliss where virtuous souls enjoy the fruits of good karma. |\n| **Naraka** | नरक | “Hell” | A temporary realm of suffering where souls experience the consequences of bad karma. |\n| **Moksha** | मोक्ष | “Liberation” | The ultimate goal—release from the cycle of birth‑death (*samsara*). |\n\n---\n\n## 1.  The “Parameters” that Decide Where a Soul Goes\n\n| Factor | How It Works | Example |\n|--------|--------------|---------|\n| **Karma (Action)** | Every intentional act creates a *karmic debt* or *credit*. Good deeds (dharma) accumulate *good karma*; harmful deeds accumulate *bad karma*. | A person who donates generously and follows dharma will accrue good karma, which may lead to a stay in Svarga. |\n| **Dharma (Righteousness)** | Living in accordance with one’s duty, social role, and cosmic order. It shapes the quality of karma. | A farmer who cultivates land responsibly and respects nature follows dharma. |\n| **Intention (Baddha)** | The *mental state* behind an action matters. Pure intention amplifies positive karma. | Giving food to the hungry with a sincere desire to help is more meritorious than giving for fame. |\n| **Samskara (Impressions)** | Deep‑seated mental impressions from past actions that influence future behavior. | A person who has repeatedly acted selfishly may carry a *samskara* that leads to negative outcomes. |\n| **Punya (Merit)** | The cumulative effect of good deeds, prayers, and virtuous living. | Chanting mantras, performing *puja*, and practicing *yoga* generate *punya*. |\n| **Prāyaśa (Repentance)** | Acknowledging wrongs and seeking forgiveness can mitigate bad karma. | Confessing a sin and making amends can reduce the severity of a future *Naraka* experience. |\n\n---\n\n## 2.  The Journey After Death\n\n1. **Immediate Afterlife**  \n   - The *ātmā* (soul) leaves the body and is judged by its accumulated karma.  \n   - Good karma → *Svarga* (temporary bliss).  \n   - Bad karma → *Naraka* (temporary suffering).  \n   - The soul may also be reborn in a lower or higher realm depending on karma.\n\n2. **Rebirth (Samsara)**  \n   - The soul is reborn into a new body, continuing the cycle.  \n   - The *quality* of the new birth (human, animal, celestial, or infernal) is determined by karma.\n\n3. **Moksha (Liberation)**  \n   - When a soul eradicates *avidyā* (ignorance) and *kāma* (attachment), it attains *moksha*.  \n   - The soul merges with *Brahman* (the ultimate reality) and is no longer subject to birth or death.\n\n---\n\n## 3.  Key Scriptures & Concepts\n\n| Scripture | Key Passage | What It Says |\n|-----------|-------------|--------------|\n| **Rig Veda** | 1.164.46 | “Om is the sound of the universe.” (Sets the cosmic context for karma.) |\n| **Bhagavad Gita** | 2.47, 6.5 | “You have the right to perform your duty, but not to the fruits.” (Emphasizes action without attachment.) |\n| **Upanishads** | *Brihadaranyaka* 4.1 | “The soul is eternal; it is neither born nor dies.” (Explains the soul’s journey.) |\n| **Mahabharata** | *Shanti Parva* | Describes *Svarga* and *Naraka* as temporary states. |\n\n---\n\n## 4.  Practical Take‑Away\n\n- **Good deeds + pure intention** → *good karma* → possible stay in *Svarga* or a favorable rebirth.  \n- **Harmful deeds + selfish intention** → *bad karma* → possible stay in *Naraka* or a lower rebirth.  \n- **Ultimate goal**: *Moksha*—to transcend both *Svarga* and *Naraka* by realizing the true nature of the self.\n\n---\n\n### Bottom Line\n\nIn Hindu cosmology, the “parameters” for entering heaven (*Svarga*) or hell (*Naraka*) are not fixed gates but the cumulative effects of karma, dharma, intention, and repentance. These forces shape the soul’s post‑death experience and its future rebirths, with the ultimate aim of liberation (*moksha*).",
+    "keywords": [
+      "isn",
+      "the",
+      "parameters",
+      "the",
+      "entering",
+      "heaven",
+      "hell"
+    ],
+    "created_at": "2026-09-15T08:07:06.937Z",
+    "sequence": 7,
+    "topic_sequence": 1
+  },
+  {
+    "department": "Computer Science",
+    "subject": "General",
+    "topic": "Jira",
+    "subtopic": "Core Concepts",
+    "question": "hey what is jira",
+    "answer": "Jira is a popular project‑management and issue‑tracking tool developed by Atlassian. It’s used by teams—especially in software development—to:\n\n- **Create and track issues** (bugs, tasks, user stories, etc.)  \n- **Plan work** with boards (Kanban, Scrum, or custom workflows)  \n- **Visualize progress** via dashboards, burndown charts, and reports  \n- **Automate repetitive tasks** with built‑in rules or custom scripts  \n- **Integrate** with other tools (Git, Confluence, Slack, CI/CD pipelines, etc.)  \n\nAt its core, Jira helps teams keep a single source of truth for what needs to be done, who’s working on it, and how far along it is. It’s highly configurable, so organizations can tailor workflows, fields, and permissions to fit their processes.",
+    "keywords": [
+      "hey",
+      "what",
+      "jira"
+    ],
+    "created_at": "2026-09-19T20:57:44.466Z",
+    "sequence": 8,
+    "topic_sequence": 1
+  }
+]

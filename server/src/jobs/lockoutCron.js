@@ -5,9 +5,14 @@
 const cron = require('node-cron');
 const ExamTimetable = require('../models/ExamTimetable');
 const User = require('../models/User');
+const { isDatabaseReady } = require('../config/db');
 
 // Run every minute
 cron.schedule('* * * * *', async () => {
+  if (!isDatabaseReady()) {
+    console.warn('[LockoutCron] Skipped: MongoDB is not connected.');
+    return;
+  }
   const now = new Date();
 
   try {

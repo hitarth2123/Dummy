@@ -12,9 +12,11 @@ router.use(protect, restrictTo('student'), lockout, ethicsGuard);
 router.post('/chat', llmController.chatLegacy);
 router.post('/tutor/chat', distressGuard, llmController.tutorChat);
 router.post('/mcq/generate', llmController.generateMcq);
+router.post('/question-bank/generate-sets', llmController.generateQuestionSets);
 router.post('/mock-test/generate', llmController.generateMock);
 router.post('/mock-test/:id/submit', llmController.submitMock);
 router.post('/learning-path/generate', llmController.generateLearningPath);
+router.post('/learning-path/topic/generate', llmController.generateLearningTopic);
 // POST /api/llm/summarise — Summarise content
 router.post('/summarise',(req, res) => res.status(501).json({ success: false, message: 'Not implemented yet' }));
 // POST /api/llm/explain   — Explain a concept

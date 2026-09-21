@@ -14,6 +14,7 @@ import {
   HelpCircle,
   LoaderCircle,
   Share2,
+  Sparkles,
   Target,
   TrendingDown,
   XCircle,
@@ -54,7 +55,7 @@ const ScoreDonut = ({ score }) => {
       </svg>
       <div className="absolute flex flex-col items-center">
         <span className="text-4xl font-black text-white">{score}%</span>
-        <span className="text-xs font-medium text-slate-400">Final Score</span>
+        <span className="text-xs font-medium text-outline">Final Score</span>
       </div>
     </div>
   );
@@ -68,19 +69,19 @@ const TopicBar = ({ topic, score_pct, correct, total }) => {
     return () => clearTimeout(t);
   }, [score_pct]);
 
-  const barColor = score_pct >= 80 ? 'bg-emerald-500' : score_pct >= 60 ? 'bg-amber-500' : 'bg-red-500';
+  const barColor = score_pct >= 80 ? 'bg-secondary-container/100' : score_pct >= 60 ? 'bg-secondary-container/150' : 'bg-error-container/150';
   const textColor = score_pct >= 80 ? 'text-emerald-400' : score_pct >= 60 ? 'text-amber-400' : 'text-red-400';
 
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between text-sm">
-        <span className="font-medium text-slate-300">{topic}</span>
+        <span className="font-medium text-outline">{topic}</span>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-500">{correct}/{total}</span>
+          <span className="text-xs text-on-surface-variant">{correct}/{total}</span>
           <span className={`font-bold ${textColor}`}>{score_pct}%</span>
         </div>
       </div>
-      <div className="h-2.5 overflow-hidden rounded-full bg-slate-800">
+      <div className="h-2.5 overflow-hidden rounded-full bg-surface-container">
         <div
           className={`h-full rounded-full transition-all duration-700 ease-out ${barColor}`}
           style={{ width: `${width}%` }}
@@ -225,13 +226,13 @@ const MockTestResults = () => {
   if (!result) {
     return (
       <section className="grid min-h-[50vh] place-items-center">
-        <div className="text-center text-slate-400">
+        <div className="text-center text-outline">
           <BarChart3 className="mx-auto mb-3" size={36} />
           <h2 className="text-xl font-bold text-white">No Results Found</h2>
-          <p className="mt-1 text-sm text-slate-400">Complete a mock test to view your performance report.</p>
+          <p className="mt-1 text-sm text-outline">Complete a mock test to view your performance report.</p>
           <Link
             to="/student/mock-test"
-            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-500"
+            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary-container px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary"
           >
             <span>Take a Mock Test</span>
             <ArrowRight size={16} />
@@ -244,32 +245,40 @@ const MockTestResults = () => {
   return (
     <section className="space-y-8">
       {/* Header & Preview Link */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-400">Assessment Report</p>
-          <h1 className="mt-1 text-3xl font-bold text-white">Mock Test Results</h1>
-          <p className="mt-1 text-sm text-slate-400">
-            {result.subject} · Submitted on {new Date(result.submitted_at || Date.now()).toLocaleDateString()}
-          </p>
-        </div>
-
-        {/* Copy Preview Link Button */}
-        {previewLink && (
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={copyPreviewLink}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800/80 px-4 py-2.5 text-xs font-semibold text-teal-300 transition hover:bg-slate-700 hover:text-white"
-            >
-              {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
-              <span>{copied ? 'Preview Link Copied!' : 'Copy Preview Link'}</span>
-            </button>
+      <section className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-r from-surface-container-low via-slate-900/90 to-surface-container p-6 text-on-surface shadow-panel sm:p-8">
+        <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+        <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/15 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-primary border border-primary/30">
+              <Sparkles size={12} className="text-secondary" />
+              <span className="text-primary-fixed">Assessment Report</span>
+            </div>
+            <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+              Mock Test <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-indigo-200">Results</span>
+            </h1>
+            <p className="mt-2 text-sm font-medium text-on-surface-variant">
+              {result.subject} · Submitted on {new Date(result.submitted_at || Date.now()).toLocaleDateString()}
+            </p>
           </div>
-        )}
-      </div>
+
+          {/* Copy Preview Link Button */}
+          {previewLink && (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={copyPreviewLink}
+                className="inline-flex items-center gap-2 rounded-xl border border-surface-variant/40 bg-surface-container/80 px-4 py-2.5 text-xs font-semibold text-secondary transition hover:bg-surface-bright hover:text-white"
+              >
+                {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                <span>{copied ? 'Preview Link Copied!' : 'Copy Preview Link'}</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
 
       {timedOut && (
-        <div className="flex items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 text-sm text-amber-300">
+        <div className="flex items-center gap-2 rounded-xl border border-amber-500/20 bg-secondary-container/150/10 p-4 text-sm text-amber-300">
           <Target size={18} />
           <span>Time expired during the test — answers submitted automatically.</span>
         </div>
@@ -277,13 +286,13 @@ const MockTestResults = () => {
 
       {/* Score Donut + Topic Breakdown */}
       <div className="grid gap-6 md:grid-cols-[240px_1fr]">
-        <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-slate-800 bg-slate-900/90 p-6 text-center shadow-xl">
+        <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-slate-800 bg-surface-container-lowest/90 p-6 text-center shadow-xl">
           <ScoreDonut score={score} />
           <div>
-            <p className="text-sm font-semibold text-slate-300">
+            <p className="text-sm font-semibold text-outline">
               {result.score} / {result.total_questions} Correct
             </p>
-            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-slate-800 px-3 py-1 text-xs font-bold">
+            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-surface-container px-3 py-1 text-xs font-bold">
               <Award
                 size={14}
                 className={score >= 80 ? 'text-emerald-400' : score >= 60 ? 'text-amber-400' : 'text-rose-400'}
@@ -295,7 +304,7 @@ const MockTestResults = () => {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-xl space-y-4">
+        <div className="rounded-3xl border border-slate-800 bg-surface-container-lowest/90 p-6 shadow-xl space-y-4">
           <div className="flex items-center gap-2">
             <BarChart3 size={20} className="text-teal-400" />
             <h2 className="text-lg font-bold text-white">Topic Performance Breakdown</h2>
@@ -313,7 +322,7 @@ const MockTestResults = () => {
         <button
           type="button"
           onClick={downloadReport}
-          className="inline-flex items-center gap-2 rounded-xl bg-teal-700 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-900/30 transition hover:bg-teal-600"
+          className="inline-flex items-center gap-2 rounded-xl bg-primary-container px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-900/30 transition hover:bg-primary-container"
         >
           <Download size={16} />
           <span>Download Test Report</span>
@@ -322,7 +331,7 @@ const MockTestResults = () => {
         {weakTopicNames && (
           <Link
             to={`/student/practice-mcq?topic=${encodeURIComponent(weakTopicNames)}`}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-5 py-3 text-sm font-semibold text-slate-200 transition hover:bg-slate-700"
+            className="inline-flex items-center gap-2 rounded-xl border border-surface-variant/40 bg-surface-container px-5 py-3 text-sm font-semibold text-slate-200 transition hover:bg-slate-700"
           >
             <BookOpen size={16} />
             <span>Practice Weak Topics</span>
@@ -335,7 +344,7 @@ const MockTestResults = () => {
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-white">Detailed Question Review</h2>
-          <span className="text-xs text-slate-400">{questionsList.length} Questions Evaluated</span>
+          <span className="text-xs text-outline">{questionsList.length} Questions Evaluated</span>
         </div>
 
         <div className="space-y-4">
@@ -349,15 +358,15 @@ const MockTestResults = () => {
             return (
               <article
                 key={q._id || idx}
-                className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl space-y-4"
+                className="rounded-2xl border border-slate-800 bg-surface-container-lowest/80 p-6 shadow-xl space-y-4"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="rounded-lg bg-slate-800 px-3 py-1 text-xs font-bold text-slate-300">
+                    <span className="rounded-lg bg-surface-container px-3 py-1 text-xs font-bold text-outline">
                       Q{idx + 1}
                     </span>
                     {q.topic && (
-                      <span className="rounded-lg bg-teal-950/60 px-2.5 py-1 text-xs font-medium text-teal-300 border border-teal-800/40">
+                      <span className="rounded-lg bg-teal-950/60 px-2.5 py-1 text-xs font-medium text-secondary border border-teal-800/40">
                         {q.topic}
                       </span>
                     )}
@@ -366,10 +375,10 @@ const MockTestResults = () => {
                   <span
                     className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
                       isCorrect
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                        ? 'bg-secondary-container/100/20 text-emerald-300 border border-emerald-500/30'
                         : selected
-                        ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                        : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                        ? 'bg-error-container/150/20 text-rose-300 border border-rose-500/30'
+                        : 'bg-secondary-container/150/20 text-amber-300 border border-amber-500/30'
                     }`}
                   >
                     {isCorrect ? (
@@ -396,12 +405,12 @@ const MockTestResults = () => {
                     const isSelected = selected === opt.label;
                     const isCorrectOption = correct === opt.label;
 
-                    let styleClasses = 'border-slate-800 bg-slate-800/40 text-slate-300';
+                    let styleClasses = 'border-slate-800 bg-surface-container/40 text-outline';
                     let badge = null;
 
                     if (isCorrectOption) {
                       // Correct option is ALWAYS highlighted in GREEN
-                      styleClasses = 'border-emerald-500/60 bg-emerald-500/15 text-emerald-200 font-semibold ring-1 ring-emerald-500/40';
+                      styleClasses = 'border-emerald-500/60 bg-secondary-container/100/15 text-emerald-200 font-semibold ring-1 ring-emerald-500/40';
                       badge = (
                         <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-400">
                           <CheckCircle2 size={14} /> {isSelected ? 'Correct Choice' : 'Correct Answer'}
@@ -409,7 +418,7 @@ const MockTestResults = () => {
                       );
                     } else if (isSelected && !isCorrectOption) {
                       // User's wrong selection is highlighted in RED
-                      styleClasses = 'border-rose-500/60 bg-rose-500/15 text-rose-200 ring-1 ring-rose-500/40';
+                      styleClasses = 'border-rose-500/60 bg-error-container/150/15 text-rose-200 ring-1 ring-rose-500/40';
                       badge = (
                         <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-400">
                           <XCircle size={14} /> Your Selection
@@ -434,8 +443,8 @@ const MockTestResults = () => {
 
                 {/* Explanation (shown if incorrect or skipped) */}
                 {!isCorrect && q.explanation && (
-                  <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-xs text-slate-400">
-                    <b className="text-slate-300 font-semibold block mb-1">Explanation:</b>
+                  <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-xs text-outline">
+                    <b className="text-outline font-semibold block mb-1">Explanation:</b>
                     <p>{q.explanation}</p>
                   </div>
                 )}

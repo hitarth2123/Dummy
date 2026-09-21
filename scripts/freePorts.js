@@ -3,7 +3,7 @@
 const { execFileSync } = require('child_process');
 
 const ports = process.argv.slice(2).map(Number).filter(Number.isInteger);
-const portsToFree = ports.length ? ports : [3000, 5012, 7031];
+const portsToFree = ports.length ? ports : [3000, 5012];
 
 const findListeners = (port) => {
   try {

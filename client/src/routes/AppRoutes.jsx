@@ -26,12 +26,14 @@ import SessionDetails     from '@pages/student/session-details';
 import Forum              from '@pages/student/forum';
 import ReportHallucination from '@pages/student/report-hallucination';
 import Emergency          from '@pages/student/emergency';
+import Settings           from '@pages/student/settings';
 
 // Faculty pages
 import FacultyDashboard  from '@pages/faculty/dashboard';
 import Availability      from '@pages/faculty/availability';
 import SessionRequests   from '@pages/faculty/session-requests';
 import FacultyMySessions from '@pages/faculty/my-sessions';
+import ProfileChangeRequests from '@pages/faculty/profile-change-requests';
 
 // HOD pages
 import HODDashboard  from '@pages/hod/dashboard';
@@ -72,13 +74,12 @@ const AppRoutes = () => (
       <Route path="mock-test"     element={<MockTest />} />
       <Route path="mock-test/:id/results" element={<MockTestResults />} />
       <Route path="ai-tutor"      element={<AITutor />} />
-      <Route path="videos"        element={<Videos />} />
       <Route path="book-session"  element={<BookSession />} />
       <Route path="my-sessions"   element={<MySessions />} />
       <Route path="my-sessions/:id" element={<SessionDetails />} />
       <Route path="forum"         element={<Forum />} />
       <Route path="report-hallucination" element={<ReportHallucination />} />
-      <Route path="emergency"     element={<Emergency />} />
+      <Route path="settings" element={<Settings />} />
     </Route>
 
     {/* Faculty */}
@@ -87,6 +88,7 @@ const AppRoutes = () => (
       <Route path="dashboard"       element={<FacultyDashboard />} />
       <Route path="availability"    element={<Availability />} />
       <Route path="session-requests" element={<SessionRequests />} />
+      <Route path="profile-change-requests" element={<ProfileChangeRequests />} />
       <Route path="my-sessions"     element={<FacultyMySessions />} />
     </Route>
 

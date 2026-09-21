@@ -50,16 +50,21 @@ const envSchema = z.object({
   SMTP_PASS: z.string().optional(),
   SMTP_FROM: z.string().optional(),
 
-  // ── LLM ───────────────────────────────────────────────────────────────────
-  LLM_PROVIDER: z
-    .enum(['openai', 'gemini', 'groq', 'ollama', 'custom', 'puter', 'deepseek'])
-    .default('openai'),
-  OPENAI_API_KEY: z.string().optional(),
-  GEMINI_API_KEY: z.string().optional(),
+  // ── AI services ───────────────────────────────────────────────────────────
+  GROQ_BASE_URL: z.string().url().default('https://api.groq.com/openai/v1'),
+  GROQ_MODEL: z.string().default('openai/gpt-oss-20b'),
   GROQ_API_KEY: z.string().optional(),
-  DEEPSEEK_API_KEY: z.string().optional(),
-  DEEPSEEK_BASE_URL: z.string().url().optional(),
-  LLM_MODEL: z.string().default('gpt-4o-mini'),
+  GROQ_API_KEYS: z.string().optional(),
+  GROQ_API_KEY_1: z.string().optional(),
+  GROQ_API_KEY_2: z.string().optional(),
+  GROQ_API_KEY_3: z.string().optional(),
+  GROQ_API_KEY_4: z.string().optional(),
+  APINEX_BASE_URL: z.string().url().default('https://api.apinex.ai/v1'),
+  APINEX_MODEL: z.string().default('free/claude-sonnet-4.6'),
+  APINEX_API_KEY: z.string().optional(),
+  ETHICS_LAYER2_THRESHOLD: z.string().regex(/^0(?:\.\d+)?|1(?:\.0+)?$/, 'ETHICS_LAYER2_THRESHOLD must be between 0 and 1').default('0.75'),
+  REDIS_URL: z.string().url().optional(),
+  DEVDOCS_BASE_URL: z.string().url().default('http://127.0.0.1:9292'),
 
   // ── Vector DB ─────────────────────────────────────────────────────────────
   VECTOR_DB_PROVIDER: z
@@ -85,18 +90,8 @@ const envSchema = z.object({
   SSO_USERINFO_URL: z.string().url().optional(),
   SSO_REDIRECT_URI: z.string().url().optional(),
   SEED_MODE: z.enum(['true', 'false']).default('false'),
-  LLM_SERVICE_ENABLED: z.enum(['true', 'false']).default('true'),
-  LLM_SERVICE_PORT: z.string().regex(/^\d+$/, 'LLM_SERVICE_PORT must be a number').default('7031'),
-  LLM_SERVICE_URL: z.string().url().optional(),
 }).superRefine((data, ctx) => {
   if (data.SEED_MODE === 'true') return;
-
-  if (data.LLM_PROVIDER === 'gemini' && !data.GEMINI_API_KEY) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['GEMINI_API_KEY'], message: 'GEMINI_API_KEY is required' });
-  }
-  if (data.LLM_PROVIDER === 'groq' && !data.GROQ_API_KEY) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['GROQ_API_KEY'], message: 'GROQ_API_KEY is required' });
-  }
 
   const requiredAlternatives = [
     ['SMTP_HOST', data.SMTP_HOST, data.MAILER_HOST],

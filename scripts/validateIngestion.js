@@ -6,7 +6,7 @@
  *
  * Usage: node scripts/validateIngestion.js [--query "your test query text"]
  *
- * Requires GEMINI_API_KEY for the test embedding and MONGO_URI for DB access.
+ * Uses the local deterministic embedding and requires MONGO_URI for DB access.
  *
  * EPIC-04 — T6, T7
  */
@@ -86,7 +86,7 @@ const testVectorSearch = async (queryText) => {
     console.log(`[Validate] Embedding generated (${queryVector.length}-dim)`);
   } catch (err) {
     console.error(`[Validate] ❌ Failed to embed query: ${err.message}`);
-    console.warn('[Validate] Skipping vector search test (no GEMINI_API_KEY or API error).');
+    console.warn('[Validate] Skipping vector search test (local vector search unavailable or API error).');
     return false;
   }
 

@@ -10,6 +10,7 @@ const app                 = require('./app');
 // ── Cron Jobs ─────────────────────────────────────────────────────────────────
 require('./src/jobs/lockoutCron');
 require('./src/jobs/feedbackCron');
+require('./src/jobs/ethicsEscalation.worker').startEthicsEscalationWorker();
 
 const start = async () => {
   await verifyMailer();

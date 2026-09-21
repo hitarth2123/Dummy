@@ -66,43 +66,43 @@ const Login = () => {
   };
 
   return (
-    <div className="grid min-h-screen bg-paper lg:grid-cols-[1.05fr_0.95fr]">
+    <div className="grid min-h-screen bg-background lg:grid-cols-[1.05fr_0.95fr]">
       <section className="hidden bg-ink px-10 py-12 text-white lg:flex lg:flex-col lg:justify-between xl:px-20">
         <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-teal-600">
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-container">
             <ShieldCheck size={21} />
           </span>
           <span className="text-lg font-semibold">AI Buddy</span>
         </div>
         <div className="max-w-lg">
-          <p className="mb-5 text-sm font-semibold uppercase tracking-[0.2em] text-teal-300">Institutional learning support</p>
+          <p className="mb-5 text-sm font-semibold uppercase tracking-[0.2em] text-secondary">Institutional learning support</p>
           <h1 className="text-5xl font-semibold leading-tight tracking-tight">A calmer way to move through your semester.</h1>
-          <p className="mt-6 max-w-md text-base leading-7 text-slate-300">One secure workspace for academic guidance, faculty support, and department operations.</p>
+          <p className="mt-6 max-w-md text-base leading-7 text-outline">One secure workspace for academic guidance, faculty support, and department operations.</p>
         </div>
-        <p className="text-sm text-slate-400">Connected to your institution&apos;s identity provider.</p>
+        <p className="text-sm text-outline">Connected to your institution&apos;s identity provider.</p>
       </section>
 
       <main className="flex items-center justify-center px-5 py-10 sm:px-8">
         <div className="w-full max-w-md">
           <div className="mb-10 flex items-center gap-3 lg:hidden">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-teal-700 text-white">
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-container text-white">
               <ShieldCheck size={21} />
             </span>
-            <span className="text-lg font-semibold text-ink">AI Buddy</span>
+            <span className="text-lg font-semibold text-on-surface">AI Buddy</span>
           </div>
 
           <div className="mb-8">
-            <div className="mb-5 inline-flex rounded-xl bg-amber-100 p-3 text-amber-700">
+            <div className="mb-5 inline-flex rounded-xl bg-secondary-container/20 p-3 text-secondary">
               <Building2 size={22} />
             </div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Welcome back</p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-ink">Sign in to your workspace</h2>
-            <p className="mt-2 text-slate-600">Sign in with your email or institutional SSO to continue.</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Welcome back</p>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-on-surface">Sign in to your workspace</h2>
+            <p className="mt-2 text-on-surface-variant">Sign in with your email or institutional SSO to continue.</p>
           </div>
 
           {import.meta.env.DEV && (
-            <div className="mb-6 rounded-xl border border-teal-100 bg-teal-50/60 p-4">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-teal-800">Quick Seed Login (Development)</p>
+            <div className="mb-6 rounded-xl border border-primary/20 bg-primary-container/15/60 p-4">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-on-primary-container">Quick Seed Login (Development)</p>
               <div className="flex flex-wrap gap-1.5">
                 {[
                   { role: 'Student', email: 'student@seed.dev', pass: 'Student@12345' },
@@ -118,7 +118,7 @@ const Login = () => {
                       setDevPassword(pass);
                       setError('');
                     }}
-                    className="rounded-lg bg-white px-2.5 py-1 text-xs font-medium text-teal-900 shadow-sm transition hover:bg-teal-700 hover:text-white border border-teal-200"
+                    className="rounded-lg bg-surface-container-low px-2.5 py-1 text-xs font-medium text-on-primary-container shadow-md transition hover:bg-primary-container hover:text-white border border-primary/30"
                   >
                     {role}
                   </button>
@@ -129,7 +129,7 @@ const Login = () => {
 
           <form onSubmit={useDevelopmentLogin} className="space-y-4">
             <div>
-              <label htmlFor="dev-gmail" className="block text-sm font-semibold text-slate-700 mb-1">
+              <label htmlFor="dev-gmail" className="block text-sm font-semibold text-on-surface mb-1">
                 Email address
               </label>
               <input
@@ -139,12 +139,12 @@ const Login = () => {
                 value={gmail}
                 onChange={(event) => setGmail(event.target.value)}
                 placeholder="student@seed.dev or email@domain.com"
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm text-ink outline-none transition focus:border-teal-600 focus:ring-2 focus:ring-teal-100"
+                className="w-full rounded-xl border border-surface-variant/50 px-4 py-3 text-sm text-on-surface outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
             </div>
 
             <div>
-              <label htmlFor="dev-password" className="block text-sm font-semibold text-slate-700 mb-1">
+              <label htmlFor="dev-password" className="block text-sm font-semibold text-on-surface mb-1">
                 Password
               </label>
               <input
@@ -153,14 +153,14 @@ const Login = () => {
                 value={devPassword}
                 onChange={(event) => setDevPassword(event.target.value)}
                 placeholder="Enter password"
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm text-ink outline-none transition focus:border-teal-600 focus:ring-2 focus:ring-teal-100"
+                className="w-full rounded-xl border border-surface-variant/50 px-4 py-3 text-sm text-on-surface outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
             </div>
 
             <button
               type="submit"
               disabled={busy}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-700 px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-teal-900/10 transition hover:bg-teal-800 disabled:cursor-wait disabled:opacity-70"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary-container px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition hover:bg-inverse-primary disabled:cursor-wait disabled:opacity-70"
             >
               {busy ? (
                 <>
@@ -177,26 +177,26 @@ const Login = () => {
           </form>
 
           <div className="relative my-6 text-center">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
-            <span className="relative bg-paper px-3 text-xs font-semibold uppercase tracking-wider text-slate-400">Or</span>
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-surface-variant/40" /></div>
+            <span className="relative bg-background px-3 text-xs font-semibold uppercase tracking-wider text-outline">Or</span>
           </div>
 
           <button
             type="button"
             disabled={busy}
             onClick={startSso}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-wait disabled:opacity-70"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-surface-variant/50 bg-surface-container-low px-5 py-3 text-sm font-semibold text-on-surface shadow-md transition hover:bg-surface-container disabled:cursor-wait disabled:opacity-70"
           >
             <span>Continue with institutional SSO</span>
           </button>
 
           {error && (
-            <p role="alert" className="mt-4 rounded-xl bg-red-50 p-4 text-sm text-red-700 border border-red-100">
+            <p role="alert" className="mt-4 rounded-xl bg-error-container/15 p-4 text-sm text-error border border-error/20">
               {error}
             </p>
           )}
 
-          <p className="mt-8 text-center text-xs leading-5 text-slate-500">
+          <p className="mt-8 text-center text-xs leading-5 text-on-surface-variant">
             Access is managed by your institution. Contact IT support if your account or role is incorrect.
           </p>
         </div>

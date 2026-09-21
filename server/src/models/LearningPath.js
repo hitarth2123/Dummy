@@ -46,11 +46,34 @@ const topicProgressSchema = new Schema(
       trim: true,
       default: '',
     },
+    simple_explanation: { type: String, trim: true, default: '' },
+    why_it_matters: { type: String, trim: true, default: '' },
+    practical_habit: { type: String, trim: true, default: '' },
+    architecture_lens: { type: String, trim: true, default: '' },
     reading_material: {
       type: String,
       trim: true,
       default: '',
     },
+    study_steps: {
+      type: [String],
+      default: [],
+    },
+    worked_example: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    common_mistakes: {
+      type: [String],
+      default: [],
+    },
+    self_check: {
+      type: [String],
+      default: [],
+    },
+    completion_checklist: { type: [String], default: [] },
+    faqs: { type: [Schema.Types.Mixed], default: [] },
     key_concepts: {
       type: [String],
       default: [],

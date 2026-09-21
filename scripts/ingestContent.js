@@ -55,12 +55,13 @@ const resolveInputPath = (filePath) => {
 const ingest = async () => {
   const args = process.argv.slice(2);
   const filePath = getArg(args, '--file');
-  if (!filePath) throw new Error('Usage: node scripts/ingestContent.js --file <path> --dept <department> --subject <subject>');
+  if (!filePath) throw new Error('Usage: node scripts/ingestContent.js --file <path> --dept <department> --subject <subject> --topic <topic> --subtopic <subtopic>');
 
   const resolvedFilePath = resolveInputPath(filePath);
   const department = getArg(args, '--dept', 'General');
   const subject = getArg(args, '--subject', 'General');
   const topic = getArg(args, '--topic', path.basename(resolvedFilePath, path.extname(resolvedFilePath)));
+  const subtopic = getArg(args, '--subtopic', 'Core Concepts');
   const sourceType = path.extname(resolvedFilePath).toLowerCase() === '.pdf' ? 'pdf' : 'manual';
   const content = await readContent(resolvedFilePath);
   const chunks = chunkText(content);
@@ -80,6 +81,7 @@ const ingest = async () => {
       department,
       subject,
       topic,
+      subtopic,
       chunk_index: index,
       token_count: chunks[index].split(/\s+/).length,
       metadata: { absolute_path: resolvedFilePath },

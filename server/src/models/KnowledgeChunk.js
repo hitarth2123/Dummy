@@ -50,6 +50,10 @@ const knowledgeChunkSchema = new Schema(
       type: String,
       trim: true,
     },
+    subtopic: {
+      type: String,
+      trim: true,
+    },
     chunk_index: {
       type: Number,
       default: 0,

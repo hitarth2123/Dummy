@@ -69,6 +69,11 @@ const mockTestSchema = new Schema(
       required: [true, 'subject is required'],
       trim: true,
     },
+    topic: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     semester: {
       type: Number,
       required: [true, 'semester is required'],

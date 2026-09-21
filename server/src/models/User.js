@@ -38,6 +38,11 @@ const userSchema = new Schema(
       required: [true, 'department is required'],
       trim: true,
     },
+    course: {
+      type: String,
+      default: 'B.Tech',
+      trim: true,
+    },
     // Student-specific fields
     enrolled_subjects: {
       type: [String],
@@ -51,6 +56,11 @@ const userSchema = new Schema(
       type: Number,
       min: 1,
       max: 8,
+    },
+    specialization: {
+      type: String,
+      default: 'Common Core',
+      trim: true,
     },
     // Faculty / HOD specific
     subject_expertise: {

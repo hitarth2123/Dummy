@@ -8,6 +8,8 @@ const BASE_DELAY_MS = 1000; // 1 second base for exponential backoff
 
 let retryCount = 0;
 
+const isDatabaseReady = () => mongoose.connection.readyState === 1;
+
 /**
  * Connects to MongoDB Atlas with exponential backoff retry logic.
  * @returns {Promise<void>}
@@ -73,4 +75,4 @@ const gracefulShutdown = async (signal) => {
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 
-module.exports = { connectDB };
+module.exports = { connectDB, isDatabaseReady };

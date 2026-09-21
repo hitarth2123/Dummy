@@ -49,7 +49,7 @@ const sendTemplatedMail = (to, subject, templateName, vars) => sendMail(to, subj
 const sendSessionConfirmed  = (to, vars) => sendTemplatedMail(to, 'Session Confirmed', 'session_confirmed', vars);
 const sendSessionDeclined   = (to, vars) => sendTemplatedMail(to, 'Session Declined', 'session_declined', vars);
 const sendFacultyRequest    = (to, vars) => sendTemplatedMail(to, 'New Session Request', 'faculty_session_request', vars);
-const sendEthicsEscalation  = (to, vars) => sendMail(to, 'Ethics Alert', loadTemplate('ethics_escalation', vars));
+const sendEthicsEscalation  = (to, vars) => sendTemplatedMail(to, 'Ethics Alert', 'ethics_escalation', vars);
 const sendGrievanceEscalation = (to, vars) => sendMail(to, 'Grievance Update', loadTemplate('grievance_escalation', vars));
 const sendDistressAlert     = (to, vars) => sendMail(to, '⚠️ Distress Alert', loadTemplate('distress_alert', vars));
 const sendHallucinationReport = (to, vars) => sendMail(to, 'Hallucination Report', loadTemplate('hallucination_report', vars));

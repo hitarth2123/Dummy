@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const Session = require('../models/Session');
 const AppError = require('../utils/AppError');
+const { curriculum } = require('../constants/curriculum');
 
 const blacklistedTokens = new Map();
 
@@ -34,7 +35,9 @@ const claimUser = (user) => ({
   userId: String(user._id || user.id || user.userId),
   role: user.role,
   dept: user.dept || user.department,
+  course: user.course || curriculum.course,
   semester: user.semester ?? null,
+  specialization: user.specialization || 'Common Core',
   enrolled_subjects: user.enrolled_subjects || user.subjects || [],
 });
 
@@ -134,7 +137,9 @@ const getSsoProfile = async (req) => {
       name: devEmail.split('@')[0],
       role: 'student',
       department: 'Computer Science',
+      course: curriculum.course,
       semester: 5,
+      specialization: 'Common Core',
       enrolled_subjects: [],
       devPassword,
     };
@@ -163,14 +168,21 @@ const login = async (req, res) => {
       password_hash: await bcrypt.hash(crypto.randomUUID(), 10),
       role: profile.role || 'student',
       department: profile.dept || profile.department || 'Unassigned',
+      course: profile.course || curriculum.course,
       semester: profile.semester,
+      specialization: profile.specialization || 'Common Core',
       enrolled_subjects: profile.enrolled_subjects || profile.subjects || [],
     });
   }
   if (user.is_active === false) throw new AppError('Account is deactivated.', 403);
 
+  let profileUpdated = false;
+  if (!user.course) { user.course = profile.course || curriculum.course; profileUpdated = true; }
+  if (!user.specialization) { user.specialization = profile.specialization || 'Common Core'; profileUpdated = true; }
+
   const tokens = await issueTokens(user, req);
   user.last_login = new Date();
+  if (profileUpdated) user.markModified('course');
   if (typeof user.save === 'function') await user.save();
 
   return res.status(200).json({

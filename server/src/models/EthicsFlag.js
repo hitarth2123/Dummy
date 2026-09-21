@@ -64,6 +64,10 @@ const ethicsFlagSchema = new Schema(
       type: Date,
       default: null,
     },
+    hod_notification_job_id: {
+      type: String,
+      default: null,
+    },
     hod_notified_by: {
       type: String,
       enum: {

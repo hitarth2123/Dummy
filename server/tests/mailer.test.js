@@ -9,8 +9,6 @@ process.env.MAILER_USER = 'mailer';
 process.env.MAILER_PASS = 'password';
 process.env.MAILER_FROM = 'ai-buddy@institution.edu';
 process.env.CLIENT_URL = 'http://localhost:3000';
-process.env.GEMINI_API_KEY = 'gemini';
-process.env.GROQ_API_KEY = 'groq';
 
 const mockTransporter = {
   verify: jest.fn(),

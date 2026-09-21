@@ -1,0 +1,8 @@
+Ethics escalation
+
+A confirmed ethics flag requires department review.
+
+Student ID: {{STUDENT_ID}}
+Category: {{CATEGORY}}
+
+Please review this case in AI Buddy. Message content is intentionally excluded from this notification.

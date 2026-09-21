@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AlertTriangle, ArrowRight, Award, ChevronLeft, ChevronRight, Clock, History, LoaderCircle, Play, Send, Timer } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Award, ChevronLeft, ChevronRight, Clock, History, LoaderCircle, Play, Send, Timer, Sparkles } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { mockTestService, studentService } from '@services/api.service';
+import CurriculumSelector from '@components/academic/CurriculumSelector';
 
 /* ── TimerBar ─────────────────────────────────────────────────────────────── */
 const TimerBar = ({ seconds, total }) => {
@@ -13,11 +14,11 @@ const TimerBar = ({ seconds, total }) => {
     <div className="flex items-center gap-3">
       <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-slate-700/40">
         <div
-          className={`absolute inset-y-0 left-0 rounded-full transition-all duration-1000 ease-linear ${urgent ? 'bg-red-500 animate-pulse' : 'bg-emerald-400'}`}
+          className={`absolute inset-y-0 left-0 rounded-full transition-all duration-1000 ease-linear ${urgent ? 'bg-error-container/150 animate-pulse' : 'bg-emerald-400'}`}
           style={{ width: `${pct}%` }}
         />
       </div>
-      <div className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-mono text-sm font-bold tabular-nums ${urgent ? 'bg-red-500/20 text-red-400' : 'bg-slate-800 text-emerald-400'}`}>
+      <div className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-mono text-sm font-bold tabular-nums ${urgent ? 'bg-error-container/150/20 text-red-400' : 'bg-surface-container text-emerald-400'}`}>
         <Timer size={14} />
         {mins}:{String(secs).padStart(2, '0')}
       </div>
@@ -35,9 +36,9 @@ const QuestionDots = ({ total, current, answers }) => (
         <div
           key={i}
           className={`grid h-7 w-7 place-items-center rounded-md text-xs font-semibold transition-all
-            ${isCurrent ? 'scale-110 ring-2 ring-indigo-400 bg-indigo-500 text-white' : ''}
-            ${!isCurrent && answered ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : ''}
-            ${!isCurrent && !answered ? 'bg-slate-800 text-slate-500 border border-slate-700' : ''}`}
+            ${isCurrent ? 'scale-110 ring-2 ring-indigo-400 bg-primary/100 text-white' : ''}
+            ${!isCurrent && answered ? 'bg-secondary-container/100/20 text-emerald-400 border border-emerald-500/30' : ''}
+            ${!isCurrent && !answered ? 'bg-surface-container text-on-surface-variant border border-surface-variant/40' : ''}`}
         >
           {i + 1}
         </div>
@@ -51,45 +52,126 @@ const ConfigScreen = ({ onStart, loading, error, history, historyLoading, onView
   const [searchParams] = useSearchParams();
   const selectedSet = searchParams.get('set') || '';
   const selectedSubject = searchParams.get('subject') || 'DBMS';
-  const [config, setConfig] = useState({ subject: selectedSubject, set_name: selectedSet, count: 30, duration_minutes: 30 });
+  const [curriculumCatalog, setCurriculumCatalog] = useState([]);
+  const [selectedSemester, setSelectedSemester] = useState(5);
+  const [config, setConfig] = useState({ subject: selectedSubject, topic: '', set_name: selectedSet, count: 30, duration_minutes: 30 });
+
+  useEffect(() => {
+    studentService.getCurriculum().then((response) => {
+      const curriculum = response?.data || response;
+      const catalog = curriculum?.catalog || [];
+      const subjects = catalog
+        .flatMap((semester) => semester.specializations || [])
+        .flatMap((specialization) => specialization.subjects || [])
+        .filter((subject, index, all) => all.findIndex((item) => item.name === subject.name) === index);
+      setCurriculumCatalog(catalog);
+      setSelectedSemester(curriculum?.semester || catalog[0]?.number || 5);
+      if (subjects.length && !subjects.some((subject) => subject.name === selectedSubject)) {
+        setConfig((previous) => ({ ...previous, subject: subjects[0].name, topic: '' }));
+      }
+    }).catch(() => setCurriculumCatalog([]));
+  }, []);
+
+  const fallbackSubjects = [
+    { name: 'DBMS', topics: ['Database Fundamentals', 'ER Modeling', 'Normalization', 'SQL', 'Transactions and ACID'] },
+    { name: 'Cybersecurity', topics: ['Security Architecture', 'Zero Trust', 'Network Security', 'Threat Modeling', 'Security Monitoring'] },
+    { name: 'Operating Systems', topics: ['Processes and Threads', 'CPU Scheduling', 'Deadlocks', 'Memory Management'] },
+  ];
+  const fallbackCatalog = [{ number: 5, specializations: [{ name: 'Common Core', subjects: fallbackSubjects }] }];
+  const activeCatalog = curriculumCatalog.length ? curriculumCatalog : fallbackCatalog;
+  const semesterOptions = activeCatalog.map((semester) => semester.number);
+  const activeSemester = activeCatalog.find((semester) => semester.number === Number(selectedSemester)) || activeCatalog[0];
+  const availableSubjects = (activeSemester?.specializations || [])
+    .flatMap((specialization) => specialization.subjects || [])
+    .filter((subject, index, all) => all.findIndex((item) => item.name === subject.name) === index);
+  const selectedSubjectData = availableSubjects.find((subject) => subject.name === config.subject) || availableSubjects[0];
+  const topics = selectedSubjectData?.topics || [];
+
   const handleSubmit = (e) => { e.preventDefault(); onStart(config); };
 
   return (
-    <section className="mx-auto max-w-4xl space-y-8">
+    <section className="w-full space-y-8">
       {/* Header */}
-      <div className="text-center">
-        <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/25">
-          <Play size={28} className="text-white" />
+      <section className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-r from-surface-container-low via-slate-900/90 to-surface-container p-6 text-on-surface shadow-panel sm:p-8">
+        <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+        <div className="relative z-10 flex items-center gap-4">
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-primary/15 text-primary border border-primary/30 shadow-glow">
+            <Play size={24} />
+          </div>
+          <div className="min-w-0">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/15 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-primary border border-primary/30">
+              <Sparkles size={12} className="text-secondary" />
+              <span className="text-primary-fixed">Assessment Studio</span>
+            </div>
+            <h1 className="mt-2 truncate text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+              Mock Test <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-indigo-200">Generator</span>
+            </h1>
+          </div>
         </div>
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-400">Assessment studio</p>
-        <h1 className="mt-2 text-3xl font-bold text-white">Mock Test</h1>
-        <p className="mt-2 text-sm text-slate-400">Build a timed 30–50 question test or review your previous attempts.</p>
-      </div>
+        <p className="relative z-10 mt-3 max-w-2xl text-sm font-medium text-on-surface-variant">
+          Build a timed 30–50 question test or review your previous attempts.
+        </p>
+      </section>
 
       <div className="grid gap-8 md:grid-cols-2 items-start">
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-slate-700/50 bg-slate-900/80 p-6 shadow-2xl backdrop-blur">
+        <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-surface-variant/40/50 bg-surface-container-lowest/80 p-6 shadow-2xl backdrop-blur">
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
             <Play size={18} className="text-indigo-400" />
             <span>Create New Mock Test</span>
           </h2>
-          {config.set_name && <div className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-3 py-2 text-xs font-semibold text-indigo-300">Paper set: {config.set_name}</div>}
-          <label className="block">
-            <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400">Subject</span>
-            <input
-              required value={config.subject}
-              onChange={(e) => setConfig({ ...config, subject: e.target.value })}
-              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-            />
-          </label>
+          {config.set_name && <div className="rounded-xl border border-indigo-500/30 bg-primary/100/10 px-3 py-2 text-xs font-semibold text-indigo-300">Paper set: {config.set_name}</div>}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <label className="block">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-outline">1. Select semester</span>
+              <select
+                required
+                value={selectedSemester}
+                onChange={(e) => {
+                  const semester = Number(e.target.value);
+                  const nextSemester = activeCatalog.find((item) => item.number === semester);
+                  const firstSubject = nextSemester?.specializations?.[0]?.subjects?.[0]?.name || '';
+                  setSelectedSemester(semester);
+                  setConfig((prev) => ({ ...prev, subject: firstSubject, topic: '' }));
+                }}
+                className="w-full rounded-xl border border-surface-variant/40 bg-surface-container px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              >
+                {semesterOptions.map((semester) => <option key={semester} value={semester}>Semester {semester}</option>)}
+              </select>
+            </label>
+            <label className="block">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-outline">2. Select subject</span>
+              <select
+                required
+                value={config.subject}
+                onChange={(e) => setConfig((prev) => ({ ...prev, subject: e.target.value, topic: '' }))}
+                className="w-full rounded-xl border border-surface-variant/40 bg-surface-container px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              >
+                {availableSubjects.map((subject) => <option key={subject.name} value={subject.name}>{subject.name}</option>)}
+              </select>
+            </label>
+            <label className="block">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-outline">3. Select topic</span>
+              <select
+                required
+                value={config.topic}
+                disabled={!topics.length}
+                onChange={(e) => setConfig((prev) => ({ ...prev, topic: e.target.value }))}
+                className="w-full rounded-xl border border-surface-variant/40 bg-surface-container px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="" disabled>Choose a topic</option>
+                {topics.map((topic) => <option key={topic} value={topic}>{topic}</option>)}
+              </select>
+            </label>
+          </div>
 
           <div className="grid grid-cols-2 gap-4">
             <label className="block">
-              <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400">Questions</span>
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-outline">Questions</span>
               <select
                 value={config.count}
                 onChange={(e) => setConfig({ ...config, count: Number(e.target.value) })}
-                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500"
+                className="w-full rounded-xl border border-surface-variant/40 bg-surface-container px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500"
               >
                 <option value="30">30</option>
                 <option value="40">40</option>
@@ -97,18 +179,18 @@ const ConfigScreen = ({ onStart, loading, error, history, historyLoading, onView
               </select>
             </label>
             <label className="block">
-              <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400">Duration (min)</span>
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-outline">Duration (min)</span>
               <input
                 type="number" min="10" max="120"
                 value={config.duration_minutes}
                 onChange={(e) => setConfig({ ...config, duration_minutes: Number(e.target.value) })}
-                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500"
+                className="w-full rounded-xl border border-surface-variant/40 bg-surface-container px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500"
               />
             </label>
           </div>
 
           {error && (
-            <div className="flex items-start gap-2 rounded-xl bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-400">
+            <div className="flex items-start gap-2 rounded-xl bg-error-container/150/10 border border-red-500/20 p-3 text-sm text-red-400">
               <AlertTriangle size={16} className="mt-0.5 shrink-0" />
               <span>{error}</span>
             </div>
@@ -124,26 +206,26 @@ const ConfigScreen = ({ onStart, loading, error, history, historyLoading, onView
         </form>
 
         {/* Previous Attempts History */}
-        <div className="space-y-4 rounded-2xl border border-slate-700/50 bg-slate-900/80 p-6 shadow-2xl backdrop-blur">
+        <div className="space-y-4 rounded-2xl border border-surface-variant/40/50 bg-surface-container-lowest/80 p-6 shadow-2xl backdrop-blur">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
               <History size={18} className="text-indigo-400" />
               <span>Previous Attempts</span>
             </h2>
-            <span className="text-xs text-slate-400 font-medium">
+            <span className="text-xs text-outline font-medium">
               {history?.length || 0} attempted
             </span>
           </div>
 
           {historyLoading ? (
-            <div className="flex min-h-[220px] items-center justify-center text-slate-400">
+            <div className="flex min-h-[220px] items-center justify-center text-outline">
               <LoaderCircle className="h-6 w-6 animate-spin text-indigo-400" />
             </div>
           ) : history && history.length > 0 ? (
             <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
               {history.map((item) => {
                 const pct = item.score_pct || 0;
-                const badgeColor = pct >= 80 ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : pct >= 60 ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-rose-500/20 text-rose-400 border-rose-500/30';
+                const badgeColor = pct >= 80 ? 'bg-secondary-container/100/20 text-emerald-400 border-emerald-500/30' : pct >= 60 ? 'bg-secondary-container/150/20 text-amber-400 border-amber-500/30' : 'bg-error-container/150/20 text-rose-400 border-rose-500/30';
                 const mins = Math.floor((item.time_taken_sec || 0) / 60);
                 const secs = (item.time_taken_sec || 0) % 60;
                 const timeStr = `${mins}m ${secs}s`;
@@ -152,16 +234,16 @@ const ConfigScreen = ({ onStart, loading, error, history, historyLoading, onView
                 return (
                   <div
                     key={item._id}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-800/50 p-3.5 transition hover:border-slate-700 hover:bg-slate-800"
+                    className="flex items-center justify-between gap-3 rounded-xl border border-slate-800 bg-surface-container/50 p-3.5 transition hover:border-surface-variant/40 hover:bg-surface-container"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-white text-sm">{item.subject}</span>
+                        <span className="font-semibold text-white text-sm">{item.topic || item.subject}</span>
                         <span className={`rounded-full border px-2 py-0.5 text-xs font-bold ${badgeColor}`}>
                           {item.score}/{item.total_questions} ({pct}%)
                         </span>
                       </div>
-                      <div className="flex items-center gap-3 text-xs text-slate-400">
+                      <div className="flex items-center gap-3 text-xs text-outline">
                         <span>{dateStr}</span>
                         <span>•</span>
                         <span className="flex items-center gap-1">
@@ -173,7 +255,7 @@ const ConfigScreen = ({ onStart, loading, error, history, historyLoading, onView
                     <button
                       type="button"
                       onClick={() => onViewResults(item._id)}
-                      className="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-semibold text-indigo-300 transition hover:bg-indigo-600 hover:text-white hover:border-indigo-600"
+                      className="inline-flex items-center gap-1 rounded-lg border border-surface-variant/40 bg-surface-container px-3 py-1.5 text-xs font-semibold text-indigo-300 transition hover:bg-indigo-600 hover:text-white hover:border-indigo-600"
                     >
                       <span>View</span>
                       <ArrowRight size={12} />
@@ -183,10 +265,10 @@ const ConfigScreen = ({ onStart, loading, error, history, historyLoading, onView
               })}
             </div>
           ) : (
-            <div className="flex min-h-[220px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-800 text-center p-6 text-slate-500">
-              <Award size={32} className="mb-2 text-slate-600" />
-              <p className="text-sm font-medium text-slate-400">No test attempts yet</p>
-              <p className="text-xs text-slate-500 mt-1">Complete your first mock test to track your performance history here.</p>
+            <div className="flex min-h-[220px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-800 text-center p-6 text-on-surface-variant">
+              <Award size={32} className="mb-2 text-on-surface-variant" />
+              <p className="text-sm font-medium text-outline">No test attempts yet</p>
+              <p className="text-xs text-on-surface-variant mt-1">Complete your first mock test to track your performance history here.</p>
             </div>
           )}
         </div>
@@ -210,7 +292,6 @@ const MockTest = () => {
   const [historyLoading, setHistoryLoading] = useState(true);
   const submitCalledRef = useRef(false);
 
-  const question = test?.questions?.[currentIndex];
   const answeredCount = Object.keys(answers).length;
   const totalQuestions = test?.questions?.length || 0;
 
@@ -326,91 +407,71 @@ const MockTest = () => {
         </div>
       </div>
 
-      {/* Question dots */}
-      <div className="rounded-xl border border-slate-700/50 bg-slate-900/60 p-3">
-        <QuestionDots total={totalQuestions} current={currentIndex} answers={answers} />
+      <div className="flex items-center justify-between rounded-xl border border-surface-variant/40/50 bg-surface-container-lowest/60 p-3 text-xs text-outline">
+        <span>{answeredCount} of {totalQuestions} answered</span>
+        <span>Scroll to review all questions</span>
       </div>
 
-      {/* Main question card */}
-      {question && (
-        <article className="rounded-2xl border border-slate-700/50 bg-slate-900/80 p-6 shadow-xl backdrop-blur space-y-6">
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span className="font-semibold uppercase tracking-wider text-indigo-400">
-              Question {currentIndex + 1} of {totalQuestions}
-            </span>
-            <span>{answeredCount} of {totalQuestions} answered</span>
-          </div>
-
-          <h2 className="text-lg font-bold text-white leading-relaxed">
-            {question.question_text || `Question ${currentIndex + 1}`}
-          </h2>
-
-          {/* Options */}
-          <div className="space-y-3">
-            {(question.options || []).map((opt) => {
-              const selected = answers[question._id] === opt.label;
-              return (
-                <button
-                  key={opt.label}
-                  type="button"
-                  onClick={() => setAnswers({ ...answers, [question._id]: opt.label })}
-                  className={`flex w-full items-center justify-between rounded-xl border p-4 text-left text-sm font-medium transition-all ${
-                    selected
-                      ? 'border-indigo-500 bg-indigo-500/15 text-white ring-1 ring-indigo-500'
-                      : 'border-slate-700/60 bg-slate-800/50 text-slate-300 hover:border-slate-600 hover:bg-slate-800'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg text-xs font-bold ${
-                      selected ? 'bg-indigo-500 text-white' : 'bg-slate-700 text-slate-300'
-                    }`}>
-                      {opt.label}
-                    </span>
-                    <span>{opt.text}</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Controls */}
-          <div className="flex items-center justify-between pt-4 border-t border-slate-800">
-            <button
-              type="button"
-              disabled={currentIndex === 0}
-              onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
-              className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-300 transition hover:bg-slate-700 disabled:opacity-40"
-            >
-              <ChevronLeft size={16} /> Previous
-            </button>
-
-            {currentIndex < totalQuestions - 1 ? (
-              <button
-                type="button"
-                onClick={() => setCurrentIndex((prev) => Math.min(totalQuestions - 1, prev + 1))}
-                className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-5 py-2 text-xs font-bold text-white shadow-lg shadow-indigo-600/25 transition hover:bg-indigo-500"
-              >
-                Next <ChevronRight size={16} />
-              </button>
-            ) : (
-              <button
-                type="button"
-                disabled={submitting}
-                onClick={() => submit(false)}
-                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/25 transition hover:shadow-emerald-500/40 disabled:opacity-60"
-              >
-                {submitting && <LoaderCircle size={16} className="animate-spin" />}
-                <Send size={16} /> Submit test
-              </button>
-            )}
-          </div>
-
-          {error && (
-            <div className="mt-4 flex items-center gap-2 rounded-xl bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-400">
-              <AlertTriangle size={16} /> {error}
+      <div className="space-y-5">
+        {(test.questions || []).map((questionItem, questionIndex) => (
+          <article key={questionItem._id || questionIndex} className="rounded-2xl border border-surface-variant/40/50 bg-surface-container-lowest/80 p-6 shadow-xl backdrop-blur space-y-6">
+            <div className="flex items-center justify-between text-xs text-outline">
+              <span className="font-semibold uppercase tracking-wider text-indigo-400">
+                Question {questionIndex + 1} of {totalQuestions}
+              </span>
+              {answers[questionItem._id] && <span className="text-emerald-400">Answered</span>}
             </div>
-          )}
-        </article>
+
+            <h2 className="text-lg font-bold text-white leading-relaxed">
+              {questionItem.question_text || `Question ${questionIndex + 1}`}
+            </h2>
+
+            <div className="space-y-3">
+              {(questionItem.options || []).map((opt) => {
+                const selected = answers[questionItem._id] === opt.label;
+                return (
+                  <button
+                    key={opt.label}
+                    type="button"
+                    onClick={() => setAnswers((previous) => ({ ...previous, [questionItem._id]: opt.label }))}
+                    className={`flex w-full items-center justify-between rounded-xl border p-4 text-left text-sm font-medium transition-all ${
+                      selected
+                        ? 'border-indigo-500 bg-primary/100/15 text-white ring-1 ring-indigo-500'
+                        : 'border-surface-variant/40/60 bg-surface-container/50 text-outline hover:border-slate-600 hover:bg-surface-container'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg text-xs font-bold ${
+                        selected ? 'bg-primary/100 text-white' : 'bg-slate-700 text-outline'
+                      }`}>
+                        {opt.label}
+                      </span>
+                      <span>{opt.text}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div className="flex justify-end border-t border-slate-800 pt-5">
+        <button
+          type="button"
+          disabled={submitting}
+          onClick={() => submit(false)}
+          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/25 transition hover:shadow-emerald-500/40 disabled:opacity-60"
+        >
+          {submitting && <LoaderCircle size={16} className="animate-spin" />}
+          <Send size={16} /> Submit test
+        </button>
+      </div>
+
+      {error && (
+        <div className="flex items-center gap-2 rounded-xl bg-error-container/150/10 border border-red-500/20 p-3 text-sm text-red-400">
+          <AlertTriangle size={16} /> {error}
+        </div>
       )}
     </section>
   );

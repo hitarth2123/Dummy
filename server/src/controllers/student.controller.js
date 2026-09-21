@@ -4,11 +4,14 @@ const LearningPath = require('../models/LearningPath');
 const ExamTimetable = require('../models/ExamTimetable');
 const MockTest = require('../models/MockTest');
 const User = require('../models/User');
+const ProfileChangeRequest = require('../models/ProfileChangeRequest');
+const PracticeAttempt = require('../models/PracticeAttempt');
 const DoubtSession = require('../models/DoubtSession');
 const FacultyAvailability = require('../models/FacultyAvailability');
-const { sendFacultyRequest } = require('../services/mailer.service');
+const { sendFacultyRequest, sendMail } = require('../services/mailer.service');
 const { getConfiguredZoomLink, getDevelopmentMeetingLink } = require('../services/meeting.service');
 const dbmsQuestionBank = require('../dataset/dbms/dbms_question_bank.json');
+const { curriculum, getSemester, flattenSubjects } = require('../constants/curriculum');
 
 const bundledDBMSQuestions = dbmsQuestionBank.sets.flatMap((set) => set.questions.map((question) => ({
   ...question,
@@ -18,6 +21,54 @@ const bundledDBMSQuestions = dbmsQuestionBank.sets.flatMap((set) => set.question
   set_name: set.set_name,
   is_verified: true,
 })));
+
+const profileFields = 'name email role department course semester specialization enrolled_subjects';
+
+const getProfile = catchAsync(async (req, res) => {
+  const profile = await User.findById(req.user.id).select(profileFields).lean();
+  if (!profile) return res.status(404).json({ success: false, message: 'Student profile not found.' });
+  return res.json({ success: true, data: profile });
+});
+
+const createProfileChangeRequest = catchAsync(async (req, res) => {
+  const { change_field, proposed_value, reason } = req.body;
+  const allowedFields = ['name', 'email', 'department', 'course', 'semester', 'specialization'];
+  if (!allowedFields.includes(change_field) || !proposed_value?.trim() || !reason?.trim()) {
+    return res.status(400).json({ success: false, message: 'Select a field, enter the requested change, and explain why.' });
+  }
+  const requestedChanges = `${change_field}: ${proposed_value.trim()}`;
+
+  const pendingRequest = await ProfileChangeRequest.findOne({ student: req.user.id, status: 'pending' });
+  if (pendingRequest) {
+    return res.status(409).json({ success: false, message: 'You already have a profile change request awaiting faculty review.' });
+  }
+
+  const request = await ProfileChangeRequest.create({
+    student: req.user.id,
+    department: req.department,
+    change_field,
+    proposed_value: proposed_value.trim(),
+    requested_changes: requestedChanges,
+    reason: reason.trim(),
+  });
+  const student = await User.findById(req.user.id).select('name email department').lean();
+  const faculty = await User.find({ role: 'faculty', department: req.department, is_active: true }).select('email').lean();
+  const addresses = faculty.map((member) => member.email).filter(Boolean).join(',');
+  if (addresses) {
+    await sendMail(
+      addresses,
+      'Student profile change request',
+      `<p>${student?.name || 'A student'} submitted a profile change request.</p><p><strong>What to change:</strong> ${requestedChanges}</p><p><strong>Why:</strong> ${reason.trim()}</p><p>Please review it in AI Buddy.</p>`,
+      `Student profile change request from ${student?.name || 'a student'}\n\nWhat to change: ${requestedChanges}\nWhy: ${reason.trim()}\n\nPlease review it in AI Buddy.`,
+    ).catch(() => {});
+  }
+  return res.status(201).json({ success: true, data: request, message: 'Your request was sent to the department faculty.' });
+});
+
+const profileChangeRequests = catchAsync(async (req, res) => {
+  const requests = await ProfileChangeRequest.find({ student: req.user.id }).sort({ createdAt: -1 }).lean();
+  return res.json({ success: true, data: requests });
+});
 
 const questionBank = catchAsync(async (req, res) => {
   const page = Math.max(Number(req.query.page) || 1, 1);
@@ -95,6 +146,25 @@ const getSubjects = catchAsync(async (req, res) => {
   return res.json({ success: true, data: subjects });
 });
 
+const getCurriculum = catchAsync(async (req, res) => {
+  const user = await User.findById(req.user.id).select('course department semester specialization enrolled_subjects').lean();
+  const semester = getSemester(user?.semester || 5);
+  const selectedSpecialization = user?.specialization || 'Common Core';
+  const subjects = flattenSubjects(semester).filter((subject) => (
+    selectedSpecialization === 'Common Core' || subject.specialization === selectedSpecialization
+  ));
+  return res.json({ success: true, data: {
+    course: user?.course || curriculum.course,
+    department: user?.department || req.department,
+    semester: user?.semester || 5,
+    specialization: selectedSpecialization,
+    catalog: curriculum.semesters,
+    semesters: curriculum.semesters.map(({ number, title, specializations }) => ({ number, title, specializations: specializations.map(({ name }) => name) })),
+    subjects,
+    enrolled_subjects: user?.enrolled_subjects || [],
+  } });
+});
+
 const getQuestionSets = catchAsync(async (req, res) => {
   const subjectFilter = req.query.subject;
   const filter = {};
@@ -133,7 +203,7 @@ const learningPath = catchAsync(async (req, res) => {
   if (!path) {
     // Fetch full user from DB to ensure we have department, semester, etc.
     const fullUser = await User.findById(req.user.id).select('name department dept semester enrolled_subjects weak_topics').lean();
-    const { upsertLearningPath } = require('../services/mockTest.service');
+    const { upsertLearningPath } = require('../services/learningPath.service');
     path = await upsertLearningPath({
       user: {
         id: req.user.id,
@@ -151,12 +221,15 @@ const learningPath = catchAsync(async (req, res) => {
 });
 
 const completeLearningPathTopic = catchAsync(async (req, res) => {
-  const { subject, topic, status = 'completed' } = req.body;
+  const { subject, topic, status = 'completed', quiz_score_pct } = req.body;
   if (!subject || !topic) {
     return res.status(400).json({ success: false, message: 'Subject and topic are required.' });
   }
   if (!['in_progress', 'completed'].includes(status)) {
     return res.status(400).json({ success: false, message: 'Invalid topic status.' });
+  }
+  if (status === 'completed' && Number(quiz_score_pct) < 80) {
+    return res.status(422).json({ success: false, message: 'Score at least 80% in the topic MCQ checkpoint before marking it done.' });
   }
 
   const path = await LearningPath.findOne({ student: req.user.id, subject });
@@ -251,11 +324,39 @@ const mockTestResults = catchAsync(async (req, res) => {
 
 const mockTestHistory = catchAsync(async (req, res) => {
   const tests = await MockTest.find({ student: req.user.id, status: 'completed' })
-    .select('_id subject score total_questions score_pct time_taken_sec submitted_at createdAt')
+    .select('_id subject topic questions.topic score total_questions score_pct time_taken_sec submitted_at createdAt')
     .sort({ submitted_at: -1, createdAt: -1 })
     .limit(20)
     .lean();
-  return res.json({ success: true, data: tests });
+  const history = tests.map(({ questions, ...test }) => ({
+    ...test,
+    topic: test.topic || questions?.find((question) => question.topic)?.topic || test.subject,
+  }));
+  return res.json({ success: true, data: history });
 });
 
-module.exports = { questionBank, toggleBookmark, learningPath, completeLearningPathTopic, dashboard, listFaculty, bookSession, studentSessions, mockTestResults, mockTestHistory, getSubjects, getQuestionSets };
+const savePracticeAttempt = catchAsync(async (req, res) => {
+  const { subject = '', topic, score, total } = req.body;
+  const numericScore = Number(score);
+  const numericTotal = Number(total);
+  if (!topic || !Number.isFinite(numericScore) || !Number.isFinite(numericTotal) || numericTotal < 1) {
+    return res.status(400).json({ success: false, message: 'topic, score, and total are required.' });
+  }
+  const attempt = await PracticeAttempt.create({
+    student: req.user.id,
+    department: req.department || req.user.dept || req.user.department,
+    subject,
+    topic,
+    score: numericScore,
+    total: numericTotal,
+    score_pct: Math.round((numericScore / numericTotal) * 100),
+  });
+  return res.status(201).json({ success: true, data: attempt });
+});
+
+const practiceAttemptHistory = catchAsync(async (req, res) => {
+  const attempts = await PracticeAttempt.find({ student: req.user.id }).sort({ createdAt: -1 }).limit(50).lean();
+  return res.json({ success: true, data: attempts });
+});
+
+module.exports = { getProfile, createProfileChangeRequest, profileChangeRequests, questionBank, toggleBookmark, learningPath, completeLearningPathTopic, dashboard, listFaculty, bookSession, studentSessions, mockTestResults, mockTestHistory, savePracticeAttempt, practiceAttemptHistory, getSubjects, getCurriculum, getQuestionSets };

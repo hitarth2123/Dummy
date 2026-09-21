@@ -10,9 +10,13 @@ router.use(protect, restrictTo('student'), lockout, deptScope);
 
 // GET  /api/student/dashboard
 router.get('/dashboard', controller.dashboard);
+router.get('/profile', controller.getProfile);
+router.get('/profile-change-requests', controller.profileChangeRequests);
+router.post('/profile-change-requests', controller.createProfileChangeRequest);
 
 // GET  /api/student/subjects — available subjects list
 router.get('/subjects', controller.getSubjects);
+router.get('/curriculum', controller.getCurriculum);
 
 // Faculty discovery and doubt-session booking
 router.get('/faculty', controller.listFaculty);
@@ -38,6 +42,8 @@ router.post('/question-bank/:id/bookmark', controller.toggleBookmark);
 
 // GET  /api/student/mock-tests — history of completed mock tests
 router.get('/mock-tests', controller.mockTestHistory);
+router.get('/practice-attempts', controller.practiceAttemptHistory);
+router.post('/practice-attempts', controller.savePracticeAttempt);
 
 // GET  /api/student/mock-test/:id/results
 router.get('/mock-test/:id/results', controller.mockTestResults);

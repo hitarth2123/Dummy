@@ -1,6 +1,8 @@
 const EthicsConfig = require('../models/EthicsConfig');
 const EthicsFlag = require('../models/EthicsFlag');
 const { logAction } = require('./audit.service');
+const { classifyEthics } = require('./groqEthics.service');
+const { enqueueEthicsEscalation } = require('../jobs/ethicsEscalation.queue');
 const AppError = require('../utils/AppError');
 
 const DEFAULT_RULES = [
@@ -17,26 +19,78 @@ const findConfig = async (department) => {
   return sortedQuery?.lean ? sortedQuery.lean() : sortedQuery;
 };
 
+const layerOneMatch = (prompt, configuredCategories) => {
+  const matches = DEFAULT_RULES.flatMap((rule) => {
+    if (!configuredCategories.has(rule.category)) return [];
+    const count = rule.patterns.filter((pattern) => pattern.test(prompt)).length;
+    return count ? [{ rule, count }] : [];
+  }).sort((left, right) => right.count - left.count);
+  if (!matches.length) return { category: 'other', severity: 'low', confidence: 0 };
+  const match = matches[0];
+  return {
+    category: match.rule.category,
+    severity: match.rule.severity,
+    confidence: 1,
+  };
+};
+
 const checkEthics = async ({ prompt, user, req }) => {
   const department = user?.dept || user?.department;
   const config = await findConfig(department);
   const configuredCategories = new Set(config?.prohibited_categories || DEFAULT_RULES.map((rule) => rule.category));
-  const violation = DEFAULT_RULES.find((rule) => configuredCategories.has(rule.category)
-    && rule.patterns.some((pattern) => pattern.test(prompt)));
+  const layerOne = layerOneMatch(prompt, configuredCategories);
+  const actor = user?._id || user?.id;
+  await logAction({
+    actor,
+    actor_role: user?.role || 'student',
+    action: 'ethics_layer1_classified',
+    resource_type: 'ethics_classifier',
+    department,
+    ip_address: req?.ip,
+    user_agent: req?.get?.('user-agent'),
+    metadata: { category: layerOne.category, confidence: layerOne.confidence, config_version: config?.version || null },
+    severity: 'info',
+  });
 
-  if (!violation) return { allowed: true };
+  let confirmed = layerOne.confidence >= 0.75;
+  let finalCategory = layerOne.category;
+  let finalSeverity = layerOne.severity;
+  let layerTwo = null;
+  if (layerOne.confidence < Number(process.env.ETHICS_LAYER2_THRESHOLD || 0.75)) {
+    try {
+      layerTwo = await classifyEthics({ prompt, category: layerOne.category });
+    } catch (error) {
+      layerTwo = { decision: 'BENIGN', provider: 'groq', error: error.message };
+    }
+    await logAction({
+      actor,
+      actor_role: user?.role || 'student',
+      action: 'ethics_layer2_classified',
+      resource_type: 'ethics_classifier',
+      department,
+      ip_address: req?.ip,
+      user_agent: req?.get?.('user-agent'),
+      metadata: { category: layerOne.category, decision: layerTwo.decision, provider: layerTwo.provider, layer1_confidence: layerOne.confidence },
+      severity: 'info',
+    });
+    confirmed = layerTwo.decision === 'VIOLATION';
+    finalCategory = layerOne.category;
+    finalSeverity = layerOne.category === 'other' ? 'low' : layerOne.severity;
+  }
 
-  const description = `Blocked LLM request matched ${violation.category}.`;
+  if (!confirmed) return { allowed: true };
+
+  const description = `Blocked LLM request matched ${finalCategory}.`;
   const flag = await EthicsFlag.create({
-    student: user?._id || user?.id,
+    student: actor,
     department: department || 'Unknown',
-    category: violation.category,
-    severity: violation.severity,
+    category: finalCategory,
+    severity: finalSeverity,
     description,
     trigger_content: prompt.slice(0, 1000),
   });
   await logAction({
-    actor: user?._id || user?.id,
+    actor,
     actor_role: user?.role || 'student',
     action: 'llm_request_blocked',
     resource_type: 'llm',
@@ -44,9 +98,13 @@ const checkEthics = async ({ prompt, user, req }) => {
     department,
     ip_address: req?.ip,
     user_agent: req?.get?.('user-agent'),
-    metadata: { category: violation.category },
-    severity: violation.severity === 'critical' ? 'critical' : 'warning',
+    metadata: { category: finalCategory, layer1_confidence: layerOne.confidence, layer2_decision: layerTwo?.decision || null },
+    severity: finalSeverity === 'critical' ? 'critical' : 'warning',
   });
+  const jobId = await enqueueEthicsEscalation({ flagId: flag._id, department, category: finalCategory, studentId: actor });
+  if (jobId && typeof EthicsFlag.findOneAndUpdate === 'function') {
+    await EthicsFlag.findOneAndUpdate({ _id: flag._id }, { hod_notification_job_id: jobId });
+  }
   throw new AppError('This request was blocked by the academic safety policy.', 403);
 };
 
@@ -60,4 +118,4 @@ const ethicsGuard = async (req, _res, next) => {
   }
 };
 
-module.exports = { checkEthics, ethicsGuard, DEFAULT_RULES };
+module.exports = { checkEthics, ethicsGuard, DEFAULT_RULES, layerOneMatch };

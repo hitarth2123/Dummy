@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle2, ChevronRight, LoaderCircle, Sparkles, Trophy, XCircle } from 'lucide-react';
+import { CheckCircle2, ChevronRight, LoaderCircle, Sparkles, Trophy, XCircle, BookOpen } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import { llmService } from '@services/api.service';
+import { llmService, studentService } from '@services/api.service';
 
 const HISTORY_KEY = 'ai-buddy-practice-attempts';
 
 const PracticeMCQ = () => {
   const [searchParams] = useSearchParams();
-  const [topic, setTopic] = useState(searchParams.get('topic') || 'Database normalization');
+  const querySubject = searchParams.get('subject') || 'DBMS';
+  const [topic, setTopic] = useState(searchParams.get('topic') || '');
+  const [selectedSubject, setSelectedSubject] = useState(querySubject);
+  const [catalog, setCatalog] = useState([]);
+  const [selectedSemester, setSelectedSemester] = useState(5);
   const [questions, setQuestions] = useState([]);
   const [sources, setSources] = useState([]);
   const [index, setIndex] = useState(0);
@@ -22,12 +26,46 @@ const PracticeMCQ = () => {
   const [error, setError] = useState('');
   const question = questions[index];
 
-  const generate = async (event) => {
-    event.preventDefault();
-    if (!topic.trim()) {
-      setError('');
-      return;
-    }
+  useEffect(() => {
+    studentService.getPracticeAttempts()
+      .then((response) => {
+        const serverAttempts = response.data || response;
+        if (Array.isArray(serverAttempts) && serverAttempts.length) {
+          setAttempts(serverAttempts.map((attempt) => ({
+            topic: attempt.topic,
+            subject: attempt.subject,
+            score: attempt.score,
+            total: attempt.total,
+            marks: `${attempt.score}/${attempt.total}`,
+            date: attempt.createdAt,
+          })));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    studentService.getCurriculum().then((response) => {
+      const data = response.data || response;
+      const semesters = data.catalog || [];
+      setCatalog(semesters);
+      const matchingSemester = semesters.find((semester) => (semester.specializations || []).some((specialization) => (specialization.subjects || []).some((subject) => subject.name === querySubject)));
+      setSelectedSemester(matchingSemester?.number || data.semester || 5);
+    }).catch(() => {});
+  }, [querySubject]);
+
+  const fallbackSubjects = [
+    { name: 'DBMS', topics: ['Database Fundamentals', 'ER Modeling', 'Normalization', 'SQL', 'Transactions and ACID'] },
+    { name: 'Operating Systems', topics: ['Processes and Threads', 'CPU Scheduling', 'Deadlocks', 'Memory Management'] },
+    { name: 'Computer Networks', topics: ['OSI Model', 'TCP/IP', 'Routing', 'Network Security'] },
+  ];
+  const activeCatalog = catalog.length ? catalog : [{ number: 5, specializations: [{ name: 'Common Core', subjects: fallbackSubjects }] }];
+  const activeSemester = activeCatalog.find((semester) => semester.number === Number(selectedSemester)) || activeCatalog[0];
+  const subjectOptions = (activeSemester?.specializations || []).flatMap((specialization) => specialization.subjects || []).filter((subjectOption, index, all) => all.findIndex((item) => item.name === subjectOption.name) === index);
+  const activeSubject = subjectOptions.find((subjectOption) => subjectOption.name === selectedSubject) || subjectOptions[0];
+  const topicOptions = activeSubject?.topics || [];
+
+  const generateWithTopic = async (topicToGenerate) => {
     setLoading(true);
     setError('');
     setQuestions([]);
@@ -37,7 +75,7 @@ const PracticeMCQ = () => {
     setSelected('');
     setSubmitted(false);
     try {
-      const response = await llmService.generateMcq({ topic, count: 5 });
+      const response = await llmService.generateMcq({ topic: topicToGenerate, count: 5 });
       const data = response.data || response;
       setQuestions((data.questions || []).slice(0, 5));
       setSources(data.rag_sources || []);
@@ -48,19 +86,31 @@ const PracticeMCQ = () => {
     }
   };
 
+  const generate = async (event) => {
+    if (event) event.preventDefault();
+    if (!topic.trim()) return;
+    await generateWithTopic(topic);
+  };
+
   const submitAnswer = () => {
     const nextScore = score + (selected === question.correct_answer ? 1 : 0);
     setScore(nextScore);
     setSubmitted(true);
   };
 
-  const nextQuestion = () => {
+  const nextQuestion = async () => {
     const finalQuestion = index >= questions.length - 1;
     if (finalQuestion) {
       const attempt = { topic, score, total: questions.length, marks: `${score}/${questions.length}`, date: new Date().toISOString() };
       const nextAttempts = [attempt, ...attempts].slice(0, 10);
       setAttempts(nextAttempts);
       localStorage.setItem(HISTORY_KEY, JSON.stringify(nextAttempts));
+      await studentService.savePracticeAttempt({
+        subject: selectedSubject,
+        topic,
+        score,
+        total: questions.length,
+      }).catch(() => {});
       setResult(attempt);
       return;
     }
@@ -71,47 +121,154 @@ const PracticeMCQ = () => {
 
   return (
     <section className="space-y-6">
-      <div>
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-700">Practice studio</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink">Practice MCQs</h1>
-        <p className="mt-2 text-slate-600">Answer five questions, then review your score and previous attempts.</p>
-      </div>
+      {/* Header */}
+      <section className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-r from-surface-container-low via-slate-900/90 to-surface-container p-6 text-on-surface shadow-panel sm:p-8">
+        <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+        <div className="relative z-10 flex items-center gap-4">
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-primary/15 text-primary border border-primary/30 shadow-glow">
+            <BookOpen size={24} />
+          </div>
+          <div className="min-w-0">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/15 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-primary border border-primary/30">
+              <Sparkles size={12} className="text-secondary" />
+              <span className="text-primary-fixed">Practice Studio</span>
+            </div>
+            <h1 className="mt-2 truncate text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+              MCQ <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-indigo-200">Generator</span>
+            </h1>
+          </div>
+        </div>
+        <p className="relative z-10 mt-3 max-w-2xl text-sm font-medium text-on-surface-variant">
+          Practice individual topics or generate questions covering an entire subject syllabus.
+        </p>
+      </section>
 
-      <form onSubmit={generate} className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-panel sm:flex-row">
-        <input value={topic} onChange={(event) => setTopic(event.target.value)} className="min-w-0 flex-1 rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-teal-600" placeholder="Topic" />
-        <button disabled={loading || !topic.trim()} className="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-700 px-5 py-3 text-sm font-semibold text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-60">
-          {loading && <LoaderCircle size={16} className="animate-spin" />} Generate 5 questions
+      <form onSubmit={generate} className="grid gap-4 rounded-2xl border border-surface-variant/40 bg-surface-container-low p-4 shadow-panel sm:grid-cols-2 lg:grid-cols-4">
+        <label className="block">
+          <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-outline">1. Select semester</span>
+          <select value={selectedSemester} onChange={(event) => { const semester = Number(event.target.value); const firstSubject = activeCatalog.find((item) => item.number === semester)?.specializations?.[0]?.subjects?.[0]?.name || ''; setSelectedSemester(semester); setSelectedSubject(firstSubject); setTopic(''); }} className="w-full rounded-xl border border-surface-variant/40 bg-surface-container px-4 py-3 text-sm text-white outline-none focus:border-primary">
+            {activeCatalog.map((semester) => <option key={semester.number} value={semester.number}>Semester {semester.number}</option>)}
+          </select>
+        </label>
+        <label className="block">
+          <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-outline">2. Select subject</span>
+          <select value={selectedSubject} onChange={(event) => { setSelectedSubject(event.target.value); setTopic(''); }} className="w-full rounded-xl border border-surface-variant/40 bg-surface-container px-4 py-3 text-sm text-white outline-none focus:border-primary">
+            {subjectOptions.map((subjectOption) => <option key={subjectOption.name} value={subjectOption.name}>{subjectOption.name}</option>)}
+          </select>
+        </label>
+        <label className="block">
+          <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-outline">3. Select topic</span>
+          <select required value={topic} onChange={(event) => setTopic(event.target.value)} disabled={!topicOptions.length} className="w-full rounded-xl border border-surface-variant/40 bg-surface-container px-4 py-3 text-sm text-white outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50">
+            <option value="" disabled>Choose a topic</option>
+            {topicOptions.map((topicOption) => <option key={topicOption} value={topicOption}>{topicOption}</option>)}
+          </select>
+        </label>
+        <button
+          type="submit"
+          disabled={loading || !topic.trim()}
+          className="inline-flex min-h-[48px] items-center justify-center gap-2 self-end rounded-xl bg-primary px-5 py-3 text-sm font-bold text-slate-950 hover:bg-primary-fixed disabled:cursor-not-allowed disabled:opacity-60 shadow-md transition"
+        >
+          {loading && <LoaderCircle size={16} className="animate-spin" />}
+          <span>4. Generate 5 Questions</span>
         </button>
       </form>
 
-      {error && <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm text-red-700">{error}</p>}
+      {error && <p role="alert" className="rounded-xl bg-error-container/15 p-4 text-sm text-error">{error}</p>}
 
       {result && (
-        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center shadow-panel">
-          <Trophy className="mx-auto text-emerald-700" size={30} />
-          <p className="mt-2 text-xs font-semibold uppercase tracking-wider text-emerald-700">Practice complete</p>
-          <h2 className="mt-1 text-3xl font-bold text-ink">{result.score} / {result.total} correct</h2>
-          <p className="mt-1 text-sm text-emerald-800">Topic: {result.topic}</p>
+        <section className="rounded-2xl border border-emerald-200 bg-secondary-container/10 p-6 text-center shadow-panel">
+          <Trophy className="mx-auto text-secondary" size={30} />
+          <p className="mt-2 text-xs font-semibold uppercase tracking-wider text-secondary">Practice complete</p>
+          <h2 className="mt-1 text-3xl font-bold text-on-surface">{result.score} / {result.total} correct</h2>
+          <p className="mt-1 text-sm text-emerald-300">Topic: {result.topic}</p>
           <button type="button" onClick={() => { setResult(null); setQuestions([]); }} className="mt-4 rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800">Try another set</button>
         </section>
       )}
 
       {question && !result && (
-        <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-panel sm:p-8">
-          <div className="flex flex-wrap items-center justify-between gap-2"><span className="text-sm font-medium text-slate-500">Question {index + 1} of {questions.length}</span><span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold capitalize text-amber-800">{question.difficulty || 'medium'}</span></div>
-          <h2 className="mt-6 text-xl font-semibold text-ink">{question.question_text}</h2>
-          <div className="mt-5 grid gap-3">{question.options.map((option) => <label key={option.label} className={`flex items-start gap-3 rounded-xl border p-4 text-sm ${selected === option.label ? 'border-teal-600 bg-teal-50' : 'border-slate-200 hover:bg-slate-50'}`}><input type="radio" name="answer" value={option.label} checked={selected === option.label} onChange={(event) => setSelected(event.target.value)} disabled={submitted} className="mt-1 accent-teal-700" /><span><b>{option.label}.</b> {option.text}</span></label>)}</div>
-          {submitted && <div className={`mt-5 rounded-xl p-4 text-sm ${selected === question.correct_answer ? 'bg-emerald-50 text-emerald-800' : 'bg-red-50 text-red-800'}`}>{selected === question.correct_answer ? <CheckCircle2 className="mr-2 inline" size={18} /> : <XCircle className="mr-2 inline" size={18} />}{selected === question.correct_answer ? 'Correct.' : `Correct answer: ${question.correct_answer}.`} {question.explanation}</div>}
-          <div className="mt-6 flex items-center justify-between gap-3"><div className="flex flex-wrap gap-2">{sources.slice(0, 2).map((source) => <span key={source.chunk_id} className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">Source: {source.source_document || source.chunk_id}</span>)}</div>{!submitted ? <button type="button" disabled={!selected} onClick={submitAnswer} className="inline-flex items-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40">Check answer</button> : <button type="button" onClick={nextQuestion} className="inline-flex items-center gap-2 rounded-xl bg-teal-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-800">{index === questions.length - 1 ? 'View score' : 'Next question'} <ChevronRight size={16} /></button>}</div>
+        <article className="rounded-2xl border border-surface-variant/40 bg-surface-container-low p-6 shadow-panel sm:p-8 space-y-6">
+          <div className="flex items-center justify-between text-xs text-outline">
+            <span className="font-bold uppercase tracking-wider text-primary">Question {index + 1} of {questions.length}</span>
+            <span>Target: {topic}</span>
+          </div>
+
+          <h2 className="text-xl font-bold text-on-surface leading-relaxed">{question.question_text || question.question}</h2>
+
+          <div className="space-y-3">
+            {(question.options || []).map((opt) => {
+              const label = typeof opt === 'string' ? opt : opt.text || opt.label;
+              const value = typeof opt === 'string' ? opt : opt.label || opt.text;
+              const isSelected = selected === value;
+              const isCorrect = question.correct_answer === value;
+
+              let btnStyle = 'border-surface-variant/40 bg-surface-container text-on-surface hover:border-primary/50';
+              if (submitted) {
+                if (isCorrect) btnStyle = 'border-emerald-500 bg-emerald-500/15 text-emerald-300 font-bold';
+                else if (isSelected) btnStyle = 'border-rose-500 bg-rose-500/15 text-rose-300';
+              } else if (isSelected) {
+                btnStyle = 'border-primary bg-primary/20 text-white font-bold ring-1 ring-primary';
+              }
+
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  disabled={submitted}
+                  onClick={() => setSelected(value)}
+                  className={`flex w-full items-center justify-between rounded-xl border p-4 text-left text-sm transition ${btnStyle}`}
+                >
+                  <span className="flex items-center gap-3">
+                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-surface-container-low text-xs font-bold text-primary">{value.slice(0, 1)}</span>
+                    {label}
+                  </span>
+                  {submitted && isCorrect && <CheckCircle2 size={18} className="text-emerald-400 shrink-0" />}
+                  {submitted && isSelected && !isCorrect && <XCircle size={18} className="text-rose-400 shrink-0" />}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center justify-between pt-4 border-t border-surface-variant/30">
+            {!submitted ? (
+              <button
+                type="button"
+                disabled={!selected}
+                onClick={submitAnswer}
+                className="ml-auto rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-slate-950 hover:bg-primary-fixed disabled:opacity-40 transition shadow-md"
+              >
+                Submit Answer
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={nextQuestion}
+                className="ml-auto inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-slate-950 hover:bg-primary-fixed transition shadow-md"
+              >
+                <span>{index < questions.length - 1 ? 'Next Question' : 'View Results'}</span>
+                <ChevronRight size={16} />
+              </button>
+            )}
+          </div>
         </article>
       )}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-panel">
-        <div className="flex items-center gap-2"><Trophy size={18} className="text-amber-600" /><h2 className="text-lg font-bold text-ink">Previous practice quizzes</h2></div>
-        {attempts.length > 0 ? <div className="mt-4 divide-y divide-slate-100">{attempts.map((attempt) => <div key={`${attempt.date}-${attempt.topic}`} className="flex items-center justify-between gap-4 py-3"><div><p className="text-sm font-semibold text-ink">{attempt.topic}</p><p className="text-xs text-slate-500">{new Date(attempt.date).toLocaleDateString()}</p></div><span className="rounded-full bg-teal-50 px-3 py-1 text-sm font-bold text-teal-800">{attempt.marks}</span></div>)}</div> : <p className="mt-3 text-sm text-slate-500">Your attempted quizzes will appear here with their topic and marks.</p>}
-      </section>
-
-      {!question && !result && !loading && <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-500"><Sparkles className="mx-auto mb-3 text-amber-600" /><p>Choose a topic to begin.</p></div>}
+      {/* History */}
+      {attempts.length > 0 && (
+        <div className="rounded-2xl border border-surface-variant/40 bg-surface-container-low p-6 shadow-panel space-y-4">
+          <h3 className="font-bold text-base text-on-surface">Recent Practice History</h3>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {attempts.map((attempt, i) => (
+              <div key={i} className="flex items-center justify-between rounded-xl border border-surface-variant/30 bg-surface-container p-3.5 text-xs">
+                <div>
+                  <p className="font-bold text-on-surface truncate max-w-[180px]">{attempt.topic}</p>
+                  <p className="text-outline mt-0.5">{new Date(attempt.date).toLocaleDateString()}</p>
+                </div>
+                <span className="rounded-full bg-primary/15 px-3 py-1 font-bold text-primary border border-primary/30">{attempt.marks}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 };

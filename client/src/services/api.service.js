@@ -152,7 +152,11 @@ export const authService = {
 };
 
 export const studentService = {
+  getProfile:       ()    => api.get('/student/profile').then(r => r.data),
+  getProfileChangeRequests: () => api.get('/student/profile-change-requests').then(r => r.data),
+  createProfileChangeRequest: (data) => api.post('/student/profile-change-requests', data).then(r => r.data),
   getDashboard:    ()    => api.get('/student/dashboard').then(r => r.data),
+  getCurriculum:   ()    => api.get('/student/curriculum').then(r => r.data),
   getSubjects:     ()    => api.get('/student/subjects').then(r => r.data),
   getLearningPath: (params) => api.get('/student/learning-path', { params }).then(r => r.data),
   completeLearningPathTopic: (data) => api.patch('/student/learning-path/topic', data).then(r => r.data),
@@ -160,6 +164,8 @@ export const studentService = {
   getQuestionSets: (params) => api.get('/student/question-bank/sets', { params }).then(r => r.data),
   toggleBookmark:  (id)  => api.post(`/student/question-bank/${id}/bookmark`).then(r => r.data),
   getMockTestHistory: () => api.get('/student/mock-tests').then(r => r.data),
+  getPracticeAttempts: () => api.get('/student/practice-attempts').then(r => r.data),
+  savePracticeAttempt: (data) => api.post('/student/practice-attempts', data).then(r => r.data),
   getMockTestResults: (id) => api.get(`/student/mock-test/${id}/results`).then(r => r.data),
   bookSession:     (data) => api.post('/student/sessions/book', data).then(r => r.data),
   getSessions:     ()    => api.get('/student/sessions').then(r => r.data),
@@ -174,6 +180,8 @@ export const facultyService = {
   getRequests:      () => api.get('/faculty/session-requests').then(r => r.data),
   updateRequest:    (id, data) => api.put(`/faculty/session-requests/${id}`, data).then(r => r.data),
   getSessions:      () => api.get('/faculty/sessions').then(r => r.data),
+  getProfileChangeRequests: () => api.get('/faculty/profile-change-requests').then(r => r.data),
+  reviewProfileChangeRequest: (id, data) => api.patch(`/faculty/profile-change-requests/${id}`, data).then(r => r.data),
 };
 
 export const adminService = {
@@ -188,11 +196,13 @@ export const mockTestService = {
 
 export const learningPathService = {
   generate: (data) => api.post('/llm/learning-path/generate', data).then(r => r.data),
+  generateTopic: (data) => api.post('/llm/learning-path/topic/generate', data).then(r => r.data),
 };
 
 export const llmService = {
   chat:     (data) => api.post('/llm/chat', data).then(r => r.data),
   generateMcq: (data) => api.post('/llm/mcq/generate', data).then(r => r.data),
+  generateQuestionSets: (data) => api.post('/llm/question-bank/generate-sets', data).then(r => r.data),
   summarise:(data) => api.post('/llm/summarise', data).then(r => r.data),
   explain:  (data) => api.post('/llm/explain', data).then(r => r.data),
 };

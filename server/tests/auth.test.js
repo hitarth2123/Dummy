@@ -8,8 +8,6 @@ process.env.MAILER_USER = 'test';
 process.env.MAILER_PASS = 'test';
 process.env.MAILER_FROM = 'test@example.com';
 process.env.CLIENT_URL = 'http://localhost:5173';
-process.env.GEMINI_API_KEY = 'test-gemini-key';
-process.env.GROQ_API_KEY = 'test-groq-key';
 
 jest.mock('../src/models/User', () => ({
   findOne: jest.fn(),
