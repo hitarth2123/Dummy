@@ -293,7 +293,7 @@ const bookSession = catchAsync(async (req, res) => {
     if (slot) await FacultyAvailability.updateOne({ faculty: faculty_id, 'slots._id': slot._id, 'slots.booked_by': req.user.id }, { $set: { 'slots.$.is_booked': false, 'slots.$.booked_by': null } });
     throw error;
   }
-  await sendFacultyRequest(faculty.email, { FACULTY_NAME: faculty.name, STUDENT_NAME: student?.name || 'Student', SUBJECT: subject, TOPIC: topic || 'General doubt', DESCRIPTION: description, SCHEDULED_AT: scheduled.toLocaleString() }).catch(() => {});
+  await sendFacultyRequest(faculty.email, { FACULTY_NAME: faculty.name, STUDENT_NAME: student?.name || 'Student', SUBJECT: subject, TOPIC: topic || 'General doubt', DESCRIPTION: description, SCHEDULED_AT: scheduled.toLocaleString() }).catch((error) => console.error(`[Mailer] Faculty request notification failed: ${error.message}`));
   return res.status(201).json({ success: true, data: session });
 });
 

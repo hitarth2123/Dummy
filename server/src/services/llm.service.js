@@ -17,7 +17,10 @@ const groqApiKeys = () => [...new Set([
   process.env.GROQ_API_KEY,
   process.env.groq_api,
 ].map((key) => key?.trim()).filter(Boolean))].slice(0, 4);
-const groqApiKey = () => groqApiKeys()[0];
+const groqApiKey = () => {
+  const keys = groqApiKeys();
+  return keys.length ? keys[Math.floor(Math.random() * keys.length)] : undefined;
+};
 const preferredModels = ['openai/gpt-oss-20b', 'openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'llama-3.1-8b-instant'];
 
 const requestChat = (model, messages, temperature, apiKey) => fetch(`${groqBaseUrl()}/chat/completions`, {
@@ -61,41 +64,59 @@ const chat = async (prompt, options = {}) => {
   ];
   const useApinex = options.provider === 'apinex'
     || (!options.provider && !options.apiKey && apinexApiKey());
-  const apiKey = options.apiKey || (useApinex ? apinexApiKey() : groqApiKey());
-  if (!apiKey) {
+  
+  const availableKeys = useApinex ? [options.apiKey || apinexApiKey()] : (options.apiKey ? [options.apiKey] : groqApiKeys());
+  if (!availableKeys.length || !availableKeys[0]) {
     const missing = new Error(`${useApinex ? 'APINEX_API_KEY' : 'GROQ_API_KEY'} is not configured`);
     missing.statusCode = 503;
     throw missing;
   }
+
   const requestedModel = options.model || (useApinex ? apinexModel() : groqModel());
   let response;
-  try {
-    response = useApinex
-      ? await requestApinexChat(requestedModel, messages, options.temperature ?? 0.2, apiKey)
-      : await requestChat(requestedModel, messages, options.temperature ?? 0.2, apiKey);
-    if (!useApinex && response.status === 404 && !options.model) {
-      const availableModel = await findAvailableModel(apiKey);
-      if (availableModel && availableModel !== requestedModel) {
-        response = await requestChat(availableModel, messages, options.temperature ?? 0.2, apiKey);
+  let lastError = null;
+
+  for (const currentApiKey of availableKeys) {
+    try {
+      response = useApinex
+        ? await requestApinexChat(requestedModel, messages, options.temperature ?? 0.2, currentApiKey)
+        : await requestChat(requestedModel, messages, options.temperature ?? 0.2, currentApiKey);
+
+      if (!useApinex && response.status === 404 && !options.model) {
+        const availableModel = await findAvailableModel(currentApiKey);
+        if (availableModel && availableModel !== requestedModel) {
+          response = await requestChat(availableModel, messages, options.temperature ?? 0.2, currentApiKey);
+        }
       }
+
+      if (response.ok) {
+        lastError = null;
+        break; // Success! Break out of the retry loop.
+      } else if (response.status !== 429 && response.status !== 401) {
+        break; // Non-retryable error (e.g., 400 Bad Request)
+      }
+    } catch (error) {
+      lastError = error;
+      // Network error, try the next key if available
     }
-  } catch (error) {
-    const unavailable = new Error(
-      `${useApinex ? 'Apinex' : 'Groq'} is unavailable: ${error.message}`
-    );
+  }
+
+  if (lastError && !response) {
+    const unavailable = new Error(`${useApinex ? 'Apinex' : 'Groq'} is unavailable: ${lastError.message}`);
     unavailable.statusCode = 503;
     throw unavailable;
   }
-  if (!response.ok) {
+
+  if (!response || !response.ok) {
     let details = '';
     try {
-      const errorBody = await response.json();
+      const errorBody = await response ? await response.json() : {};
       details = errorBody.error?.message || errorBody.message || JSON.stringify(errorBody);
     } catch {
-      details = response.statusText || '';
+      details = response ? response.statusText : 'Unknown Error';
     }
     throw new Error(
-      `${useApinex ? 'Apinex' : 'Groq'} request failed with status ${response.status} for model ${requestedModel}`
+      `${useApinex ? 'Apinex' : 'Groq'} request failed with status ${response ? response.status : 'unknown'} for model ${requestedModel}`
       + (details ? `: ${details}` : '')
     );
   }

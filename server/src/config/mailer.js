@@ -29,8 +29,8 @@ const verifyMailer = async () => {
 		console.log(`[Mailer] SMTP transporter verified on ${smtp.host}:${smtp.port}`);
 	} catch (error) {
 		console.error(`[Mailer] SMTP verification failed: ${error.message}`);
-		if (env.NODE_ENV === 'development' && env.MAILER_STRICT_STARTUP !== 'true') {
-			console.warn('[Mailer] Continuing in development; set MAILER_STRICT_STARTUP=true to fail startup on SMTP errors.');
+		if (env.NODE_ENV === 'production' && env.MAILER_STRICT_STARTUP !== 'true') {
+			console.warn('[Mailer] Continuing in production; set MAILER_STRICT_STARTUP=true to fail startup on SMTP errors.');
 			return;
 		}
 		process.exit(1);

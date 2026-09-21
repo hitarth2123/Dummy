@@ -9,6 +9,7 @@
     "start": "node server.js",
     "predev": "node ../scripts/freePorts.js 3000 5012",
     "dev": "nodemon --ignore src/dataset --ignore src/config server.js",
+    "build": "node ../scripts/validateServerBuild.js",
     "validate:env": "node ../scripts/validateEnv.js",
     "seed": "node ../scripts/seedDb.js",
     "ingest": "node ../scripts/ingestContent.js",

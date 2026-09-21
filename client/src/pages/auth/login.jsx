@@ -124,7 +124,7 @@ const Login = () => {
               <div className="flex flex-wrap gap-1.5">
                 {[
                   { role: 'Student', email: 'student@seed.dev', pass: 'Student@12345' },
-                  { role: 'Faculty', email: 'faculty@seed.dev', pass: 'Faculty@12345' },
+                  { role: 'Faculty', email: '2024.hitarthp@isu.ac.in', pass: 'Faculty@12345' },
                   { role: 'HOD', email: 'hod@seed.dev', pass: 'Hod@12345' },
                   { role: 'Admin', email: 'admin@seed.dev', pass: 'Admin@12345' },
                 ].map(({ role, email, pass }) => (

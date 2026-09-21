@@ -922,5 +922,29 @@
     ],
     "created_at": "2026-09-20T10:40:03.910Z",
     "updated_at": "2026-09-20T10:40:03.910Z"
+  },
+  {
+    "conversation_id": "6ab0cf7e3046ee0a5861df3e",
+    "user_id": "6ab0cf40b7de8f746f15f169",
+    "title": "shivam ka mtlab / Core Concepts",
+    "topic": "shivam ka mtlab",
+    "subtopic": "Core Concepts",
+    "sequence": 27,
+    "messages": [
+      {
+        "sequence": 1,
+        "role": "user",
+        "content": "shivam ka mtlab",
+        "created_at": "2026-09-21T06:32:31.545Z"
+      },
+      {
+        "sequence": 2,
+        "role": "assistant",
+        "content": "**Shivam** (शिवम्) is a Sanskrit‑derived name that is commonly used in India.  \nIt literally means **“auspicious,” “good,” “pure,”** or **“peaceful.”**  \n\nThe word is closely related to **Shiva** (the Hindu deity), and it carries connotations of:\n\n| Aspect | Meaning |\n|--------|---------|\n| **Auspicious / Blessed** | Something that brings good fortune. |\n| **Pure / Clean** | Free from impurity or sin. |\n| **Peaceful / Harmonious** | Calm, serene, and balanced. |\n| **Beautiful / Good** | Often used to describe something that is morally or aesthetically pleasing. |\n\nIn everyday usage, parents often choose the name Shivam for a boy to wish him a life that is **harmonious, virtuous, and blessed**.  \n\n**Sources**  \n- Sanskrit dictionary definitions (e.g., *Monier-Williams Sanskrit-English Dictionary*).  \n- Common name‑meaning resources such as *Behind the Name* and *BabyNames.com* that list “Shivam” as meaning “auspicious, good, pure.”",
+        "created_at": "2026-09-21T06:32:31.545Z"
+      }
+    ],
+    "created_at": "2026-09-21T06:32:31.545Z",
+    "updated_at": "2026-09-21T06:32:31.545Z"
   }
 ]

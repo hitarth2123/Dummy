@@ -213,7 +213,7 @@ Development accounts:
 |---|---|---|
 | Admin | `admin@seed.dev` | `Admin@12345` |
 | HOD | `hod@seed.dev` | `Hod@12345` |
-| Faculty, Computer Science | `faculty@seed.dev` | `Faculty@12345` |
+| Faculty, Computer Science | `2024.hitarthp@isu.ac.in` | `Faculty@12345` |
 | Faculty, ECE | `faculty.ece@seed.dev` | `FacultyEce@12345` |
 | Student, Computer Science | `student@seed.dev` | `Student@12345` |
 | Student, ECE | `student.two@seed.dev` | `StudentTwo@12345` |

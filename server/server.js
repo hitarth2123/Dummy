@@ -6,6 +6,7 @@ const { connectDB }       = require('./src/config/db');
 const { checkIndexExists }= require('./src/config/vectorDb');
 const { verifyMailer }     = require('./src/config/mailer');
 const app                 = require('./app');
+const { startEmailWorker } = require('./src/jobs/email.worker');
 
 // ── Cron Jobs ─────────────────────────────────────────────────────────────────
 require('./src/jobs/lockoutCron');
@@ -16,6 +17,7 @@ const start = async () => {
   await verifyMailer();
   await connectDB();
   await checkIndexExists();   // non-blocking warning if index missing
+  startEmailWorker();
 
 
   const PORT = env.PORT || 5000;

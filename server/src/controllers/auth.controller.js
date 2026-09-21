@@ -127,8 +127,7 @@ const exchangeSsoCode = async (code) => {
 const getSsoProfile = async (req) => {
   const devEmail = req.body?.devEmail;
   const devPassword = req.body?.devPassword;
-  const devLoginEnabled = process.env.NODE_ENV !== 'production'
-    && process.env.DEV_LOGIN_ENABLED !== 'false';
+  const devLoginEnabled = process.env.DEV_LOGIN_ENABLED !== 'false';
   if (devEmail && devLoginEnabled) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(devEmail.trim())) {
       throw new AppError('Please enter a valid email address.', 400);

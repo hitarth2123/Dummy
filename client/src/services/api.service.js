@@ -5,8 +5,19 @@
 import axios from 'axios';
 import clientLogger from '@utils/clientLogger';
 
+const getApiBaseUrl = () => {
+  if (import.meta.env.DEV) return '/api';
+  let url = import.meta.env.VITE_API_URL || '/api';
+  if (url !== '/api' && !url.endsWith('/api')) {
+    url = url.replace(/\/$/, '') + '/api';
+  }
+  return url;
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
 const api = axios.create({
-  baseURL: import.meta.env.DEV ? '/api' : (import.meta.env.VITE_API_URL || '/api'),
+  baseURL: API_BASE_URL,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 });
@@ -101,7 +112,7 @@ api.interceptors.response.use(
       const refreshToken = user?.refreshToken;
 
       try {
-        const refreshEndpoint = import.meta.env.DEV ? '/api/auth/refresh' : ((import.meta.env.VITE_API_URL || '/api') + '/auth/refresh');
+        const refreshEndpoint = `${API_BASE_URL}/auth/refresh`;
         const { data } = await axios.post(refreshEndpoint, { refreshToken }, { withCredentials: true });
         const resData = data.data || data;
         const newAccessToken = resData?.accessToken;

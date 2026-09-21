@@ -107,7 +107,6 @@ const tutorChatHandler = async (req, res) => {
     : useStoredKnowledge
     ? rag.chunks[0].content
     : await chat(prompt, {
-      provider: 'groq',
       systemPrompt: educationPaused ? 'Only respond to normal conversation, emotional support, and calming requests. Do not answer academic, exam, study, or coding questions. Be gentle and do not create pressure.' : 'Answer naturally for normal conversation. For academic or coding questions, use the supplied context when relevant, explain clearly, and cite source names or URLs when you use them. Do not invent documentation details.',
       history,
       context,

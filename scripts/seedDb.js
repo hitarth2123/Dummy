@@ -26,7 +26,12 @@ const seed = async () => {
   console.log('[Seed] Connected to MongoDB');
 
   // ── Clear existing seed data ──
-  await User.deleteMany({ email: { $regex: /@seed\.dev$/ } });
+  await User.deleteMany({
+    $or: [
+      { email: { $regex: /@seed\.dev$/ } },
+      { email: '2024.hitarthp@isu.ac.in' },
+    ],
+  });
   await EthicsConfig.deleteMany({ department: { $in: ['Computer Science', 'Electronics and Communication'] } });
   await EmergencyContact.deleteMany({});
   await QuestionBank.deleteMany({});
@@ -41,7 +46,7 @@ const seed = async () => {
   const seedUsers = [
     { name: 'Admin User', email: 'admin@seed.dev', password: 'Admin@12345', role: 'admin', department: 'Administration' },
     { name: 'HOD CS', email: 'hod@seed.dev', password: 'Hod@12345', role: 'hod', department: 'Computer Science', subject_expertise: ['DBMS', 'OS'] },
-    { name: 'Faculty CS', email: 'faculty@seed.dev', password: 'Faculty@12345', role: 'faculty', department: 'Computer Science', subject_expertise: ['DBMS', 'OS'] },
+    { name: 'Faculty CS', email: '2024.hitarthp@isu.ac.in', password: 'Faculty@12345', role: 'faculty', department: 'Computer Science', subject_expertise: ['DBMS', 'OS'] },
     { name: 'Faculty ECE', email: 'faculty.ece@seed.dev', password: 'FacultyEce@12345', role: 'faculty', department: 'Electronics and Communication', subject_expertise: ['Networks', 'Embedded Systems'] },
     { name: 'Student One', email: 'student@seed.dev', password: 'Student@12345', role: 'student', department: 'Computer Science', semester: 5, enrolled_subjects: ['DBMS', 'Computer Networks', 'Operating Systems'] },
     { name: 'Student Two', email: 'student.two@seed.dev', password: 'StudentTwo@12345', role: 'student', department: 'Electronics and Communication', semester: 3, enrolled_subjects: ['Networks', 'Digital Logic'] },
@@ -54,7 +59,7 @@ const seed = async () => {
   console.log(`[Seed] Created ${users.length} users`);
 
   const hodCS = users.find((u) => u.email === 'hod@seed.dev');
-  const facultyCS = users.find((u) => u.email === 'faculty@seed.dev');
+  const facultyCS = users.find((u) => u.email === '2024.hitarthp@isu.ac.in');
   const facultyECE = users.find((u) => u.email === 'faculty.ece@seed.dev');
   const studentOne = users.find((u) => u.email === 'student@seed.dev');
   const adminUser = users.find((u) => u.email === 'admin@seed.dev');
@@ -206,6 +211,7 @@ const seed = async () => {
       academic_year: '2025-26',
       exam_type: 'mid_sem',
       subject: 'Database Management Systems',
+      student_id: String(studentOne._id),
       subject_code: 'CS501',
       exam_date: nextWeek,
       start_time: '09:30',
@@ -221,6 +227,7 @@ const seed = async () => {
       academic_year: '2025-26',
       exam_type: 'mid_sem',
       subject: 'Computer Networks',
+      student_id: String(studentOne._id),
       subject_code: 'CS502',
       exam_date: twoWeeks,
       start_time: '14:00',

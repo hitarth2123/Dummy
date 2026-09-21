@@ -41,6 +41,7 @@ const renderTemplate = (templateName, extension, vars = {}) => {
 
 const loadTemplate = (templateName, vars = {}) => renderTemplate(templateName, 'html', vars);
 const loadTextTemplate = (templateName, vars = {}) => renderTemplate(templateName, 'txt', vars);
+const facultyRecipient = (recipient) => process.env.FACULTY_NOTIFICATION_EMAIL || recipient;
 
 const sendTemplatedMail = async (to, subject, templateName, vars, triggerId) => {
   const jobId = await enqueueEmail({ triggerId, to, subject, templateName, vars });
@@ -52,8 +53,9 @@ const sendTemplatedMail = async (to, subject, templateName, vars, triggerId) => 
  * Convenience senders for specific email types.
  */
 const sendSessionConfirmed  = (to, vars) => sendTemplatedMail(to, 'Session Confirmed', 'session_confirmed', vars, 'E-01');
+const sendFacultySessionConfirmed = (to, vars) => sendTemplatedMail(facultyRecipient(to), 'Session Confirmed', 'session_confirmed', vars, 'E-01');
 const sendSessionDeclined   = (to, vars) => sendTemplatedMail(to, 'Session Declined', 'session_declined', vars, 'E-02');
-const sendFacultyRequest    = (to, vars) => sendTemplatedMail(to, 'New Session Request', 'faculty_session_request', vars, 'E-03');
+const sendFacultyRequest    = (to, vars) => sendTemplatedMail(facultyRecipient(to), 'New Session Request', 'faculty_session_request', vars, 'E-03');
 const sendEthicsEscalation  = (to, vars) => sendTemplatedMail(to, 'Ethics Alert', 'ethics_escalation', vars, 'E-04');
 const sendGrievanceEscalation = (to, vars) => sendTemplatedMail(to, 'Grievance Update', 'grievance_escalation', vars, 'E-06');
 const sendDistressAlert     = (to, vars) => sendTemplatedMail(to, 'Distress Alert', 'distress_alert', vars, 'E-07');
@@ -65,6 +67,7 @@ module.exports = {
   loadTemplate,
   loadTextTemplate,
   sendSessionConfirmed,
+  sendFacultySessionConfirmed,
   sendSessionDeclined,
   sendFacultyRequest,
   sendEthicsEscalation,

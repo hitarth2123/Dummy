@@ -4,7 +4,7 @@ const DoubtSession = require('../models/DoubtSession');
 const User = require('../models/User');
 const ProfileChangeRequest = require('../models/ProfileChangeRequest');
 const { createMeetingLink, getConfiguredZoomLink } = require('../services/meeting.service');
-const { sendSessionConfirmed, sendSessionDeclined, sendMail } = require('../services/mailer.service');
+const { sendSessionConfirmed, sendFacultySessionConfirmed, sendSessionDeclined, sendMail } = require('../services/mailer.service');
 
 const getAvailability = catchAsync(async (req, res) => {
   const availability = await FacultyAvailability.findOneAndUpdate(
@@ -103,7 +103,7 @@ const updateSession = catchAsync(async (req, res) => {
       { faculty: req.user.id, 'slots.day_of_week': day, 'slots.start_time': time, 'slots.booked_by': session.student._id },
       { $set: { 'slots.$.is_booked': false, 'slots.$.booked_by': null } }
     );
-    await sendSessionDeclined(session.student.email, { STUDENT_NAME: session.student.name, FACULTY_NAME: session.faculty.name, SUBJECT: session.subject, SCHEDULED_AT: session.scheduled_at.toLocaleString(), REASON: session.decline_reason }).catch(() => {});
+    await sendSessionDeclined(session.student.email, { STUDENT_NAME: session.student.name, FACULTY_NAME: session.faculty.name, SUBJECT: session.subject, SCHEDULED_AT: session.scheduled_at.toLocaleString(), REASON: session.decline_reason }).catch((error) => console.error(`[Mailer] Session decline notification failed: ${error.message}`));
   } else if (action === 'confirm') {
     const meeting = await createMeetingLink(session);
     session.status = 'confirmed';
@@ -112,7 +112,7 @@ const updateSession = catchAsync(async (req, res) => {
     session.meeting_platform = meeting.platform;
     await session.save();
     const vars = { STUDENT_NAME: session.student.name, FACULTY_NAME: session.faculty.name, SUBJECT: session.subject, TOPIC: session.topic || 'Doubt session', SCHEDULED_AT: session.scheduled_at.toLocaleString(), MEETING_LINK: meeting.url, NOTE: meeting.fallback ? 'Link generation failed at the provider; use the fallback meeting link.' : '' };
-    await Promise.all([sendSessionConfirmed(session.student.email, vars), sendSessionConfirmed(session.faculty.email, vars)]).catch(() => {});
+    await Promise.all([sendSessionConfirmed(session.student.email, vars), sendFacultySessionConfirmed(session.faculty.email, vars)]).catch((error) => console.error(`[Mailer] Session confirmation notification failed: ${error.message}`));
   } else {
     await session.save();
   }
